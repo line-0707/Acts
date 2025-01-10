@@ -15,60 +15,6 @@
 		</script>
 	  </head>
 	  <body>
-		<div align="center">
-		  <button id="allow_push_notification">トークン取得</button>
-		</div>
-		  <p id="output"></p>
-		  <script type="module">
-			  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-			  import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
-	  
-			  // Your web app's Firebase configuration
-			  const firebaseConfig = {
-				apiKey: "AIzaSyBU4w8tyZCI_72ilhWeztfx5hXrwXnZVTI",
-    			authDomain: "acts-f710f.firebaseapp.com",
-    			projectId: "acts-f710f",
-    			storageBucket: "acts-f710f.firebasestorage.app",
-    			messagingSenderId: "1026378966831",
-    			appId: "1:1026378966831:web:883700b9bc8bbe425723da"
-			  };
-	  
-			  // Initialize Firebase
-			  const app = initializeApp(firebaseConfig);
-	  
-			  // 通知を許可するボタンが押された時のアクション
-			  const btn = document.getElementById('allow_push_notification');
-			  btn.addEventListener("click", function () {
-				  //let promise = Notification.requestPermission();
-				  //console.log("promise: ",promise);
-				  if (!("Notification" in window)) {
-					  // ブラウザーが通知に対応しているか調べる
-					  alert("このブラウザーはデスクトップ通知には対応していません。");
-				  } else if (Notification.permission !== "denied") {
-	  
-				  //if(Notification.permission !== "denied") {
-					  Notification.requestPermission().then((permission) => {
-						  const messaging = getMessaging();
-						  // Add the public key generated from the console here.
-						  getToken(messaging, {vapidKey: "BF0T2Ho6_tkk3umRfHgE4dYvP440uguOvlgXvVqUBA0V44efi_mv-W93G8FDszAyZ--9hIHP-RVjgTIjPNB3b8M"})
-							  .then((token) => {
-								  if (token) {
-									  // tokenを出力
-									  //document.getElementById('output').textContent = `${token.Promise}`;
-									  console.log( "token", token);
-									  document.getElementById('output').textContent = token;
-								  }else{
-									  console.log('登録トークンがありません。生成する許可をリクエストします。');
-								  }
-							  })
-							  .catch((err) => {
-								  console.log('getToken Error',err);
-							  });
-					  });
-				  }
-			  });
-		  </script>
-	  </body>
 	<STYLE> 
  .stl_ sup {
 	vertical-align: baseline;
