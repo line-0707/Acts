@@ -2,9 +2,39 @@
 <html>
 	<head>
 		<meta charset="utf-8" />
-		<title>
-		</title>
-		
+	<meta charset="utf-8" />
+    <title>プッシュ通知のテスト</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+    	apiKey: "AIzaSyBU4w8tyZCI_72ilhWeztfx5hXrwXnZVTI",
+    	authDomain: "acts-f710f.firebaseapp.com",
+    	projectId: "acts-f710f",
+    	storageBucket: "acts-f710f.firebasestorage.app",
+    	messagingSenderId: "1026378966831",
+    	appId: "1:1026378966831:web:883700b9bc8bbe425723da"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const messaging = firebase.messaging();
+
+        function requestNotificationPermission() {
+            messaging.getToken({ vapidKey: 'BF0T2Ho6_tkk3umRfHgE4dYvP440uguOvlgXvVqUBA0V44efi_mv-W93G8FDszAyZ--9hIHP-RVjgTIjPNB3b8M' })
+                .then((currentToken) => {
+                    if (currentToken) {
+                        console.log('Notification Token:', currentToken);
+                        // トークンをサーバーに送信
+                    } else {
+                        console.log('通知トークンが取得できませんでした。');
+                    }
+                })
+                .catch((err) => {
+                    console.error('トークン取得エラー:', err);
+                });
+        }
+    </script>
 	<STYLE> 
  .stl_ sup {
 	vertical-align: baseline;
