@@ -4,12 +4,12 @@ importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-comp
 
 // Firebaseプロジェクトの設定
 const firebaseConfig = {
-    apiKey: "あなたのAPIキー",
-    authDomain: "あなたのプロジェクトID.firebaseapp.com",
-    projectId: "あなたのプロジェクトID",
-    storageBucket: "あなたのプロジェクトID.appspot.com",
-    messagingSenderId: "送信者ID",
-    appId: "アプリID"
+    apiKey: "AIzaSyBU4w8tyZCI_72ilhWeztfx5hXrwXnZVTI",
+    authDomain: "acts-f710f.firebaseapp.com",
+    projectId: "acts-f710f",
+    storageBucket: "acts-f710f.firebasestorage.app",
+    messagingSenderId: "1026378966831",
+    appId: "1:1026378966831:web:883700b9bc8bbe425723da"
 };
 
 firebase.initializeApp(firebaseConfig);
