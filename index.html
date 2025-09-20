@@ -19,8 +19,62 @@
 	</style>
 </head>
 
-<iframe
-	src="https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=https://line-0707.github.io/Acts/source/index.pdf#toolbar=0&navpanes=0"
-	style="width: 100%; height: 100vh; border: none;"></iframe>
+<body>
+	<div id="controls">
+		<label for="lang">言語 / Language / Язык: </label>
+		<select id="lang">
+			<option value="en">English</option>
+			<option value="ja">日本語</option>
+			<option value="ru">Русский</option>
+		</select>
+	</div>
+
+	<iframe id="pdfFrame"
+		src="https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=https://line-0707.github.io/Acts/source/index.pdf#toolbar=0&navpanes=0"
+		style="width: 100%; height: 100vh; border: none;">
+	</iframe>
+
+	<script>
+		// 言語ごとのタイトルとPDFファイル対応表
+		const translations = {
+			en: { title: "Information Site", file: "source/index_en.pdf" },
+			ja: { title: "Information", file: "source/index_ja.pdf" },
+			ru: { title: "Информационная Сайта", file: "source/index.pdf" }
+		};
+
+		const langSelect = document.getElementById("lang");
+		const pdfFrame = document.getElementById("pdfFrame");
+		const pageTitle = document.getElementById("pageTitle");
+
+		// 言語切り替え関数
+		function switchLanguage(langCode) {
+			if (!(langCode in translations)) langCode = "ru"; // デフォルトは英語
+			const info = translations[langCode];
+
+			// タイトル更新
+			document.title = info.title;
+			pageTitle.textContent = info.title;
+
+			// PDF.js ビューアの src を切り替え
+			const viewerBase = "https://line-0707.github.io/Acts/pdfviewer/web/viewer.html";
+			const fileUrl = `https://line-0707.github.io/Acts/source/${info.file}`;
+			pdfFrame.src = `${viewerBase}?file=${fileUrl}#toolbar=0&navpanes=0`;
+		}
+
+		// セレクトボックス変更時
+		langSelect.addEventListener("change", () => {
+			switchLanguage(langSelect.value);
+		});
+
+		// 初期値をブラウザ言語に合わせる
+		const userLang = (navigator.language || "ru").substring(0, 2);
+		if (userLang in translations) {
+			langSelect.value = userLang;
+			switchLanguage(userLang);
+		} else {
+			switchLanguage("ru");
+		}
+	</script>
+</body>
 
 </html>

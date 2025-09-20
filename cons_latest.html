@@ -16,6 +16,26 @@
          height: 100vh;
       }
    </style>
+   <script>
+      document.addEventListener("DOMContentLoaded", function () {
+         // ブラウザの言語を取得
+         const userLang = navigator.language || navigator.userLanguage;
+
+         // 言語ごとのタイトル設定
+         const titles = {
+            "ja": "基本法",
+            "en": "The Basic Law",
+            "ru": "Основой Закон",
+            // 必要に応じて追加
+         };
+
+         // 言語コードの先頭2文字（例: ja-JP → ja）
+         const langCode = userLang.substring(0, 2);
+
+         // タイトルを変更（該当言語がなければ英語にフォールバック）
+         document.title = titles[langCode] || titles["ru"];
+      });
+   </script>
 </head>
 
 <iframe
