@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" type="image/x-icon" href="acts.ico">
 	<title>Информационная Сайта</title>
+	<link rel="stylesheet" href="style.css">
 	<style>
 		body {
 			margin: 0;
@@ -51,11 +52,14 @@
 	</div>
 
 	<!-- 言語切替プルダウン -->
+<div id="languageContainer">
+	<span id="languageLabel">Language:</span>
 	<select id="languageSelector" onchange="changeLanguage(this.value)">
 		<option value="ru">Русский</option>
 		<option value="en">English</option>
 		<option value="ja">日本語</option>
 	</select>
+</div>
 
 	<script>
 		let front = document.getElementById('pdf1');

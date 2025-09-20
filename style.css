@@ -1,0 +1,21 @@
+#languageContainer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    background: rgba(240, 240, 240, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#languageLabel {
+    margin-right: 5px;
+    font-weight: bold;
+}
+
+#languageSelector {
+    font-size: 14px;
+}
