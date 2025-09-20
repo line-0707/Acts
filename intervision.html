@@ -40,41 +40,47 @@
             background-color: #d52b1e;
         }
 
-        /* 言語セレクター中央 */
-        #langSelector {
+        /* 左7.5%に文字列 */
+        #bannerText {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 5px 10px;
-            font-size: 1em;
-        }
-
-        /* 左側に画像＋ハイパーリンク */
-        #bannerLeft {
-            position: absolute;
-            top: 50%;
-            left: 15%;
+            left: 7.5%;
             transform: translateY(-50%);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #000;
         }
 
-        #bannerLeft img {
+        #bannerText a {
+            text-decoration: none;
+            color: #000;
+        }
+
+        #bannerText a:hover {
+            text-decoration: underline;
+        }
+
+        /* 右7.5%に画像 */
+        #bannerImage {
+            position: absolute;
+            top: 50%;
+            right: 7.5%;
+            transform: translateY(-50%);
+        }
+
+        #bannerImage img {
             width: 70px;
             height: 70px;
         }
 
-        #bannerLeft a {
+        /* 左85%に言語セレクター */
+        #langSelector {
+            position: absolute;
+            top: 50%;
+            left: 85%;
+            transform: translate(-50%, -50%);
+            padding: 5px 10px;
             font-size: 1em;
-            color: #000;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        #bannerLeft a:hover {
-            text-decoration: underline;
         }
 
         h1 {
@@ -124,18 +130,22 @@
         <div class="flagStripe blue"></div>
         <div class="flagStripe red"></div>
 
-        <!-- 言語セレクター中央 -->
+        <!-- 左7.5%に文字列 -->
+        <div id="bannerText">
+            <a href="https://line-0707.github.io/Acts/index.html">Вернуться на информационный сайт</a>
+        </div>
+
+        <!-- 右7.5%に画像 -->
+        <div id="bannerImage">
+            <img src="source/intervision_logo.png" alt="Logo">
+        </div>
+
+        <!-- 左85%に言語セレクター -->
         <select id="langSelector" onchange="changeLanguage(this.value)">
             <option value="ru">Русский</option>
             <option value="en">English</option>
             <option value="ja">日本語</option>
         </select>
-
-        <!-- 左側に画像＋ハイパーリンク -->
-        <div id="bannerLeft">
-            <img src="source/intervision_logo.png" alt="Logo">
-            <a href="https://line-0707.github.io/Acts/index.html">Вернуться на информационный сайт</a>
-        </div>
     </div>
 
     <h1 id="pageTitle">Intervision チャンネルコンテンツ</h1>
