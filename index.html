@@ -19,7 +19,7 @@
 			display: flex;
 			align-items: center;
 			justify-content: flex-end;
-			padding-right: 20px;
+			padding: 0 20px;
 			background: #f0f0f0;
 			box-sizing: border-box;
 		}
@@ -29,27 +29,29 @@
 			font-weight: bold;
 		}
 
+		#lastUpdated {
+			margin-left: 20px;
+			font-size: 0.9em;
+			color: #555;
+		}
+
 		/* PDFコンテナ */
 		#pdfContainer {
-			position: relative;
 			height: calc(100% - 45px);
 			/* 上部バーの高さを引く */
 		}
 
-		#pdfContainer iframe {
+		#pdfFrame {
 			width: 100%;
 			height: 100%;
 			border: none;
-			position: absolute;
-			top: 0;
-			left: 0;
 		}
 	</style>
 </head>
 
 <body>
 
-	<!-- 上部バーにプルダウン -->
+	<!-- 上部バー -->
 	<div id="topBar">
 		<label for="languageSelector">Language:</label>
 		<select id="languageSelector" onchange="changeLanguage(this.value)">
@@ -57,22 +59,18 @@
 			<option value="en">English</option>
 			<option value="ja">日本語</option>
 		</select>
+
+		<span id="lastUpdated"></span>
 	</div>
 
-	<!-- PDF表示（クロスフェード用に2枚） -->
+	<!-- PDF表示 -->
 	<div id="pdfContainer">
 		<iframe id="pdfFrame"></iframe>
-		<iframe id="pdfBackup" style="display:none; opacity:0;"></iframe>
 	</div>
 
 	<script>
-		let front = document.getElementById('pdfFrame');
-		let back = document.getElementById('pdfBackup');
-
-		// 初期PDF表示
-		front.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
-			+ encodeURIComponent('https://line-0707.github.io/Acts/source/index.pdf')
-			+ '#toolbar=0&navpanes=0';
+		const pdfFrame = document.getElementById('pdfFrame');
+		const lastUpdatedSpan = document.getElementById('lastUpdated');
 
 		function changeLanguage(lang) {
 			let pdfUrl;
@@ -89,36 +87,45 @@
 					break;
 				case 'ja':
 					pdfUrl = 'https://line-0707.github.io/Acts/source/index_ja.pdf';
-					titleText = 'Information';
+					titleText = '情報サイト';
 					break;
 				default:
 					pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
 					titleText = 'Информационная Сайта';
 			}
 
-			// バックiframeに新しいPDFを読み込む
-			back.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
+			// PDF切替
+			pdfFrame.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
 				+ encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
 
-			back.style.display = 'block';
-			back.style.opacity = 0;
-			back.style.transition = 'opacity 0.5s';
-
-			back.onload = () => {
-				requestAnimationFrame(() => {
-					back.style.opacity = 1;
-					front.style.opacity = 0;
-				});
-
-				setTimeout(() => {
-					front.src = back.src;
-					front.style.opacity = 1;
-					back.style.display = 'none';
-				}, 500);
-			};
-
+			// タイトル切替
 			document.title = titleText;
+
+			// 最終更新日更新
+			updateLastUpdated(lang);
 		}
+
+		// 言語に応じて日付をフォーマット
+		function updateLastUpdated(lang) {
+			const lastModified = new Date(document.lastModified);
+			let locale;
+			switch (lang) {
+				case 'ru': locale = 'ru-RU'; break;
+				case 'en': locale = 'en-US'; break;
+				case 'ja': locale = 'ja-JP'; break;
+				default: locale = 'en-US';
+			}
+			lastUpdatedSpan.textContent = new Intl.DateTimeFormat(locale, {
+				year: 'numeric', month: 'long', day: 'numeric',
+				hour: '2-digit', minute: '2-digit'
+			}).format(lastModified);
+		}
+
+		// ページロード時に初期PDFと日付を表示
+		window.addEventListener('load', () => {
+			const initialLang = document.getElementById('languageSelector').value;
+			changeLanguage(initialLang);
+		});
 	</script>
 
 </body>
