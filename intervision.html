@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>YouTube プレイリスト紹介</title>
+    <title>Intervision チャンネルコンテンツ</title>
+    <link rel="icon" href="acts.ico" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
     <style>
         body {
@@ -12,14 +13,21 @@
             margin: 20px;
             line-height: 1.6;
             text-align: center;
+            position: relative;
         }
 
         h1 {
             margin-bottom: 20px;
         }
 
+        /* 言語セレクターを左から80％に配置 */
         #langSelector {
-            margin-bottom: 30px;
+            position: absolute;
+            left: 80%;
+            top: 20px;
+            /* ページ上部からの位置 */
+            transform: translateX(-50%);
+            /* 中心を左位置に合わせる */
             padding: 5px 10px;
             font-size: 1em;
         }
@@ -67,7 +75,7 @@
         <option value="ja">日本語</option>
     </select>
 
-    <h1 id="pageTitle">おすすめのYouTubeプレイリスト</h1>
+    <h1 id="pageTitle">Intervision チャンネルコンテンツ</h1>
 
     <div class="playlist">
         <h2 class="playlistTitle">Парад</h2>
@@ -90,15 +98,15 @@
     <script>
         const texts = {
             ru: {
-                pageTitle: "Рекомендуемые Ютьюб плейлисты",
+                pageTitle: "Канал «Интервидение» Публикация видео",
                 playlists: ["Парад", "Объяснение", "Марши"]
             },
             en: {
-                pageTitle: "Recommended YouTube Playlists",
+                pageTitle: "Intervision channel Video contents",
                 playlists: ["Parade", "Explanation", "Marches"]
             },
             ja: {
-                pageTitle: "おすすめのYouTubeプレイリスト",
+                pageTitle: "Intervisionチャンネルコンテンツ",
                 playlists: ["パレード", "解説", "行進曲"]
             }
         };
