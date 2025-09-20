@@ -47,12 +47,10 @@
 
 <body>
 	<!-- PDF iframeを2枚重ねてクロスフェード -->
-	<div id="pdfContainer" style="flex:1; position:relative;">
-		<iframe id="pdf1"
-			src="pdfviewer/web/viewer.html?file=https://line-0707.github.io/Acts/source/index.pdf#toolbar=0&navpanes=0"
-			style="width:100%; height:100%; border:none;"></iframe>
-		<iframe id="pdf2"
-			style="width:100%; height:100%; border:none; position:absolute; top:0; left:0; opacity:0; display:none;"></iframe>
+	<div id="pdfContainer" style="position:relative; height:calc(100vh - 60px);">
+		<iframe id="pdfFrame" style="width:100%; height:100%; border:none;"></iframe>
+		<iframe id="pdfBackup"
+			style="width:100%; height:100%; border:none; position:absolute; top:0; left:0; display:none; opacity:0;"></iframe>
 	</div>
 
 	<!-- 下部余白部分にプルダウン配置 -->
