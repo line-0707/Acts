@@ -11,32 +11,44 @@
             background-color: #f9f9f9;
             margin: 20px;
             line-height: 1.6;
+            text-align: center;
         }
 
         h1 {
-            text-align: center;
             margin-bottom: 30px;
         }
 
         .playlist {
             margin-bottom: 50px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .playlist h2 {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-size: 1.5em;
             color: #333;
         }
 
         iframe {
             width: 100%;
-            max-width: 800px;
             height: 450px;
             border: none;
             display: block;
-            margin: 0 auto;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 600px) {
+            iframe {
+                height: 250px;
+            }
+
+            .playlist h2 {
+                font-size: 1.2em;
+            }
         }
     </style>
 </head>
@@ -48,27 +60,21 @@
         <h2>Парад</h2>
         <iframe
             src="https://www.youtube.com/embed/videoseries?si=Y3vIEO3XmE9dY0J4&amp;list=PLMaOtQxqinZYDO5c-CYPszqjqVEr3x3kI"
-            title="YouTube video player" frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            title="YouTube video player" allowfullscreen></iframe>
     </div>
 
     <div class="playlist">
         <h2>Объяснение</h2>
         <iframe
             src="https://www.youtube.com/embed/videoseries?si=XUcZiLuGv-2p_zCx&amp;list=PLMaOtQxqinZYwBVb9kSG-I8-gCg-a2cQ5"
-            title="YouTube video player" frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            title="YouTube video player" allowfullscreen></iframe>
     </div>
 
     <div class="playlist">
         <h2>Марши</h2>
-        <iframe width="560" height="315"
+        <iframe
             src="https://www.youtube.com/embed/videoseries?si=WoxJpCiYtwg_3eWs&amp;list=PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0"
-            title="YouTube video player" frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            title="YouTube video player" allowfullscreen></iframe>
     </div>
 
 </body>
