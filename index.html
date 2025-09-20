@@ -4,32 +4,18 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="shortcut icon" type="image/x-icon" href="acts.ico">
 	<title>Информационная Сайта</title>
-	<script src="index.js"></script>
 	<style>
+		html,
 		body {
 			margin: 0;
-			display: flex;
-			flex-direction: column;
-			height: 100vh;
-		}
-
-		#pdfContainer {
-			height: calc(100% - 45px);
-			/* 下部余白 60px を引く */
-		}
-
-		iframe {
-			width: 100%;
+			padding: 0;
 			height: 100%;
-			border: none;
 		}
 
-		/* 下部余白部分 */
-		#bottomBar {
+		/* 上部バー */
+		#topBar {
 			height: 45px;
-			/* 下部の余白 */
 			display: flex;
 			align-items: center;
 			justify-content: flex-end;
@@ -38,23 +24,33 @@
 			box-sizing: border-box;
 		}
 
-		#bottomBar label {
+		#topBar label {
 			margin-right: 5px;
 			font-weight: bold;
+		}
+
+		/* PDFコンテナ */
+		#pdfContainer {
+			position: relative;
+			height: calc(100% - 45px);
+			/* 上部バーの高さを引く */
+		}
+
+		#pdfContainer iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
+			position: absolute;
+			top: 0;
+			left: 0;
 		}
 	</style>
 </head>
 
 <body>
-	<!-- PDF iframeを2枚重ねてクロスフェード -->
-	<div id="pdfContainer" style="position:relative; height:calc(100vh - 60px);">
-		<iframe id="pdfFrame" style="width:100%; height:100%; border:none;"></iframe>
-		<iframe id="pdfBackup"
-			style="width:100%; height:100%; border:none; position:absolute; top:0; left:0; display:none; opacity:0;"></iframe>
-	</div>
 
-	<!-- 下部余白部分にプルダウン配置 -->
-	<div id="bottomBar">
+	<!-- 上部バーにプルダウン -->
+	<div id="topBar">
 		<label for="languageSelector">Language:</label>
 		<select id="languageSelector" onchange="changeLanguage(this.value)">
 			<option value="ru">Русский</option>
@@ -63,62 +59,67 @@
 		</select>
 	</div>
 
-<script>
-	let front = document.getElementById('pdfFrame');
-	let back = document.getElementById('pdfBackup');
+	<!-- PDF表示（クロスフェード用に2枚） -->
+	<div id="pdfContainer">
+		<iframe id="pdfFrame"></iframe>
+		<iframe id="pdfBackup" style="display:none; opacity:0;"></iframe>
+	</div>
 
-	// 初期PDF表示
-	front.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
-		+ encodeURIComponent('https://line-0707.github.io/Acts/source/index.pdf')
-		+ '#toolbar=0&navpanes=0';
+	<script>
+		let front = document.getElementById('pdfFrame');
+		let back = document.getElementById('pdfBackup');
 
-	function changeLanguage(lang) {
-		let pdfUrl;
-		let titleText;
+		// 初期PDF表示
+		front.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
+			+ encodeURIComponent('https://line-0707.github.io/Acts/source/index.pdf')
+			+ '#toolbar=0&navpanes=0';
 
-		switch (lang) {
-			case 'ru':
-				pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
-				titleText = 'Информационная Сайта';
-				break;
-			case 'en':
-				pdfUrl = 'https://line-0707.github.io/Acts/source/index_en.pdf';
-				titleText = 'Information Site';
-				break;
-			case 'ja':
-				pdfUrl = 'https://line-0707.github.io/Acts/source/index_ja.pdf';
-				titleText = 'Information';
-				break;
-			default:
-				pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
-				titleText = 'Информационная Сайта';
+		function changeLanguage(lang) {
+			let pdfUrl;
+			let titleText;
+
+			switch (lang) {
+				case 'ru':
+					pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
+					titleText = 'Информационная Сайта';
+					break;
+				case 'en':
+					pdfUrl = 'https://line-0707.github.io/Acts/source/index_en.pdf';
+					titleText = 'Information Site';
+					break;
+				case 'ja':
+					pdfUrl = 'https://line-0707.github.io/Acts/source/index_ja.pdf';
+					titleText = 'Information';
+					break;
+				default:
+					pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
+					titleText = 'Информационная Сайта';
+			}
+
+			// バックiframeに新しいPDFを読み込む
+			back.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
+				+ encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
+
+			back.style.display = 'block';
+			back.style.opacity = 0;
+			back.style.transition = 'opacity 0.5s';
+
+			back.onload = () => {
+				requestAnimationFrame(() => {
+					back.style.opacity = 1;
+					front.style.opacity = 0;
+				});
+
+				setTimeout(() => {
+					front.src = back.src;
+					front.style.opacity = 1;
+					back.style.display = 'none';
+				}, 500);
+			};
+
+			document.title = titleText;
 		}
-
-		// 新しいPDFをバックiframeに読み込む
-		back.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
-			+ encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
-
-		back.style.display = 'block';   // ここを追加
-		back.style.opacity = 0;
-		back.style.transition = 'opacity 0.5s';
-
-		back.onload = () => {
-			requestAnimationFrame(() => {
-				back.style.opacity = 1;
-				front.style.opacity = 0;
-			});
-
-			setTimeout(() => {
-				front.src = back.src;
-				front.style.opacity = 1;
-				back.style.display = 'none';
-			}, 500);
-		};
-
-		// ページタイトル切替
-		document.title = titleText;
-	}
-</script>
+	</script>
 
 </body>
 
