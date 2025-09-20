@@ -68,65 +68,66 @@
 		<iframe id="pdfFrame"></iframe>
 	</div>
 
-	<script>
-		const pdfFrame = document.getElementById('pdfFrame');
-		const lastUpdatedSpan = document.getElementById('lastUpdated');
+<script>
+	const pdfFrame = document.getElementById('pdfFrame');
+	const lastUpdatedSpan = document.getElementById('lastUpdated');
 
-		function changeLanguage(lang) {
-			let pdfUrl;
-			let titleText;
+	function changeLanguage(lang) {
+		let pdfUrl;
+		let titleText;
+		let lastUpdatedLabel;
 
-			switch (lang) {
-				case 'ru':
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
-					titleText = 'Информационная Сайта';
-					break;
-				case 'en':
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index_en.pdf';
-					titleText = 'Information Site';
-					break;
-				case 'ja':
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index_ja.pdf';
-					titleText = '情報サイト';
-					break;
-				default:
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
-					titleText = 'Информационная Сайта';
-			}
-
-			// PDF切替
-			pdfFrame.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
-				+ encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
-
-			// タイトル切替
-			document.title = titleText;
-
-			// 最終更新日更新
-			updateLastUpdated(lang);
+		switch (lang) {
+			case 'ru':
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
+				titleText = 'Информационная Сайта';
+				lastUpdatedLabel = 'Последнее обновление: ';
+				break;
+			case 'en':
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index_en.pdf';
+				titleText = 'Information Site';
+				lastUpdatedLabel = 'Last Updated: ';
+				break;
+			case 'ja':
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index_ja.pdf';
+				titleText = '情報サイト';
+				lastUpdatedLabel = '最終更新日：';
+				break;
+			default:
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
+				titleText = 'Информационная Сайта';
+				lastUpdatedLabel = 'Last Updated: ';
 		}
 
-		// 言語に応じて日付をフォーマット
-		function updateLastUpdated(lang) {
-			const lastModified = new Date(document.lastModified);
-			let locale;
-			switch (lang) {
-				case 'ru': locale = 'ru-RU'; break;
-				case 'en': locale = 'en-US'; break;
-				case 'ja': locale = 'ja-JP'; break;
-				default: locale = 'en-US';
-			}
-			lastUpdatedSpan.textContent = new Intl.DateTimeFormat(locale, {
-				year: 'numeric', month: 'long', day: 'numeric',
-				hour: '2-digit', minute: '2-digit'
-			}).format(lastModified);
+		// PDF切替
+		pdfFrame.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
+			+ encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
+
+		// ページタイトル切替
+		document.title = titleText;
+
+		// 最終更新日表示
+		const lastModified = new Date(document.lastModified);
+		let locale;
+		switch (lang) {
+			case 'ru': locale = 'ru-RU'; break;
+			case 'en': locale = 'en-US'; break;
+			case 'ja': locale = 'ja-JP'; break;
+			default: locale = 'en-US';
 		}
 
-		// ページロード時に初期PDFと日付を表示
-		window.addEventListener('load', () => {
-			const initialLang = document.getElementById('languageSelector').value;
-			changeLanguage(initialLang);
-		});
-	</script>
+		lastUpdatedSpan.textContent = lastUpdatedLabel + new Intl.DateTimeFormat(locale, {
+			year: 'numeric', month: 'long', day: 'numeric',
+			hour: '2-digit', minute: '2-digit'
+		}).format(lastModified);
+	}
+
+	// 初期表示
+	window.addEventListener('load', () => {
+		const initialLang = document.getElementById('languageSelector').value;
+		changeLanguage(initialLang);
+	});
+</script>
 
 </body>
 
