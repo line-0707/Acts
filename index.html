@@ -12,39 +12,55 @@
 			overflow: hidden;
 		}
 
-		embed {
-			width: 100vw;
+		/* PDF用コンテナ */
+		#pdfContainer {
+			position: relative;
+			width: 100%;
 			height: 100vh;
 		}
 
-		#toolbar {
-			background: #f0f0f0;
-			padding: 5px;
-			text-align: center;
+		iframe {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			border: none;
+			top: 0;
+			left: 0;
+			opacity: 1;
+			transition: opacity 0.5s;
 		}
 
-		button {
-			margin: 0 5px;
+		/* 言語選択プルダウン */
+		#languageSelector {
+			position: fixed;
+			bottom: 20px;
+			right: 20px;
+			z-index: 999;
 			padding: 5px 10px;
+			font-size: 14px;
 		}
 	</style>
 </head>
 
 <body>
-
-	<!-- 言語切替ボタン -->
-	<div id="toolbar">
-		<button onclick="changeLanguage('ru')">Русский</button>
-		<button onclick="changeLanguage('en')">English</button>
-		<button onclick="changeLanguage('ja')">日本語</button>
+	<!-- PDF iframeを2枚重ねてクロスフェード -->
+	<div id="pdfContainer">
+		<iframe id="pdf1"
+			src="https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=https://line-0707.github.io/Acts/source/index.pdf#toolbar=0&navpanes=0"></iframe>
+		<iframe id="pdf2" style="opacity:0;"></iframe>
 	</div>
 
-	<!-- PDF表示 -->
-	<iframe id="pdfFrame"
-		src="https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=https://line-0707.github.io/Acts/source/index.pdf#toolbar=0&navpanes=0"
-		style="width: 100%; height: 100vh; border: none;"> </iframe>
+	<!-- 言語切替プルダウン -->
+	<select id="languageSelector" onchange="changeLanguage(this.value)">
+		<option value="ru">Русский</option>
+		<option value="en">English</option>
+		<option value="ja">日本語</option>
+	</select>
 
 	<script>
+		let front = document.getElementById('pdf1');
+		let back = document.getElementById('pdf2');
+
 		function changeLanguage(lang) {
 			let pdfUrl;
 			let titleText;
@@ -67,8 +83,21 @@
 					titleText = 'Информационная Сайта';
 			}
 
-			// iframeのsrcを書き換えてPDFを切り替える
-			document.getElementById('pdfFrame').src = 'pdfviewer/web/viewer.html?file=' + encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
+			// 新しいPDFをback iframeに読み込む
+			back.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=' + encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
+
+			// 読み込み完了時にフェード切替
+			back.onload = () => {
+				back.style.opacity = 1;
+				front.style.opacity = 0;
+
+				// 0.5秒後にiframeを入れ替え
+				setTimeout(() => {
+					front.src = back.src;
+					front.style.opacity = 1;
+					back.style.opacity = 0;
+				}, 500);
+			};
 
 			// ページタイトルも切り替え
 			document.title = titleText;
