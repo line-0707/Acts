@@ -13,6 +13,7 @@
             margin: 0;
             line-height: 1.6;
             text-align: center;
+            color: #333;
         }
 
         /* バナー */
@@ -40,12 +41,12 @@
             background-color: #d52b1e;
         }
 
+        /* バナー左文字リンク */
         #bannerText {
             position: absolute;
             top: 50%;
             left: 7.5%;
             transform: translateY(-50%);
-            font-size: 1em;
             font-weight: bold;
             color: #fff;
         }
@@ -59,7 +60,7 @@
             text-decoration: underline;
         }
 
-
+        /* バナー右画像 */
         #bannerImage {
             position: absolute;
             top: 50%;
@@ -68,11 +69,11 @@
         }
 
         #bannerImage a img {
-            width: 70px;
-            height: 70px;
+            width: 45px;
+            height: 45px;
         }
 
-
+        /* 言語セレクター */
         #langSelector {
             position: absolute;
             top: 50%;
@@ -80,6 +81,13 @@
             transform: translate(-50%, -50%);
             padding: 5px 10px;
             font-size: 1em;
+        }
+
+        /* 最終更新日 */
+        #lastUpdate {
+            margin-top: 85px;
+            font-size: 0.9em;
+            color: #666;
         }
 
         h1 {
@@ -120,19 +128,20 @@
             }
         }
 
-        /* ダークモード対応（本体部分のみ） */
+        /* ダークモード（本文部分のみ） */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #121212;
-                /* 本文背景を暗く */
                 color: #eee;
-                /* 本文文字を白系に */
             }
 
             h1,
             .playlist h2 {
                 color: #fff;
-                /* ページタイトル・プレイリストタイトルを白 */
+            }
+
+            #lastUpdate {
+                color: #ccc;
             }
         }
     </style>
@@ -145,7 +154,7 @@
         <div class="flagStripe blue"></div>
         <div class="flagStripe red"></div>
 
-        <!-- 左7.5%に文字列リンク -->
+        <!-- 左7.5%に文字リンク -->
         <div id="bannerText">
             <a id="backLink" href="https://line-0707.github.io/Acts/index.html">Вернуться на информационный сайт</a>
         </div>
@@ -165,7 +174,10 @@
         </select>
     </div>
 
-    <h1 id="pageTitle">Канал «Интервидение» Публикация видео</h1>
+    <!-- 最終更新日 -->
+    <div id="lastUpdate"></div>
+
+    <h1 id="pageTitle">Intervision チャンネルコンテンツ</h1>
 
     <div class="playlist">
         <h2 class="playlistTitle">Парад</h2>
@@ -190,19 +202,31 @@
             ru: {
                 pageTitle: "Канал «Интервидение» Публикация видео",
                 playlists: ["Парад", "Объяснение", "Марши"],
-                backLink: "Вернуться на информационный сайт"
+                backLink: "Вернуться на информационный сайт",
+                lastUpdateLabel: "Последнее обновление："
             },
             en: {
                 pageTitle: "Intervision channel Video contents",
                 playlists: ["Parade", "Explanation", "Marches"],
-                backLink: "Return to information site"
+                backLink: "Return to information site",
+                lastUpdateLabel: "Last update: "
             },
             ja: {
                 pageTitle: "Intervisionチャンネルコンテンツ",
                 playlists: ["パレード", "解説", "行進曲"],
-                backLink: "情報サイトに戻る"
+                backLink: "情報サイトに戻る",
+                lastUpdateLabel: "最終更新日："
             }
         };
+
+        function formatDate(date, lang) {
+            return date.toLocaleDateString(lang, { year: 'numeric', month: '2-digit', day: '2-digit' });
+        }
+
+        function updateLastUpdate(lang) {
+            const today = new Date();
+            document.getElementById("lastUpdate").textContent = texts[lang].lastUpdateLabel + formatDate(today, lang);
+        }
 
         function changeLanguage(lang) {
             // ページタイトル
@@ -212,7 +236,12 @@
             titles.forEach((el, idx) => { el.textContent = texts[lang].playlists[idx]; });
             // バナー左文字列（リンク先は固定）
             document.getElementById("backLink").textContent = texts[lang].backLink;
+            // 最終更新日
+            updateLastUpdate(lang);
         }
+
+        // 初期表示：ロシア語
+        window.onload = () => { changeLanguage('ru'); };
     </script>
 </body>
 
