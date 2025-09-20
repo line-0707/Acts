@@ -63,52 +63,62 @@
 		</select>
 	</div>
 
-	<script>
-		let front = document.getElementById('pdf1');
-		let back = document.getElementById('pdf2');
+<script>
+	let front = document.getElementById('pdfFrame');
+	let back = document.getElementById('pdfBackup');
 
-		function changeLanguage(lang) {
-			let pdfUrl;
-			let titleText;
+	// 初期PDF表示
+	front.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
+		+ encodeURIComponent('https://line-0707.github.io/Acts/source/index.pdf')
+		+ '#toolbar=0&navpanes=0';
 
-			switch (lang) {
-				case 'ru':
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
-					titleText = 'Информационная Сайта';
-					break;
-				case 'en':
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index_en.pdf';
-					titleText = 'Information Site';
-					break;
-				case 'ja':
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index_ja.pdf';
-					titleText = 'Information';
-					break;
-				default:
-					pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
-					titleText = 'Информационная Сайта';
-			}
+	function changeLanguage(lang) {
+		let pdfUrl;
+		let titleText;
 
-			// 新しいPDFをback iframeに読み込む
-			back.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=' + encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
+		switch (lang) {
+			case 'ru':
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
+				titleText = 'Информационная Сайта';
+				break;
+			case 'en':
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index_en.pdf';
+				titleText = 'Information Site';
+				break;
+			case 'ja':
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index_ja.pdf';
+				titleText = 'Information';
+				break;
+			default:
+				pdfUrl = 'https://line-0707.github.io/Acts/source/index.pdf';
+				titleText = 'Информационная Сайта';
+		}
 
-			// 読み込み完了時にフェード切替
-			back.onload = () => {
+		// 新しいPDFをバックiframeに読み込む
+		back.src = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file='
+			+ encodeURIComponent(pdfUrl) + '#toolbar=0&navpanes=0';
+
+		back.style.display = 'block';   // ここを追加
+		back.style.opacity = 0;
+		back.style.transition = 'opacity 0.5s';
+
+		back.onload = () => {
+			requestAnimationFrame(() => {
 				back.style.opacity = 1;
 				front.style.opacity = 0;
+			});
 
-				// 0.5秒後にiframeを入れ替え
-				setTimeout(() => {
-					front.src = back.src;
-					front.style.opacity = 1;
-					back.style.opacity = 0;
-				}, 500);
-			};
+			setTimeout(() => {
+				front.src = back.src;
+				front.style.opacity = 1;
+				back.style.display = 'none';
+			}, 500);
+		};
 
-			// ページタイトルも切り替え
-			document.title = titleText;
-		}
-	</script>
+		// ページタイトル切替
+		document.title = titleText;
+	}
+</script>
 
 </body>
 
