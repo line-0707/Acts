@@ -15,7 +15,13 @@
         }
 
         h1 {
+            margin-bottom: 20px;
+        }
+
+        #langSelector {
             margin-bottom: 30px;
+            padding: 5px 10px;
+            font-size: 1em;
         }
 
         .playlist {
@@ -23,6 +29,7 @@
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
+            text-align: center;
         }
 
         .playlist h2 {
@@ -40,7 +47,6 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
-        /* レスポンシブ対応 */
         @media (max-width: 600px) {
             iframe {
                 height: 250px;
@@ -54,29 +60,57 @@
 </head>
 
 <body>
-    <h1>おすすめのYouTubeプレイリスト</h1>
+    <!-- 言語選択 -->
+    <select id="langSelector" onchange="changeLanguage(this.value)">
+        <option value="ru">Русский</option>
+        <option value="en">English</option>
+        <option value="ja">日本語</option>
+    </select>
+
+    <h1 id="pageTitle">おすすめのYouTubeプレイリスト</h1>
 
     <div class="playlist">
-        <h2>Парад</h2>
-        <iframe
-            src="https://www.youtube.com/embed/videoseries?si=Y3vIEO3XmE9dY0J4&amp;list=PLMaOtQxqinZYDO5c-CYPszqjqVEr3x3kI"
-            title="YouTube video player" allowfullscreen></iframe>
+        <h2 class="playlistTitle">Парад</h2>
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYDO5c-CYPszqjqVEr3x3kI&hl=ru"
+            allowfullscreen></iframe>
     </div>
 
     <div class="playlist">
-        <h2>Объяснение</h2>
-        <iframe
-            src="https://www.youtube.com/embed/videoseries?si=XUcZiLuGv-2p_zCx&amp;list=PLMaOtQxqinZYwBVb9kSG-I8-gCg-a2cQ5"
-            title="YouTube video player" allowfullscreen></iframe>
+        <h2 class="playlistTitle">Объяснение</h2>
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYwBVb9kSG-I8-gCg-a2cQ5&hl=ru"
+            allowfullscreen></iframe>
     </div>
 
     <div class="playlist">
-        <h2>Марши</h2>
-        <iframe
-            src="https://www.youtube.com/embed/videoseries?si=WoxJpCiYtwg_3eWs&amp;list=PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0"
-            title="YouTube video player" allowfullscreen></iframe>
+        <h2 class="playlistTitle">Марши</h2>
+        <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0&hl=ru"
+            allowfullscreen></iframe>
     </div>
 
+    <script>
+        const texts = {
+            ru: {
+                pageTitle: "Рекомендуемые Ютьюб плейлисты",
+                playlists: ["Парад", "Объяснение", "Марши"]
+            },
+            en: {
+                pageTitle: "Recommended YouTube Playlists",
+                playlists: ["Parade", "Explanation", "Marches"]
+            },
+            ja: {
+                pageTitle: "おすすめのYouTubeプレイリスト",
+                playlists: ["パレード", "解説", "行進曲"]
+            }
+        };
+
+        function changeLanguage(lang) {
+            document.getElementById("pageTitle").textContent = texts[lang].pageTitle;
+            const titles = document.querySelectorAll(".playlistTitle");
+            titles.forEach((el, idx) => {
+                el.textContent = texts[lang].playlists[idx];
+            });
+        }
+    </script>
 </body>
 
 </html>
