@@ -2,20 +2,18 @@
     position: fixed;
     bottom: 20px;
     right: 20px;
-    z-index: 999;
     display: flex;
     align-items: center;
     background: rgba(240, 240, 240, 0.8);
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 14px;
+    pointer-events: none;
+    /* 全体は透明化してマウスを通す */
 }
 
-#languageLabel {
-    margin-right: 5px;
-    font-weight: bold;
-}
-
-#languageSelector {
-    font-size: 14px;
+#languageContainer select,
+#languageContainer label {
+    pointer-events: auto;
+    /* プルダウンとラベルだけ操作可能に */
 }
