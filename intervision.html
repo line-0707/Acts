@@ -40,7 +40,6 @@
             background-color: #d52b1e;
         }
 
-        /* 左7.5%に文字列リンク */
         #bannerText {
             position: absolute;
             top: 50%;
@@ -60,11 +59,11 @@
             text-decoration: underline;
         }
 
-        /* 右92.5%に画像リンク */
+
         #bannerImage {
             position: absolute;
             top: 50%;
-            left: 92.5%;
+            left: 95%;
             transform: translate(-50%, -50%);
         }
 
@@ -73,7 +72,7 @@
             height: 70px;
         }
 
-        /* 左85%に言語セレクター */
+
         #langSelector {
             position: absolute;
             top: 50%;
@@ -118,6 +117,22 @@
 
             .playlist h2 {
                 font-size: 1.2em;
+            }
+        }
+
+        /* ダークモード対応（本体部分のみ） */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                /* 本文背景を暗く */
+                color: #eee;
+                /* 本文文字を白系に */
+            }
+
+            h1,
+            .playlist h2 {
+                color: #fff;
+                /* ページタイトル・プレイリストタイトルを白 */
             }
         }
     </style>
