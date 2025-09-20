@@ -238,11 +238,27 @@
             document.getElementById("backLink").textContent = texts[lang].backLink;
             // 最終更新日
             updateLastUpdate(lang);
+            let titleText;
+            switch (lang) {
+                case 'ru':
+                    titleText = 'Интервидение';
+                    break;
+                case 'en':
+                    titleText = 'Intervison';
+                    break;
+                case 'ja': ;
+                    titleText = 'インタービジョン';
+                    break;
+                default:
+                    titleText = 'Интервидение';
+            }
         }
 
         // 初期表示：ロシア語
         window.onload = () => { changeLanguage('ru'); };
+
     </script>
+
 </body>
 
 </html>
