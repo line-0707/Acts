@@ -40,7 +40,7 @@
             background-color: #d52b1e;
         }
 
-        /* 左7.5%に文字列 */
+        /* 左7.5%に文字列リンク */
         #bannerText {
             position: absolute;
             top: 50%;
@@ -48,27 +48,27 @@
             transform: translateY(-50%);
             font-size: 1em;
             font-weight: bold;
-            color: #000;
+            color: #fff;
         }
 
         #bannerText a {
             text-decoration: none;
-            color: #000;
+            color: #fff;
         }
 
         #bannerText a:hover {
             text-decoration: underline;
         }
 
-        /* 右7.5%に画像 */
+        /* 右92.5%に画像リンク */
         #bannerImage {
             position: absolute;
             top: 50%;
-            right: 7.5%;
-            transform: translateY(-50%);
+            left: 92.5%;
+            transform: translate(-50%, -50%);
         }
 
-        #bannerImage img {
+        #bannerImage a img {
             width: 70px;
             height: 70px;
         }
@@ -130,14 +130,16 @@
         <div class="flagStripe blue"></div>
         <div class="flagStripe red"></div>
 
-        <!-- 左7.5%に文字列 -->
+        <!-- 左7.5%に文字列リンク -->
         <div id="bannerText">
-            <a href="https://line-0707.github.io/Acts/index.html">Вернуться на информационный сайт</a>
+            <a id="backLink" href="https://line-0707.github.io/Acts/index.html">Вернуться на информационный сайт</a>
         </div>
 
-        <!-- 右7.5%に画像 -->
+        <!-- 右92.5%に画像リンク -->
         <div id="bannerImage">
-            <img src="source/intervision_logo.png" alt="Logo">
+            <a href="https://www.youtube.com/@intervidenie/">
+                <img src="source/intervision_logo.png" alt="Logo">
+            </a>
         </div>
 
         <!-- 左85%に言語セレクター -->
@@ -170,15 +172,31 @@
 
     <script>
         const texts = {
-            ru: { pageTitle: "Канал «Интервидение» Публикация видео", playlists: ["Парад", "Объяснение", "Марши"] },
-            en: { pageTitle: "Intervision channel Video contents", playlists: ["Parade", "Explanation", "Marches"] },
-            ja: { pageTitle: "Intervisionチャンネルコンテンツ", playlists: ["パレード", "解説", "行進曲"] }
+            ru: {
+                pageTitle: "Канал «Интервидение» Публикация видео",
+                playlists: ["Парад", "Объяснение", "Марши"],
+                backLink: "Вернуться на информационный сайт"
+            },
+            en: {
+                pageTitle: "Intervision channel Video contents",
+                playlists: ["Parade", "Explanation", "Marches"],
+                backLink: "Return to information site"
+            },
+            ja: {
+                pageTitle: "Intervisionチャンネルコンテンツ",
+                playlists: ["パレード", "解説", "行進曲"],
+                backLink: "情報サイトに戻る"
+            }
         };
 
         function changeLanguage(lang) {
+            // ページタイトル
             document.getElementById("pageTitle").textContent = texts[lang].pageTitle;
+            // プレイリストタイトル
             const titles = document.querySelectorAll(".playlistTitle");
             titles.forEach((el, idx) => { el.textContent = texts[lang].playlists[idx]; });
+            // バナー左文字列（リンク先は固定）
+            document.getElementById("backLink").textContent = texts[lang].backLink;
         }
     </script>
 </body>
