@@ -6,39 +6,40 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="shortcut icon" type="image/x-icon" href="acts.ico">
 	<title>Информационная Сайта</title>
-	<link rel="stylesheet" href="style.css">
 	<style>
 		body {
 			margin: 0;
-			overflow: hidden;
-		}
-
-		/* PDF用コンテナ */
-		#pdfContainer {
-			position: relative;
-			width: 100%;
+			display: flex;
+			flex-direction: column;
 			height: 100vh;
 		}
 
+		/* PDF iframeは下部の余白分だけ短く */
+		#pdfContainer {
+			flex: 1;
+		}
+
 		iframe {
-			position: absolute;
 			width: 100%;
 			height: 100%;
 			border: none;
-			top: 0;
-			left: 0;
-			opacity: 1;
-			transition: opacity 0.5s;
 		}
 
-		/* 言語選択プルダウン */
-		#languageSelector {
-			position: fixed;
-			bottom: 20px;
-			right: 20px;
-			z-index: 999;
-			padding: 5px 10px;
-			font-size: 14px;
+		/* 下部余白部分 */
+		#bottomBar {
+			height: 60px;
+			/* 下部の余白 */
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			padding-right: 20px;
+			background: #f0f0f0;
+			box-sizing: border-box;
+		}
+
+		#bottomBar label {
+			margin-right: 5px;
+			font-weight: bold;
 		}
 	</style>
 </head>
@@ -51,15 +52,15 @@
 		<iframe id="pdf2" style="opacity:0;"></iframe>
 	</div>
 
-	<!-- 言語切替プルダウン -->
-<div id="languageContainer">
-	<span id="languageLabel">Language:</span>
-	<select id="languageSelector" onchange="changeLanguage(this.value)">
-		<option value="ru">Русский</option>
-		<option value="en">English</option>
-		<option value="ja">日本語</option>
-	</select>
-</div>
+	<!-- 下部余白部分にプルダウン配置 -->
+	<div id="bottomBar">
+		<label for="languageSelector">Language:</label>
+		<select id="languageSelector" onchange="changeLanguage(this.value)">
+			<option value="ru">Русский</option>
+			<option value="en">English</option>
+			<option value="ja">日本語</option>
+		</select>
+	</div>
 
 	<script>
 		let front = document.getElementById('pdf1');
