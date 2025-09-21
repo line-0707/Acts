@@ -2,8 +2,8 @@
 <html lang="ru">
 
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>ИНФОРМАЦИОННАЯ САЙТА — Документы</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
@@ -11,36 +11,33 @@
   <style>
     :root {
       --bg: #f7f8fb;
-      --card: #ffffff;
-      --muted: #6b7280;
+      --card-light: rgba(255, 255, 255, 0.85);
+      --card-dark: rgba(0, 0, 0, 0.5);
+      --the: #6b7280;
       --accent: #0f172a;
-      --header-bg: #fbfdff;
-      --subcat-bg: #eef2f7;
-      --header-color: var(--muted);
-      --subcat-color: var(--accent);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      body {
-        background: var(--bg) url('source/dark.jpg') center/cover no-repeat;
-      }
+      --header-bg-light: rgba(255, 255, 255, 0.85);
+      --header-bg-dark: rgba(0, 0, 0, 0.5);
+      --subcat-bg-light: rgba(238, 242, 247, 0.85);
+      --subcat-bg-dark: rgba(0, 0, 0, 0.3);
+      --title-color-light: #000;
+      --title-color-dark: #fff;
+      --stroke: #ffffff;
+      --link-light: #0366d6;
+      --link-dark: #5ab6ff;
     }
 
     html,
     body {
       height: 100%;
       margin: 0;
-      font-family: 'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial
-    }
-
-    body {
+      font-family: 'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
       background: var(--bg) url('source/light.jpg') center/cover no-repeat;
       transition: background 0.3s ease;
     }
 
     .wrap {
       max-width: 980px;
-      margin: 0 auto
+      margin: 0 auto;
     }
 
     header {
@@ -48,16 +45,15 @@
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 20px
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
     .logo {
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      /* 丸にする */
       overflow: hidden;
-      /* 丸の外にはみ出した部分を隠す */
       background: #e6eef9;
       display: flex;
       align-items: center;
@@ -67,11 +63,8 @@
 
     .logo img {
       width: auto;
-      /* 横幅を自動調整 */
       height: 100%;
-      /* 高さをコンテナいっぱいに */
       object-fit: cover;
-      /* 余分な部分を切り取る */
       display: block;
     }
 
@@ -81,60 +74,31 @@
       justify-content: left;
       height: 72px;
       text-align: left;
-      flex-grow: 1
+      flex-grow: 1;
     }
-
-    .title-block h1,
-    .title-block .lead {
-      text-shadow:
-        1.5px 0 0 var(--stroke),
-        -1.5px 0 0 var(--stroke),
-        0 1.5px 0 var(--stroke),
-        0 -1.5px 0 var(--stroke),
-        1.05px 1.05px 0 var(--stroke),
-        -1.05px 1.05px 0 var(--stroke),
-        1.05px -1.05px 0 var(--stroke),
-        -1.05px -1.05px 0 var(--stroke);
-    }
-
-    /* ライトモード */
-    :root {
-      --title-color: #000;
-      --stroke: #fff;
-    }
-
-    /* ダークモード */
-    .dark {
-      --title-color: #fff;
-      --stroke: #000;
-    }
-
-    .title-block h1,
-    .title-block .lead {
-      color: var(--title-color);
-    }
-
 
     .title-block-inner {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      height: 100%
+      height: 100%;
+    }
+
+    .title-block h1,
+    .title-block .lead {
+      text-shadow: 1.5px 0 0 var(--stroke), -1.5px 0 0 var(--stroke), 0 1.5px 0 var(--stroke),
+        0 -1.5px 0 var(--stroke), 1.05px 1.05px 0 var(--stroke), -1.05px 1.05px 0 var(--stroke),
+        1.05px -1.05px 0 var(--stroke), -1.05px -1.05px 0 var(--stroke);
     }
 
     h1 {
       font-size: 20px;
-      margin: 0
+      margin: 0;
     }
 
     p.lead {
       margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 14px
-    }
-
-    .lang-select {
-      position: relative
+      font-size: 14px;
     }
 
     .lang-select select {
@@ -144,69 +108,70 @@
       font-size: 13px;
       background: #e5e7eb;
       color: #111827;
-      cursor: pointer
+      cursor: pointer;
     }
 
     .card {
-      background: var(--card);
       padding: 18px;
       border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04)
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      background: var(--card-light);
+      transition: background 0.3s ease;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12px
+      margin-top: 12px;
+      transition: color 0.3s ease, background 0.3s ease;
     }
 
     th,
     td {
       padding: 10px 12px;
       text-align: left;
-      border-bottom: 1px solid #eef2f7;
-      font-size: 14px
+      font-size: 14px;
     }
 
     th {
-      background: var(--header-bg);
+      background: var(--header-bg-light);
       font-weight: 700;
-      color: var(--header-color);
-      font-size: 13px
+      color: var(--muted);
+      font-size: 13px;
     }
 
     tr.subcat td {
-      background: var(--subcat-bg);
-      color: var(--subcat-color);
+      background: var(--subcat-bg-light);
+      color: var(--accent);
       font-weight: normal;
     }
 
     tr.divider td {
       border: none;
-      padding: 0
+      padding: 0;
     }
 
     tr.divider td hr {
       border: none;
       border-top: 1px solid #e5e7eb;
-      margin: 8px 0
+      margin: 8px 0;
     }
 
     td.status {
       white-space: nowrap;
-      border-radius: 6px
+      border-radius: 6px;
     }
 
     .status.available {
       background: #d1fae5;
       color: #065f46;
-      font-weight: 600
+      font-weight: 600;
     }
 
     .status.limited {
       background: #fef9c3;
       color: #92400e;
-      font-weight: 600
+      font-weight: 600;
     }
 
     .status.expired,
@@ -214,68 +179,40 @@
     .status.progress {
       background: #fecaca;
       color: #991b1b;
-      font-weight: 600
-    }
-
-    .muted {
-      color: var(--muted);
-      font-size: 13px
+      font-weight: 600;
     }
 
     td a {
-      color: #0366d6;
-      text-decoration: none
+      color: var(--link-light);
+      text-decoration: none;
+      transition: color 0.3s ease;
     }
 
     td a:hover {
-      text-decoration: underline
+      text-decoration: underline;
     }
 
     .title-link {
       color: inherit;
-      text-decoration: none
+      text-decoration: none;
     }
 
     footer {
       margin-top: 18px;
-      color: var(--muted);
       font-size: 13px;
       display: flex;
       justify-content: space-between;
-      align-items: center
+      align-items: center;
+      color: #fff !important;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 4px 8px;
+      border-radius: 4px;
     }
 
-    footer .last-update {
-      margin-left: auto
-    }
-
-    footer,
-    footer .last-update {
-      color: #ffffff !important;
-      /* 常に白文字 */
+    footer .last-update,
+    footer #author-text {
+      color: #fff !important;
       text-shadow: none !important;
-      /* 縁取りを無効化 */
-    }
-
-    @media (max-width:640px) {
-      .logo {
-        width: 56px;
-        height: 56px
-      }
-
-      th,
-      td {
-        padding: 8px
-      }
-
-      header {
-        gap: 10px;
-        flex-direction: column
-      }
-
-      .title-block {
-        text-align: center
-      }
     }
 
     .theme-toggle {
@@ -286,11 +223,70 @@
       height: 36px;
       border-radius: 50%;
       cursor: pointer;
-      background: var(--card);
+      background: var(--card-light);
       color: var(--accent);
       font-size: 24px;
       border: none;
       margin-right: 8px;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    /* Dark mode styles */
+    .dark body {
+      background-image: url('source/dark.jpg');
+    }
+
+    .dark .card {
+      background: var(--card-dark);
+    }
+
+    .dark table {
+      color: #fff;
+    }
+
+    .dark th {
+      background: var(--header-bg-dark);
+      color: #fff;
+    }
+
+    .dark tr.subcat td {
+      background: var(--subcat-bg-dark);
+      color: #fff;
+    }
+
+    .dark td a {
+      color: var(--link-dark);
+    }
+
+    .dark .theme-toggle {
+      background: var(--card-dark);
+      color: #fff;
+    }
+
+    .dark #note-text {
+      color: #e5e7eb;
+      /* 薄い灰色で見やすく */
+    }
+
+    @media (max-width:640px) {
+      .logo {
+        width: 56px;
+        height: 56px;
+      }
+
+      th,
+      td {
+        padding: 8px;
+      }
+
+      header {
+        gap: 10px;
+        flex-direction: column;
+      }
+
+      .title-block {
+        text-align: center;
+      }
     }
   </style>
 </head>
@@ -298,21 +294,19 @@
 <body>
   <div class="wrap">
     <header>
-      <a href="https://line-0707.github.io/Acts/index.html" class="logo"><img src="source/icon.webp" alt="ИНФ"></a>
+      <a href="#" class="logo"><img src="source/icon.webp" alt="ИНФ"></a>
       <div class="title-block">
         <div class="title-block-inner">
-          <a href="https://line-0707.github.io/Acts/index.html" class="title-link">
+          <a href="#" class="title-link">
             <h1 id="page-title">ИНФОРМАЦИОННАЯ САЙТА</h1>
           </a>
           <p class="lead" id="page-subtitle">Сводка опубликованных документов и ресурсов</p>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:4px;">
-        <!-- ライト／ダーク切替ボタン -->
         <button class="theme-toggle" id="theme-btn">
           <span class="material-icons" id="theme-icon">light_mode</span>
         </button>
-
         <div class="lang-select">
           <select onchange="setLang(this.value)">
             <option value="ru">Русский</option>
@@ -324,264 +318,178 @@
     </header>
 
     <section class="card">
-      <table aria-label="Документы">
+      <table aria-label="Документы" id="docs-table">
         <thead>
           <tr>
-            <th id="col-file">Файлы</th>
-            <th id="col-status">Статус</th>
-            <th id="col-update">Последнее обновление</th>
+            <th id="col-file" data-translate="col-file">Файлы</th>
+            <th id="col-status" data-translate="col-status">Статус</th>
+            <th id="col-update" data-translate="col-update">Последнее обновление</th>
           </tr>
         </thead>
         <tbody>
-          <tr data-date="2025-06-28">
-            <td><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank" rel="noopener"
-                data-key="link1">Основой Закон — 7-е издание</a></td>
-            <td class="status available" data-key="available">Доступный</td>
-            <td>28 июня 2025г.</td>
+          <tr data-translate-row="1">
+            <td data-translate="file-1"><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank"
+                rel="noopener" data-key="link1">Основой
+                Закон — 7-е издание</a></td>
+            <td class="status available" data-translate="status-1">Доступный</td>
+            <td data-translate="date-1" data-date="2025-06-28">28 июня 2025г.</td>
           </tr>
-
           <tr class="divider">
             <td colspan="3">
               <hr>
             </td>
           </tr>
-
-          <tr class="subcat">
-            <td data-key="catExam" colspan="3"></td>
+          <tr class="subcat" data-translate-row="subcat-1">
+            <td data-translate="subcat-1" colspan="3">Результаты моих экзаменов</td>
           </tr>
-
-          <tr data-date="2024-06-02">
-            <td><a href="https://1drv.ms/x/c/99010fb379641e00/QQAeZHmzDwEggJngRgEAAAAAKEMVkXY9R_795w" target="_blank"
-                rel="noopener" data-key="link2">Результаты моих экзаменов — В средней школе</a></td>
-            <td class="status limited" data-key="limited">Ограниченный доступ</td>
-            <td>2 июня 2024г.</td>
+          <tr data-translate-row="8">
+            <td data-translate="file-8"><a
+                href="https://1drv.ms/x/c/99010fb379641e00/QQAeZHmzDwEggJngRgEAAAAAKEMVkXY9R_795w" target="_blank"
+                rel="noopener" data-key="link1">В средней школе</a></td>
+            <td class="status limited" data-translate="status-8">Ограниченный доступ</td>
+            <td data-translate="date-8" data-date="2024-06-02">2 июня 2024г.</td>
           </tr>
-
-          <tr data-date="2025-03-25">
-            <td><a href="https://1drv.ms/x/c/99010fb379641e00/EQAeZHmzDwEggJmmyQEAAAAB4W5VuetxJJs5e_UGj-7KHg"
-                target="_blank" rel="noopener" data-key="link3">В мой 1-й год обучения в старшей школе</a></td>
-            <td class="status available" data-key="available">Доступный</td>
-            <td>25 марта 2025г.</td>
+          <tr data-translate-row="2">
+            <td data-translate="file-2"><a href="#">В мой 1-й год обучения в старшей школе</a></td>
+            <td class="status available" data-translate="status-2">Доступный</td>
+            <td data-translate="date-2" data-date="2025-03-25">25 марта 2025г.</td>
           </tr>
-
-          <tr data-date="2025-06-27">
-            <td><a href="https://1drv.ms/x/c/99010fb379641e00/EVXUlAgX2PhEtEPnpARXmG8BKY75s_HRFe84WexNXmOGAA"
-                target="_blank" rel="noopener" data-key="link4">В мой 2-й год обучения в старшей школе</a></td>
-            <td class="status available" data-key="available">Доступный</td>
-            <td>27 июня 2025г.</td>
+          <tr data-translate-row="3">
+            <td data-translate="file-3"><a href="#">В мой 2-й год обучения в старшей школе</a></td>
+            <td class="status available" data-translate="status-3">Доступный</td>
+            <td data-translate="date-3" data-date="2025-06-27">27 июня 2025г.</td>
           </tr>
-
-          <tr data-date="1970-01-01">
-            <td><s data-key="linkHigh3">В мой 3-й год обучения в старшей школе</s></td>
-            <td class="status unavailable" data-key="unavailable">нет в наличии<sup>1</sup></td>
-            <td>—</td>
+          <tr data-translate-row="4">
+            <td data-translate="file-4"><s>В мой 3-й год обучения в старшей школе</s></td>
+            <td class="status unavailable" data-translate="status-4">нет в наличии<sup>1</sup></td>
+            <td data-translate="date-4">—</td>
           </tr>
-
           <tr class="divider">
             <td colspan="3">
               <hr>
             </td>
           </tr>
-
-          <tr class="subcat">
-            <td data-key="catTempLaw" colspan="3"></td>
+          <tr data-translate-row="5">
+            <td data-translate="file-5"><a href="#">Временные или специальные законы</a></td>
+            <td class="status expired" data-translate="status-5">Истекший</td>
+            <td data-translate="date-5" data-date="2025-03-05">5 марта 2025г.</td>
           </tr>
-
-          <tr data-date="2025-03-05">
-            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener"
-                data-key="link5">Временные или специальные законы</a></td>
-            <td class="status expired" data-key="expired">Истекший</td>
-            <td>5 марта 2025г.</td>
+          <tr data-translate-row="6">
+            <td data-translate="file-6"><a href="#">Номер 3: об использовании социальных сетей</a></td>
+            <td class="status available" data-translate="status-6">Доступно / Архив</td>
+            <td data-translate="date-6" data-date="2025-03-05">5 марта 2025г.</td>
           </tr>
-
-          <tr data-date="2025-03-05">
-            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener"
-                data-key="link6">Номер 3: об использовании социальных сетей</a></td>
-            <td class="status available" data-key="available">Доступно / Архив</td>
-            <td>5 марта 2025г.</td>
-          </tr>
-
           <tr class="divider">
             <td colspan="3">
               <hr>
             </td>
           </tr>
-
-          <tr data-date="1970-01-01">
-            <td><a href="https://line-0707.github.io/Acts/intervision.html" target="_blank" rel="noopener"
-                data-key="link7">Телеканал «Интервидение»</a></td>
-            <td class="status progress" data-key="progress">Работа в процессе</td>
-            <td>—</td>
+          <tr data-translate-row="7">
+            <td data-translate="file-7"><a href="#">Телеканал «Интервидение»</a></td>
+            <td class="status progress" data-translate="status-7">Работа в процессе</td>
+            <td data-translate="date-7">—</td>
           </tr>
-
         </tbody>
       </table>
-
-      <div style="margin-top:12px" class="muted" id="note-text">1. Некоторые данные отсутствуют. Исправлений нет.</div>
+      <div style="margin-top:12px" class="muted" id="note-text" data-translate="note-1">1. Некоторые данные отсутствуют.
+        Исправлений нет.</div>
     </section>
 
     <footer class="muted">
-      <span id="author-text">Создано: Юя Камошита с ChatGPT</span>
+      <span id="author-text" data-translate="author">Создано: Юя Камошита с ChatGPT</span>
       <span class="last-update" id="auto-last">—</span>
     </footer>
   </div>
 
   <script>
-    const translations = {
-      ru: {
-        title: 'ИНФОРМАЦИОННАЯ САЙТА',
-        subtitle: 'Сводка опубликованных документов и ресурсов',
-        colFile: 'Файлы', colStatus: 'Статус', colUpdate: 'Последнее обновление',
-        available: 'Доступный', limited: 'Ограниченный доступ', expired: 'Истекший', unavailable: 'нет в наличии', progress: 'Работа в процессе',
-        note: '1. Некоторые данные отсутствуют. Исправлений нет.',
-        lastUpdateLabel: 'Последнее обновление',
-        author: 'Создано: Юя Камошита с ChatGPT',
-        links: {
-          link1: 'Основой Закон — 7-е издание',
-          link2: 'Результаты моих экзаменов — В средней школе',
-          link3: 'В мой 1-й год обучения в старшей школе',
-          link4: 'В мой 2-й год обучения в старшей школе',
-          link5: 'Временные или специальные законы',
-          link6: 'Номер 3: об использовании социальных сетей',
-          link7: 'Телеканал «Интервидение»',
-          linkHigh3: 'В мой 3-й год обучения в старшей школе'
-        },
-        subcat: {
-          catExam: 'Результаты экзаменов',
-          catTempLaw: 'Временные или специальные законы'
-        },
-        dateFormat: d => `${d.getDate()} ${['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'][d.getMonth()]} ${d.getFullYear()}г.`
-      },
-      en: {
-        title: 'INFORMATION SITE',
-        subtitle: 'Summary of published documents and resources',
-        colFile: 'Files', colStatus: 'Status', colUpdate: 'Last update',
-        available: 'Available', limited: 'Limited access', expired: 'Expired', unavailable: 'Unavailable', progress: 'In progress',
-        note: '1. Some data is missing. No corrections.',
-        lastUpdateLabel: 'Last update',
-        author: 'Author: Yuya Kamoshita with ChatGPT',
-        links: {
-          link1: 'Basic Law — 7th edition',
-          link2: 'My exam results — Middle School',
-          link3: 'My 1st year in high school',
-          link4: 'My 2nd year in high school',
-          link5: 'Temporary or special laws',
-          link6: 'No.3: on social network usage',
-          link7: 'Channel «Intervision»',
-          linkHigh3: 'My 3rd year in high school'
-        },
-        subcat: {
-          catExam: 'Exam Results',
-          catTempLaw: 'Temporary or special laws'
-        },
-        dateFormat: d => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-      },
-      ja: {
-        title: 'Information',
-        subtitle: '公開済文書とリソース一覧',
-        colFile: 'ファイル', colStatus: 'ステータス', colUpdate: '最終更新',
-        available: '利用可能', limited: '制限付き', expired: '期限切れ', unavailable: '利用不可', progress: '作業中',
-        note: '1. 一部のデータが欠落しています。修正はありません。',
-        lastUpdateLabel: '最終更新',
-        author: '作成者：鴨下友哉 ＆ ChatGPT',
-        links: {
-          link1: '基本法 — 第7版',
-          link2: '中学生時代',
-          link3: '高校1年次',
-          link4: '高校2年次',
-          link5: '臨時法',
-          link6: '第3号: SNS利用について',
-          link7: 'チャンネル インタービジョン',
-          linkHigh3: '高校3年次'
-        },
-        subcat: {
-          catExam: '試験結果',
-          catTempLaw: '臨時法'
-        },
-        dateFormat: d => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
-      }
-    };
-
-    function setLang(lang) {
-      const t = translations[lang];
-      if (!t) return;
-
-      document.getElementById('page-title').textContent = t.title;
-      document.getElementById('page-subtitle').textContent = t.subtitle;
-      document.getElementById('col-file').textContent = t.colFile;
-      document.getElementById('col-status').textContent = t.colStatus;
-      document.getElementById('col-update').textContent = t.colUpdate;
-      document.getElementById('note-text').innerHTML = t.note.replace('нет в наличии', 'нет в наличии<sup>1</sup>');
-      document.getElementById('author-text').textContent = t.author;
-
-      // 小カテゴリー
-      Object.keys(t.subcat).forEach(key => {
-        const el = document.querySelector(`td[data-key="${key}"]`);
-        if (el) el.textContent = t.subcat[key];
-      });
-
-      // テーブル内リンクテキストとステータス・日付
-      document.querySelectorAll('tbody tr[data-date]').forEach(tr => {
-        const tdLinkA = tr.querySelector('td a');
-        const tdLinkS = tr.querySelector('td s');
-        if (tdLinkA && tdLinkA.dataset.key && t.links[tdLinkA.dataset.key]) tdLinkA.textContent = t.links[tdLinkA.dataset.key];
-        if (tdLinkS && tdLinkS.dataset.key && t.links[tdLinkS.dataset.key]) tdLinkS.textContent = t.links[tdLinkS.dataset.key];
-
-        const tdStatus = tr.querySelector('td.status');
-        if (tdStatus && tdStatus.dataset.key && t[tdStatus.dataset.key]) tdStatus.innerHTML = t[tdStatus.dataset.key] + (tdStatus.dataset.key === 'unavailable' ? '<sup>1</sup>' : '');
-
-        const tdDate = tr.querySelector('td:last-child');
-        if (tdDate && tdDate.textContent !== '—') {
-          const d = new Date(tr.dataset.date);
-          tdDate.textContent = t.dateFormat(d);
-        }
-      });
-
-      // サイト最終更新日
-      const lastMod = new Date(document.lastModified);
-      document.getElementById('auto-last').textContent = `${t.lastUpdateLabel}: ${t.dateFormat(lastMod)}`;
-    }
-
     const themeBtn = document.getElementById('theme-btn');
     const themeIcon = document.getElementById('theme-icon');
 
     function setTheme(theme) {
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
-        document.body.style.backgroundImage = "url('source/dark.jpg')";
         themeIcon.textContent = 'dark_mode';
-
-        // ダークモード：白文字 + 黒縁取り
-        document.querySelector('.title-block h1').style.color = '#ffffff';
-        document.querySelector('.title-block h1').style.webkitTextStrokeColor = '#000000';
-        document.querySelector('.title-block .lead').style.color = '#ffffff';
-        document.querySelector('.title-block .lead').style.webkitTextStrokeColor = '#000000';
+        themeIcon.style.color = '#ffffff';
       } else {
         document.documentElement.classList.remove('dark');
-        document.body.style.backgroundImage = "url('source/light.jpg')";
         themeIcon.textContent = 'light_mode';
-
-        // ライトモード：黒文字 + 白縁取り
-        document.querySelector('.title-block h1').style.color = '#000000';
-        document.querySelector('.title-block h1').style.webkitTextStrokeColor = '#ffffff';
-        document.querySelector('.title-block .lead').style.color = '#000000';
-        document.querySelector('.title-block .lead').style.webkitTextStrokeColor = '#ffffff';
+        themeIcon.style.color = '#0f172a';
       }
     }
 
-
-
     themeBtn.addEventListener('click', () => {
-      if (document.documentElement.classList.contains('dark')) {
-        setTheme('light');
-      } else {
-        setTheme('dark');
-      }
+      setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
     });
 
-    // ページロード時に OS の設定を反映
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     setTheme(prefersDark ? 'dark' : 'light');
+
+    function formatDate(dateStr, lang) {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString(lang);
+    }
+
+    function updateLastModified() {
+      const lastMod = new Date(document.lastModified);
+      const dateStr = isNaN(lastMod.getTime()) ? new Date().toLocaleDateString() : lastMod.toLocaleDateString();
+      document.getElementById('auto-last').textContent = `Последнее обновление: ${dateStr}`;
+    }
+    updateLastModified();
+
+    function setLang(lang) {
+      const translations = {
+        en: {
+          'page-title': 'INFORMATION SITE',
+          'page-subtitle': 'Summary of published documents and resources',
+          'col-file': 'Files', 'col-status': 'Status', 'col-update': 'Last update',
+          'file-1': 'Basic Law — 7th edition', 'status-1': 'Available', 'date-1': formatDate('2025-06-28', 'en'),
+          'file-2': 'In my 1st year of high school', 'status-2': 'Available', 'date-2': formatDate('2025-03-25', 'en'),
+          'file-3': 'In my 2nd year of high school', 'status-3': 'Available', 'date-3': formatDate('2025-06-27', 'en'),
+          'file-4': 'In my 3rd year of high school', 'status-4': 'Unavailable', 'date-4': '—',
+          'file-5': 'Temporary or special laws', 'status-5': 'Expired', 'date-5': formatDate('2025-03-05', 'en'),
+          'file-6': 'No.3: on social network usage', 'status-6': 'Available / Archive', 'date-6': formatDate('2025-03-05', 'en'),
+          'file-7': 'TV Channel "Intervision"', 'status-7': 'In progress', 'note-1': '1. Some data is missing. No corrections.', 'author': 'Created by Yuya Kamoshita with ChatGPT',
+          'file-8': 'In middle school',
+          'status-8': 'Limited access',
+          'date-8': formatDate('2024-06-02', 'en')
+        },
+        ja: {
+          'page-title': 'Information',
+          'page-subtitle': '公開された資料とリソースの一覧',
+          'col-file': 'ファイル', 'col-status': 'ステータス', 'col-update': '最終更新日',
+          'file-1': '基本法 — 第7版', 'status-1': '利用可能', 'date-1': formatDate('2025-06-28', 'ja'),
+          'file-2': '高校1年次', 'status-2': '利用可能', 'date-2': formatDate('2025-03-25', 'ja'),
+          'file-3': '高校2年次', 'status-3': '利用可能', 'date-3': formatDate('2025-06-27', 'ja'),
+          'file-4': '高校3年次', 'status-4': '利用不可', 'date-4': '—',
+          'file-5': '臨時または特別法', 'status-5': '期限切れ', 'date-5': formatDate('2025-03-05', 'ja'),
+          'file-6': '第3号：SNS利用について', 'status-6': '利用可能 / アーカイブ', 'date-6': formatDate('2025-03-05', 'ja'),
+          'file-7': 'テレビチャンネル「インタービジョン」', 'status-7': '作業中', 'note-1': '1. 一部のデータは欠落しています。修正はありません。', 'author': '作者：鴨下友哉&ChatGPT使用',
+          'file-8': '中学生時代',
+          'status-8': '制限あり',
+          'date-8': formatDate('2024-06-02', 'ja')
+        },
+        ru: {
+          'page-title': 'ИНФОРМАЦИОННАЯ САЙТА',
+          'page-subtitle': 'Сводка опубликованных документов и ресурсов',
+          'col-file': 'Файлы', 'col-status': 'Статус', 'col-update': 'Последнее обновление',
+          'file-1': 'Основой Закон — 7-е издание', 'status-1': 'Доступный', 'date-1': formatDate('2025-06-28', 'ru'),
+          'file-2': 'В мой 1-й год обучения в старшей школе', 'status-2': 'Доступный', 'date-2': formatDate('2025-03-25', 'ru'),
+          'file-3': 'В мой 2-й год обучения в старшей школе', 'status-3': 'Доступный', 'date-3': formatDate('2025-06-27', 'ru'),
+          'file-4': 'В мой 3-й год обучения в старшей школе', 'status-4': 'нет в наличии', 'date-4': '—',
+          'file-5': 'Временные или специальные законы', 'status-5': 'Истекший', 'date-5': formatDate('2025-03-05', 'ru'),
+          'file-6': 'Номер 3: об использовании социальных сетей', 'status-6': 'Доступно / Архив', 'date-6': formatDate('2025-03-05', 'ru'),
+          'file-7': 'Телеканал «Интервидение»', 'status-7': 'Работа в процессе', 'note-1': '1. Некоторые данные отсутствуют. Исправлений нет.', 'author': 'Создано: Юя Камошита с ChatGPT',
+          'file-8': 'В средней школе',
+          'status-8': '	Ограниченный доступ',
+          'date-8': formatDate('2024-06-02', 'ru')
+        }
+      };
+      Object.keys(translations[lang]).forEach(id => {
+        const el = document.querySelector(`[data-translate="${id}"]`);
+        if (el) el.textContent = translations[lang][id];
+      });
+    }
 
   </script>
 </body>
