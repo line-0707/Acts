@@ -13,6 +13,10 @@
       --card: #ffffff;
       --muted: #6b7280;
       --accent: #0f172a;
+      --header-bg: #fbfdff;
+      --subcat-bg: #eef2f7;
+      --header-color: var(--muted);
+      --subcat-color: var(--accent);
     }
 
     @media (prefers-color-scheme: dark) {
@@ -21,6 +25,10 @@
         --card: #1e293b;
         --muted: #9ca3af;
         --accent: #f3f4f6;
+        --header-bg: #1e293b;
+        --subcat-bg: #0f172a;
+        --header-color: var(--muted);
+        --subcat-color: var(--accent);
       }
     }
 
@@ -73,9 +81,9 @@
     .title-block {
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: left;
       height: 72px;
-      text-align: center;
+      text-align: left;
       flex-grow: 1
     }
 
@@ -133,10 +141,16 @@
     }
 
     th {
-      background: #fbfdff;
+      background: var(--header-bg);
       font-weight: 700;
-      color: var(--muted);
+      color: var(--header-color);
       font-size: 13px
+    }
+
+    tr.subcat td {
+      background: var(--subcat-bg);
+      color: var(--subcat-color);
+      font-weight: normal;
     }
 
     tr.divider td {
@@ -262,8 +276,8 @@
         </thead>
         <tbody>
           <tr data-date="2025-06-28">
-            <td><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank" rel="noopener">Основой Закон
-                — 7-е издание</a></td>
+            <td><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank" rel="noopener"
+                data-key="link1">Основой Закон — 7-е издание</a></td>
             <td class="status available" data-key="available">Доступный</td>
             <td>28 июня 2025г.</td>
           </tr>
@@ -274,30 +288,35 @@
             </td>
           </tr>
 
+          <!-- 小カテゴリー: 試験結果 -->
+          <tr class="subcat">
+            <td data-key="catExam" colspan="3"></td>
+          </tr>
+
           <tr data-date="2024-06-02">
             <td><a href="https://1drv.ms/x/c/99010fb379641e00/QQAeZHmzDwEggJngRgEAAAAAKEMVkXY9R_795w" target="_blank"
-                rel="noopener">Результаты моих экзаменов — В средней школе</a></td>
+                rel="noopener" data-key="link2">Результаты моих экзаменов — В средней школе</a></td>
             <td class="status limited" data-key="limited">Ограниченный доступ</td>
             <td>2 июня 2024г.</td>
           </tr>
 
           <tr data-date="2025-03-25">
-            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener">В мой 1-й год
-                обучения в старшей школе</a></td>
+            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener"
+                data-key="link3">В мой 1-й год обучения в старшей школе</a></td>
             <td class="status available" data-key="available">Доступный</td>
             <td>25 марта 2025г.</td>
           </tr>
 
           <tr data-date="2025-06-27">
-            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener">В мой 2-й
-                год обучения в старшей школе</a></td>
+            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener"
+                data-key="link4">В мой 2-й год обучения в старшей школе</a></td>
             <td class="status available" data-key="available">Доступный</td>
             <td>27 июня 2025г.</td>
           </tr>
 
           <tr data-date="1970-01-01">
-            <td>В мой 3-й год обучения в старшей школе</td>
-            <td class="status unavailable" data-key="unavailable">нет в наличии</td>
+            <td><s data-key="linkHigh3">В мой 3-й год обучения в старшей школе</s></td>
+            <td class="status unavailable" data-key="unavailable">нет в наличии<sup>1</sup></td>
             <td>—</td>
           </tr>
 
@@ -307,16 +326,21 @@
             </td>
           </tr>
 
+          <!-- 小カテゴリー: Временные или специальные законы -->
+          <tr class="subcat">
+            <td data-key="catTempLaw" colspan="3"></td>
+          </tr>
+
           <tr data-date="2025-03-05">
-            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener">Временные или
-                специальные законы</a></td>
+            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener"
+                data-key="link5">Временные или специальные законы</a></td>
             <td class="status expired" data-key="expired">Истекший</td>
             <td>5 марта 2025г.</td>
           </tr>
 
           <tr data-date="2025-03-05">
-            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener">Номер 3:
-                об использовании социальных сетей</a></td>
+            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener"
+                data-key="link6">Номер 3: об использовании социальных сетей</a></td>
             <td class="status available" data-key="available">Доступно / Архив</td>
             <td>5 марта 2025г.</td>
           </tr>
@@ -328,8 +352,8 @@
           </tr>
 
           <tr data-date="1970-01-01">
-            <td><a href="https://line-0707.github.io/Acts/intervision.html" target="_blank" rel="noopener">Телеканал
-                «Интервидение»</a></td>
+            <td><a href="https://line-0707.github.io/Acts/intervision.html" target="_blank" rel="noopener"
+                data-key="link7">Телеканал «Интервидение»</a></td>
             <td class="status progress" data-key="progress">Работа в процессе</td>
             <td>—</td>
           </tr>
@@ -337,68 +361,132 @@
         </tbody>
       </table>
 
-      <div style="margin-top:12px" class="muted" id="note-text">
-        Примечание: Некоторые данные отсутствуют. Исправлений нет.
-      </div>
-
+      <div style="margin-top:12px" class="muted" id="note-text">1. Некоторые данные отсутствуют. Исправлений нет.</div>
     </section>
 
     <footer class="muted">
-      <span>Сгенерировано автоматически — при необходимости внесу правки по вашему желанию.</span>
-      <span class="last-update" id="auto-last">Последнее обновление: —</span>
+      <span id="author-text">Создано: Юя Камошита с ChatGPT</span>
+      <span class="last-update" id="auto-last">—</span>
     </footer>
   </div>
 
   <script>
-    (function () {
-      const rows = Array.from(document.querySelectorAll('tbody tr'));
-      const dates = rows.map(r => r.dataset.date).filter(d => d && d !== '1970-01-01');
-      if (dates.length === 0) return;
-      const max = dates.reduce((a, b) => new Date(a) > new Date(b) ? a : b);
-      const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-      const dt = new Date(max);
-      const pretty = dt.getDate() + ' ' + months[dt.getMonth()] + ' ' + dt.getFullYear() + 'г.';
-      document.getElementById('auto-last').textContent = 'Последнее обновление: ' + pretty;
-    })();
-
     const translations = {
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
         colFile: 'Файлы', colStatus: 'Статус', colUpdate: 'Последнее обновление',
         available: 'Доступный', limited: 'Ограниченный доступ', expired: 'Истекший', unavailable: 'нет в наличии', progress: 'Работа в процессе',
-        note: 'Примечание: Некоторые данные отсутствуют. Исправлений нет.',
+        note: '1. Некоторые данные отсутствуют. Исправлений нет.',
+        lastUpdateLabel: 'Последнее обновление',
+        author: 'Создано: Юя Камошита с ChatGPT',
+        links: {
+          link1: 'Основой Закон — 7-е издание',
+          link2: 'Результаты моих экзаменов — В средней школе',
+          link3: 'В мой 1-й год обучения в старшей школе',
+          link4: 'В мой 2-й год обучения в старшей школе',
+          link5: 'Временные или специальные законы',
+          link6: 'Номер 3: об использовании социальных сетей',
+          link7: 'Телеканал «Интервидение»',
+          linkHigh3: 'В мой 3-й год обучения в старшей школе'
+        },
+        subcat: {
+          catExam: 'Результаты экзаменов',
+          catTempLaw: 'Временные или специальные законы'
+        },
+        dateFormat: d => `${d.getDate()} ${['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'][d.getMonth()]} ${d.getFullYear()}г.`
       },
       en: {
         title: 'INFORMATION SITE',
         subtitle: 'Summary of published documents and resources',
         colFile: 'Files', colStatus: 'Status', colUpdate: 'Last update',
         available: 'Available', limited: 'Limited access', expired: 'Expired', unavailable: 'Unavailable', progress: 'In progress',
-        note: 'Note: Some data is missing. No corrections.',
+        note: '1. Some data is missing. No corrections.',
+        lastUpdateLabel: 'Last update',
+        author: 'Author: Yuya Kamoshita with ChatGPT',
+        links: {
+          link1: 'Basic Law — 7th edition',
+          link2: 'My exam results — Middle School',
+          link3: 'My 1st year in high school',
+          link4: 'My 2nd year in high school',
+          link5: 'Temporary or special laws',
+          link6: 'No.3: on social network usage',
+          link7: 'Channel «Intervision»',
+          linkHigh3: 'My 3rd year in high school'
+        },
+        subcat: {
+          catExam: 'Exam Results',
+          catTempLaw: 'Temporary or special laws'
+        },
+        dateFormat: d => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
       },
       ja: {
-        title: '情報サイト',
-        subtitle: '公開された文書とリソースのまとめ',
+        title: 'Information',
+        subtitle: '公開済文書とリソース一覧',
         colFile: 'ファイル', colStatus: 'ステータス', colUpdate: '最終更新',
-        available: '利用可能', limited: '制限付き', expired: '期限切れ', unavailable: '未提供', progress: '作業中',
-        note: '注: 一部のデータが欠落しています。修正はありません。',
+        available: '利用可能', limited: '制限付き', expired: '期限切れ', unavailable: '利用不可', progress: '作業中',
+        note: '1. 一部のデータが欠落しています。修正はありません。',
+        lastUpdateLabel: '最終更新',
+        author: '作成者：鴨下友哉 ＆ ChatGPT',
+        links: {
+          link1: '基本法 — 第7版',
+          link2: '中学生時代',
+          link3: '高校1年次',
+          link4: '高校2年次',
+          link5: '臨時法',
+          link6: '第3号: SNS利用について',
+          link7: 'チャンネル インタービジョン',
+          linkHigh3: '高校3年次'
+        },
+        subcat: {
+          catExam: '試験結果',
+          catTempLaw: '臨時法'
+        },
+        dateFormat: d => `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
       }
     };
 
     function setLang(lang) {
       const t = translations[lang];
       if (!t) return;
+
       document.getElementById('page-title').textContent = t.title;
       document.getElementById('page-subtitle').textContent = t.subtitle;
       document.getElementById('col-file').textContent = t.colFile;
       document.getElementById('col-status').textContent = t.colStatus;
       document.getElementById('col-update').textContent = t.colUpdate;
-      document.querySelectorAll('td.status').forEach(td => {
-        const key = td.getAttribute('data-key');
-        if (t[key]) td.textContent = t[key];
+      document.getElementById('note-text').innerHTML = t.note.replace('нет в наличии', 'нет в наличии<sup>1</sup>');
+      document.getElementById('author-text').textContent = t.author;
+
+      // 小カテゴリー
+      Object.keys(t.subcat).forEach(key => {
+        const el = document.querySelector(`td[data-key="${key}"]`);
+        if (el) el.textContent = t.subcat[key];
       });
-      document.getElementById('note-text').textContent = t.note;
+
+      // テーブル内リンクテキストとステータス・日付
+      document.querySelectorAll('tbody tr[data-date]').forEach(tr => {
+        const tdLinkA = tr.querySelector('td a');
+        const tdLinkS = tr.querySelector('td s');
+        if (tdLinkA && tdLinkA.dataset.key && t.links[tdLinkA.dataset.key]) tdLinkA.textContent = t.links[tdLinkA.dataset.key];
+        if (tdLinkS && tdLinkS.dataset.key && t.links[tdLinkS.dataset.key]) tdLinkS.textContent = t.links[tdLinkS.dataset.key];
+
+        const tdStatus = tr.querySelector('td.status');
+        if (tdStatus && tdStatus.dataset.key && t[tdStatus.dataset.key]) tdStatus.innerHTML = t[tdStatus.dataset.key] + (tdStatus.dataset.key === 'unavailable' ? '<sup>1</sup>' : '');
+
+        const tdDate = tr.querySelector('td:last-child');
+        if (tdDate && tdDate.textContent !== '—') {
+          const d = new Date(tr.dataset.date);
+          tdDate.textContent = t.dateFormat(d);
+        }
+      });
+
+      // サイト最終更新日
+      const lastMod = new Date(document.lastModified);
+      document.getElementById('auto-last').textContent = `${t.lastUpdateLabel}: ${t.dateFormat(lastMod)}`;
     }
+
+    setLang('ru');
   </script>
 </body>
 
