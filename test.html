@@ -7,6 +7,7 @@
   <title>ИНФОРМАЦИОННАЯ САЙТА — Документы</title>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     :root {
       --bg: #f7f8fb;
@@ -20,15 +21,8 @@
     }
 
     @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f172a;
-        --card: #1e293b;
-        --muted: #9ca3af;
-        --accent: #f3f4f6;
-        --header-bg: #1e293b;
-        --subcat-bg: #0f172a;
-        --header-color: var(--muted);
-        --subcat-color: var(--accent);
+      body {
+        background: var(--bg) url('source/dark.jpg') center/cover no-repeat;
       }
     }
 
@@ -40,11 +34,8 @@
     }
 
     body {
-      background: var(--bg);
-      color: var(--accent);
-      line-height: 1.5;
-      padding: 28px;
-      position: relative
+      background: var(--bg) url('source/light.jpg') center/cover no-repeat;
+      transition: background 0.3s ease;
     }
 
     .wrap {
@@ -63,19 +54,25 @@
     .logo {
       width: 72px;
       height: 72px;
-      border-radius: 8px;
+      border-radius: 50%;
+      /* 丸にする */
       overflow: hidden;
+      /* 丸の外にはみ出した部分を隠す */
       background: #e6eef9;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0
+      flex-shrink: 0;
     }
 
     .logo img {
-      width: 100%;
+      width: auto;
+      /* 横幅を自動調整 */
       height: 100%;
-      object-fit: cover
+      /* 高さをコンテナいっぱいに */
+      object-fit: cover;
+      /* 余分な部分を切り取る */
+      display: block;
     }
 
     .title-block {
@@ -86,6 +83,37 @@
       text-align: left;
       flex-grow: 1
     }
+
+    .title-block h1,
+    .title-block .lead {
+      text-shadow:
+        1.5px 0 0 var(--stroke),
+        -1.5px 0 0 var(--stroke),
+        0 1.5px 0 var(--stroke),
+        0 -1.5px 0 var(--stroke),
+        1.05px 1.05px 0 var(--stroke),
+        -1.05px 1.05px 0 var(--stroke),
+        1.05px -1.05px 0 var(--stroke),
+        -1.05px -1.05px 0 var(--stroke);
+    }
+
+    /* ライトモード */
+    :root {
+      --title-color: #000;
+      --stroke: #fff;
+    }
+
+    /* ダークモード */
+    .dark {
+      --title-color: #fff;
+      --stroke: #000;
+    }
+
+    .title-block h1,
+    .title-block .lead {
+      color: var(--title-color);
+    }
+
 
     .title-block-inner {
       display: flex;
@@ -221,6 +249,14 @@
       margin-left: auto
     }
 
+    footer,
+    footer .last-update {
+      color: #ffffff !important;
+      /* 常に白文字 */
+      text-shadow: none !important;
+      /* 縁取りを無効化 */
+    }
+
     @media (max-width:640px) {
       .logo {
         width: 56px;
@@ -241,6 +277,21 @@
         text-align: center
       }
     }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      background: var(--card);
+      color: var(--accent);
+      font-size: 24px;
+      border: none;
+      margin-right: 8px;
+    }
   </style>
 </head>
 
@@ -256,12 +307,19 @@
           <p class="lead" id="page-subtitle">Сводка опубликованных документов и ресурсов</p>
         </div>
       </div>
-      <div class="lang-select">
-        <select onchange="setLang(this.value)">
-          <option value="ru">Русский</option>
-          <option value="en">English</option>
-          <option value="ja">日本語</option>
-        </select>
+      <div style="display:flex; align-items:center; gap:4px;">
+        <!-- ライト／ダーク切替ボタン -->
+        <button class="theme-toggle" id="theme-btn">
+          <span class="material-icons" id="theme-icon">light_mode</span>
+        </button>
+
+        <div class="lang-select">
+          <select onchange="setLang(this.value)">
+            <option value="ru">Русский</option>
+            <option value="en">English</option>
+            <option value="ja">日本語</option>
+          </select>
+        </div>
       </div>
     </header>
 
@@ -288,7 +346,6 @@
             </td>
           </tr>
 
-          <!-- 小カテゴリー: 試験結果 -->
           <tr class="subcat">
             <td data-key="catExam" colspan="3"></td>
           </tr>
@@ -301,15 +358,15 @@
           </tr>
 
           <tr data-date="2025-03-25">
-            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener"
-                data-key="link3">В мой 1-й год обучения в старшей школе</a></td>
+            <td><a href="https://1drv.ms/x/c/99010fb379641e00/EQAeZHmzDwEggJmmyQEAAAAB4W5VuetxJJs5e_UGj-7KHg"
+                target="_blank" rel="noopener" data-key="link3">В мой 1-й год обучения в старшей школе</a></td>
             <td class="status available" data-key="available">Доступный</td>
             <td>25 марта 2025г.</td>
           </tr>
 
           <tr data-date="2025-06-27">
-            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener"
-                data-key="link4">В мой 2-й год обучения в старшей школе</a></td>
+            <td><a href="https://1drv.ms/x/c/99010fb379641e00/EVXUlAgX2PhEtEPnpARXmG8BKY75s_HRFe84WexNXmOGAA"
+                target="_blank" rel="noopener" data-key="link4">В мой 2-й год обучения в старшей школе</a></td>
             <td class="status available" data-key="available">Доступный</td>
             <td>27 июня 2025г.</td>
           </tr>
@@ -326,7 +383,6 @@
             </td>
           </tr>
 
-          <!-- 小カテゴリー: Временные или специальные законы -->
           <tr class="subcat">
             <td data-key="catTempLaw" colspan="3"></td>
           </tr>
@@ -486,7 +542,47 @@
       document.getElementById('auto-last').textContent = `${t.lastUpdateLabel}: ${t.dateFormat(lastMod)}`;
     }
 
-    setLang('ru');
+    const themeBtn = document.getElementById('theme-btn');
+    const themeIcon = document.getElementById('theme-icon');
+
+    function setTheme(theme) {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+        document.body.style.backgroundImage = "url('source/dark.jpg')";
+        themeIcon.textContent = 'dark_mode';
+
+        // ダークモード：白文字 + 黒縁取り
+        document.querySelector('.title-block h1').style.color = '#ffffff';
+        document.querySelector('.title-block h1').style.webkitTextStrokeColor = '#000000';
+        document.querySelector('.title-block .lead').style.color = '#ffffff';
+        document.querySelector('.title-block .lead').style.webkitTextStrokeColor = '#000000';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.body.style.backgroundImage = "url('source/light.jpg')";
+        themeIcon.textContent = 'light_mode';
+
+        // ライトモード：黒文字 + 白縁取り
+        document.querySelector('.title-block h1').style.color = '#000000';
+        document.querySelector('.title-block h1').style.webkitTextStrokeColor = '#ffffff';
+        document.querySelector('.title-block .lead').style.color = '#000000';
+        document.querySelector('.title-block .lead').style.webkitTextStrokeColor = '#ffffff';
+      }
+    }
+
+
+
+    themeBtn.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        setTheme('light');
+      } else {
+        setTheme('dark');
+      }
+    });
+
+    // ページロード時に OS の設定を反映
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setTheme(prefersDark ? 'dark' : 'light');
+
   </script>
 </body>
 
