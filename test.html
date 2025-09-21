@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ИНФОРМАЦИОННАЯ САЙТА — Документы</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --muted: #6b7280;
+      --accent: #0f172a;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --muted: #9ca3af;
+        --accent: #f3f4f6;
+      }
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      font-family: 'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--accent);
+      line-height: 1.5;
+      padding: 28px;
+      position: relative
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px
+    }
+
+    .logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #e6eef9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 72px;
+      text-align: center;
+      flex-grow: 1
+    }
+
+    .title-block-inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0
+    }
+
+    p.lead {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .lang-select {
+      position: relative
+    }
+
+    .lang-select select {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      background: #e5e7eb;
+      color: #111827;
+      cursor: pointer
+    }
+
+    .card {
+      background: var(--card);
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 14px
+    }
+
+    th {
+      background: #fbfdff;
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    tr.divider td {
+      border: none;
+      padding: 0
+    }
+
+    tr.divider td hr {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 8px 0
+    }
+
+    td.status {
+      white-space: nowrap;
+      border-radius: 6px
+    }
+
+    .status.available {
+      background: #d1fae5;
+      color: #065f46;
+      font-weight: 600
+    }
+
+    .status.limited {
+      background: #fef9c3;
+      color: #92400e;
+      font-weight: 600
+    }
+
+    .status.expired,
+    .status.unavailable,
+    .status.progress {
+      background: #fecaca;
+      color: #991b1b;
+      font-weight: 600
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    td a {
+      color: #0366d6;
+      text-decoration: none
+    }
+
+    td a:hover {
+      text-decoration: underline
+    }
+
+    .title-link {
+      color: inherit;
+      text-decoration: none
+    }
+
+    footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    footer .last-update {
+      margin-left: auto
+    }
+
+    @media (max-width:640px) {
+      .logo {
+        width: 56px;
+        height: 56px
+      }
+
+      th,
+      td {
+        padding: 8px
+      }
+
+      header {
+        gap: 10px;
+        flex-direction: column
+      }
+
+      .title-block {
+        text-align: center
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <a href="https://line-0707.github.io/Acts/index.html" class="logo"><img src="source/icon.webp" alt="ИНФ"></a>
+      <div class="title-block">
+        <div class="title-block-inner">
+          <a href="https://line-0707.github.io/Acts/index.html" class="title-link">
+            <h1 id="page-title">ИНФОРМАЦИОННАЯ САЙТА</h1>
+          </a>
+          <p class="lead" id="page-subtitle">Сводка опубликованных документов и ресурсов</p>
+        </div>
+      </div>
+      <div class="lang-select">
+        <select onchange="setLang(this.value)">
+          <option value="ru">Русский</option>
+          <option value="en">English</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="card">
+      <table aria-label="Документы">
+        <thead>
+          <tr>
+            <th id="col-file">Файлы</th>
+            <th id="col-status">Статус</th>
+            <th id="col-update">Последнее обновление</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-date="2025-06-28">
+            <td><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank" rel="noopener">Основой Закон
+                — 7-е издание</a></td>
+            <td class="status available" data-key="available">Доступный</td>
+            <td>28 июня 2025г.</td>
+          </tr>
+
+          <tr class="divider">
+            <td colspan="3">
+              <hr>
+            </td>
+          </tr>
+
+          <tr data-date="2024-06-02">
+            <td><a href="https://1drv.ms/x/c/99010fb379641e00/QQAeZHmzDwEggJngRgEAAAAAKEMVkXY9R_795w" target="_blank"
+                rel="noopener">Результаты моих экзаменов — В средней школе</a></td>
+            <td class="status limited" data-key="limited">Ограниченный доступ</td>
+            <td>2 июня 2024г.</td>
+          </tr>
+
+          <tr data-date="2025-03-25">
+            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener">В мой 1-й год
+                обучения в старшей школе</a></td>
+            <td class="status available" data-key="available">Доступный</td>
+            <td>25 марта 2025г.</td>
+          </tr>
+
+          <tr data-date="2025-06-27">
+            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener">В мой 2-й
+                год обучения в старшей школе</a></td>
+            <td class="status available" data-key="available">Доступный</td>
+            <td>27 июня 2025г.</td>
+          </tr>
+
+          <tr data-date="1970-01-01">
+            <td>В мой 3-й год обучения в старшей школе</td>
+            <td class="status unavailable" data-key="unavailable">нет в наличии</td>
+            <td>—</td>
+          </tr>
+
+          <tr class="divider">
+            <td colspan="3">
+              <hr>
+            </td>
+          </tr>
+
+          <tr data-date="2025-03-05">
+            <td><a href="https://line-0707.github.io/Acts/sp_latest.html" target="_blank" rel="noopener">Временные или
+                специальные законы</a></td>
+            <td class="status expired" data-key="expired">Истекший</td>
+            <td>5 марта 2025г.</td>
+          </tr>
+
+          <tr data-date="2025-03-05">
+            <td><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html" target="_blank" rel="noopener">Номер 3:
+                об использовании социальных сетей</a></td>
+            <td class="status available" data-key="available">Доступно / Архив</td>
+            <td>5 марта 2025г.</td>
+          </tr>
+
+          <tr class="divider">
+            <td colspan="3">
+              <hr>
+            </td>
+          </tr>
+
+          <tr data-date="1970-01-01">
+            <td><a href="https://line-0707.github.io/Acts/intervision.html" target="_blank" rel="noopener">Телеканал
+                «Интервидение»</a></td>
+            <td class="status progress" data-key="progress">Работа в процессе</td>
+            <td>—</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <div style="margin-top:12px" class="muted" id="note-text">
+        Примечание: Некоторые данные отсутствуют. Исправлений нет.
+      </div>
+
+    </section>
+
+    <footer class="muted">
+      <span>Сгенерировано автоматически — при необходимости внесу правки по вашему желанию.</span>
+      <span class="last-update" id="auto-last">Последнее обновление: —</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const rows = Array.from(document.querySelectorAll('tbody tr'));
+      const dates = rows.map(r => r.dataset.date).filter(d => d && d !== '1970-01-01');
+      if (dates.length === 0) return;
+      const max = dates.reduce((a, b) => new Date(a) > new Date(b) ? a : b);
+      const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+      const dt = new Date(max);
+      const pretty = dt.getDate() + ' ' + months[dt.getMonth()] + ' ' + dt.getFullYear() + 'г.';
+      document.getElementById('auto-last').textContent = 'Последнее обновление: ' + pretty;
+    })();
+
+    const translations = {
+      ru: {
+        title: 'ИНФОРМАЦИОННАЯ САЙТА',
+        subtitle: 'Сводка опубликованных документов и ресурсов',
+        colFile: 'Файлы', colStatus: 'Статус', colUpdate: 'Последнее обновление',
+        available: 'Доступный', limited: 'Ограниченный доступ', expired: 'Истекший', unavailable: 'нет в наличии', progress: 'Работа в процессе',
+        note: 'Примечание: Некоторые данные отсутствуют. Исправлений нет.',
+      },
+      en: {
+        title: 'INFORMATION SITE',
+        subtitle: 'Summary of published documents and resources',
+        colFile: 'Files', colStatus: 'Status', colUpdate: 'Last update',
+        available: 'Available', limited: 'Limited access', expired: 'Expired', unavailable: 'Unavailable', progress: 'In progress',
+        note: 'Note: Some data is missing. No corrections.',
+      },
+      ja: {
+        title: '情報サイト',
+        subtitle: '公開された文書とリソースのまとめ',
+        colFile: 'ファイル', colStatus: 'ステータス', colUpdate: '最終更新',
+        available: '利用可能', limited: '制限付き', expired: '期限切れ', unavailable: '未提供', progress: '作業中',
+        note: '注: 一部のデータが欠落しています。修正はありません。',
+      }
+    };
+
+    function setLang(lang) {
+      const t = translations[lang];
+      if (!t) return;
+      document.getElementById('page-title').textContent = t.title;
+      document.getElementById('page-subtitle').textContent = t.subtitle;
+      document.getElementById('col-file').textContent = t.colFile;
+      document.getElementById('col-status').textContent = t.colStatus;
+      document.getElementById('col-update').textContent = t.colUpdate;
+      document.querySelectorAll('td.status').forEach(td => {
+        const key = td.getAttribute('data-key');
+        if (t[key]) td.textContent = t[key];
+      });
+      document.getElementById('note-text').textContent = t.note;
+    }
+  </script>
+</body>
+
+</html>
