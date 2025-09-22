@@ -11,14 +11,14 @@
   <style>
     :root {
       --bg: #f7f8fb;
-      --card-light: rgba(255, 255, 255, 0.85);
-      --card-dark: rgba(0, 0, 0, 0.5);
+      --card-light: rgba(255, 255, 255, 0.95);
+      --card-dark: rgba(6, 8, 15, 0.65);
       --the: #6b7280;
       --accent: #0f172a;
       --header-bg-light: rgba(255, 255, 255, 0.85);
       --header-bg-dark: rgba(0, 0, 0, 0.5);
       --subcat-bg-light: rgba(238, 242, 247, 0.85);
-      --subcat-bg-dark: rgba(0, 0, 0, 0.3);
+      --subcat-bg-dark: rgba(255, 255, 255, 0.03);
       --title-color-light: #000;
       --title-color-dark: #fff;
       --stroke: #ffffff;
@@ -30,7 +30,7 @@
     body {
       height: 100%;
       margin: 0;
-      font-family: 'Noto Sans JP', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+      font-family: 'Noto Sans JP', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: var(--bg) url('source/light.jpg') center/cover no-repeat;
       transition: background 0.3s ease;
     }
@@ -38,6 +38,7 @@
     .wrap {
       max-width: 980px;
       margin: 0 auto;
+      padding: 18px;
     }
 
     header {
@@ -124,6 +125,7 @@
       border-collapse: collapse;
       margin-top: 12px;
       transition: color 0.3s ease, background 0.3s ease;
+      color: #0b1220;
     }
 
     th,
@@ -131,6 +133,7 @@
       padding: 10px 12px;
       text-align: left;
       font-size: 14px;
+      vertical-align: middle;
     }
 
     th {
@@ -143,7 +146,7 @@
     tr.subcat td {
       background: var(--subcat-bg-light);
       color: var(--accent);
-      font-weight: normal;
+      font-weight: 600;
     }
 
     tr.divider td {
@@ -160,23 +163,26 @@
     td.status {
       white-space: nowrap;
       border-radius: 6px;
+      padding: 6px 10px;
+      display: inline-block;
     }
 
-    .status.available {
+    /* light mode status colors */
+    td.status.available {
       background: #d1fae5;
       color: #065f46;
       font-weight: 600;
     }
 
-    .status.limited {
+    td.status.limited {
       background: #fef9c3;
       color: #92400e;
       font-weight: 600;
     }
 
-    .status.expired,
-    .status.unavailable,
-    .status.progress {
+    td.status.expired,
+    td.status.unavailable,
+    td.status.progress {
       background: #fecaca;
       color: #991b1b;
       font-weight: 600;
@@ -195,6 +201,17 @@
     .title-link {
       color: inherit;
       text-decoration: none;
+    }
+
+    /* 3年目リンク専用: 下線なし、取り消し線あり、ライトモード黒／ダークモード白 */
+    a.broken-link {
+      text-decoration: line-through;
+      cursor: default;
+      color: #000000 !important;
+    }
+
+    .dark a.broken-link {
+      color: #ffffff !important;
     }
 
     footer {
@@ -234,6 +251,7 @@
     /* Dark mode styles */
     .dark body {
       background-image: url('source/dark.jpg');
+      background-color: #071024;
     }
 
     .dark .card {
@@ -241,17 +259,17 @@
     }
 
     .dark table {
-      color: #fff;
+      color: #e6eef8;
     }
 
     .dark th {
       background: var(--header-bg-dark);
-      color: #fff;
+      color: #e6eef8;
     }
 
     .dark tr.subcat td {
       background: var(--subcat-bg-dark);
-      color: #fff;
+      color: #e6eef8;
     }
 
     .dark td a {
@@ -265,7 +283,51 @@
 
     .dark #note-text {
       color: #e5e7eb;
-      /* 薄い灰色で見やすく */
+    }
+
+    /* ステータスの色付き中黒をライト/ダーク両方で表示 */
+    td.status::before {
+      content: '●';
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 0.85em;
+      vertical-align: middle;
+      opacity: 0.95;
+    }
+
+    td.status.available::before {
+      color: #10b981;
+    }
+
+    td.status.limited::before {
+      color: #f59e0b;
+    }
+
+    td.status.expired::before,
+    td.status.unavailable::before,
+    td.status.progress::before {
+      color: #ef4444;
+    }
+
+    /* ダークモードでは背景は控えめに */
+    .dark td.status.available {
+      background: rgba(16, 185, 129, 0.12);
+      color: #d1fae5;
+      font-weight: 700;
+    }
+
+    .dark td.status.limited {
+      background: rgba(245, 158, 11, 0.10);
+      color: #ffedd5;
+      font-weight: 700;
+    }
+
+    .dark td.status.expired,
+    .dark td.status.unavailable,
+    .dark td.status.progress {
+      background: rgba(239, 68, 68, 0.10);
+      color: #ffecec;
+      font-weight: 700;
     }
 
     @media (max-width:640px) {
@@ -294,21 +356,22 @@
 <body>
   <div class="wrap">
     <header>
-      <a href="#" class="logo"><img src="source/icon.webp" alt="ИНФ"></a>
+      <a href="#" class="logo" aria-hidden="true"><img src="source/icon.webp" alt="ИНФ"></a>
       <div class="title-block">
         <div class="title-block-inner">
           <a href="#" class="title-link">
-            <h1 id="page-title">ИНФОРМАЦИОННАЯ САЙТА</h1>
+            <h1 id="page-title" data-translate="page-title">ИНФОРМАЦИОННАЯ САЙТА</h1>
           </a>
-          <p class="lead" id="page-subtitle">Сводка опубликованных документов и ресурсов</p>
+          <p class="lead" id="page-subtitle" data-translate="page-subtitle">Сводка опубликованных документов и ресурсов
+          </p>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:4px;">
-        <button class="theme-toggle" id="theme-btn">
+        <button class="theme-toggle" id="theme-btn" aria-label="Toggle theme">
           <span class="material-icons" id="theme-icon">light_mode</span>
         </button>
         <div class="lang-select">
-          <select onchange="setLang(this.value)">
+          <select id="lang-select" aria-label="Language selector">
             <option value="ru">Русский</option>
             <option value="en">English</option>
             <option value="ja">日本語</option>
@@ -329,8 +392,7 @@
         <tbody>
           <tr data-translate-row="1">
             <td data-translate="file-1"><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank"
-                rel="noopener" data-key="link1">Основой
-                Закон — 7-е издание</a></td>
+                rel="noopener">Основой Закон — 7-е издание</a></td>
             <td class="status available" data-translate="status-1">Доступный</td>
             <td data-translate="date-1" data-date="2025-06-28">28 июня 2025г.</td>
           </tr>
@@ -343,9 +405,7 @@
             <td data-translate="subcat-1" colspan="3">Результаты моих экзаменов</td>
           </tr>
           <tr data-translate-row="8">
-            <td data-translate="file-8"><a
-                href="https://1drv.ms/x/c/99010fb379641e00/QQAeZHmzDwEggJngRgEAAAAAKEMVkXY9R_795w" target="_blank"
-                rel="noopener" data-key="link1">В средней школе</a></td>
+            <td data-translate="file-8"><a href="#">В средней школе</a></td>
             <td class="status limited" data-translate="status-8">Ограниченный доступ</td>
             <td data-translate="date-8" data-date="2024-06-02">2 июня 2024г.</td>
           </tr>
@@ -360,7 +420,10 @@
             <td data-translate="date-3" data-date="2025-06-27">27 июня 2025г.</td>
           </tr>
           <tr data-translate-row="4">
-            <td data-translate="file-4"><s>В мой 3-й год обучения в старшей школе</s></td>
+            <td data-translate="file-4">
+              <a href="#" class="broken-link" onclick="event.preventDefault();" aria-disabled="true">В мой 3-й год
+                обучения в старшей школе</a>
+            </td>
             <td class="status unavailable" data-translate="status-4">нет в наличии<sup>1</sup></td>
             <td data-translate="date-4">—</td>
           </tr>
@@ -404,7 +467,8 @@
   <script>
     const themeBtn = document.getElementById('theme-btn');
     const themeIcon = document.getElementById('theme-icon');
-
+    const langSelect = document.getElementById('lang-select');
+    let currentLang = 'ru';
     function setTheme(theme) {
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -416,81 +480,82 @@
         themeIcon.style.color = '#0f172a';
       }
     }
-
     themeBtn.addEventListener('click', () => {
       setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
     });
-
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     setTheme(prefersDark ? 'dark' : 'light');
-
-    function formatDate(dateStr, lang) {
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return dateStr;
-      return d.toLocaleDateString(lang);
+    function formatDisplayDate(dateInput, lang = 'ru', withTime = false) {
+      const d = new Date(dateInput);
+      if (isNaN(d.getTime())) return dateInput;
+      const day = d.getDate();
+      const year = d.getFullYear();
+      const hours = d.getHours().toString().padStart(2, '0');
+      const minutes = d.getMinutes().toString().padStart(2, '0');
+      if (lang === 'ru') {
+        const monthName = new Intl.DateTimeFormat('ru', { month: 'long' }).format(d);
+        const datePart = `${day} ${monthName} ${year}г.`;
+        return withTime ? `${datePart}, ${hours}:${minutes}` : datePart;
+      } else if (lang === 'en') {
+        const datePart = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(d);
+        return withTime ? `${datePart}, ${hours}:${minutes}` : datePart;
+      } else if (lang === 'ja') {
+        const month = d.getMonth() + 1;
+        const datePart = `${year}年${month}月${day}日`;
+        return withTime ? `${datePart} ${hours}:${minutes}` : datePart;
+      } else {
+        return withTime ? `${d.toLocaleString(lang)}` : `${d.toLocaleDateString(lang)}`;
+      }
     }
-
-    function updateLastModified() {
-      const lastMod = new Date(document.lastModified);
-      const dateStr = isNaN(lastMod.getTime()) ? new Date().toLocaleDateString() : lastMod.toLocaleDateString();
-      document.getElementById('auto-last').textContent = `Последнее обновление: ${dateStr}`;
+    function setPreserveInlineChildren(el, text) {
+      if (!el) return;
+      const a = el.querySelector('a'); if (a) { a.textContent = text; return; }
+      const s = el.querySelector('s'); if (s) { s.textContent = text; return; }
+      const sup = el.querySelector('sup');
+      if (sup) {
+        const rest = Array.from(el.children).filter(ch => ch.tagName === 'SUP').map(ch => ch.outerHTML).join('');
+        el.innerHTML = text + rest; return;
+      }
+      el.textContent = text;
     }
-    updateLastModified();
-
+    function updateLastModified(lang = currentLang) {
+      const lastModRaw = document.lastModified;
+      const lastModDate = new Date(lastModRaw);
+      const fallback = new Date();
+      const finalDate = isNaN(lastModDate.getTime()) ? fallback : lastModDate;
+      const prefix = { ru: 'Последнее обновление:', en: 'Last updated:', ja: '最終更新：' }[lang] || 'Last updated:';
+      document.getElementById('auto-last').textContent = `${prefix} ${formatDisplayDate(finalDate.toISOString(), lang, true)}`;
+    }
+    const translations = {
+      en: { 'page-title': 'INFORMATION SITE', 'page-subtitle': 'Summary of published documents and resources', 'col-file': 'Files', 'col-status': 'Status', 'col-update': 'Last update', 'file-1': 'Basic Law — 7th edition', 'status-1': 'Available', 'file-2': 'In my 1st year of high school', 'status-2': 'Available', 'file-3': 'In my 2nd year of high school', 'status-3': 'Available', 'file-4': 'In my 3rd year of high school', 'status-4': 'Unavailable', 'file-5': 'Temporary or special laws', 'status-5': 'Expired', 'file-6': 'No.3: on social network usage', 'status-6': 'Available / Archive', 'file-7': 'TV Channel "Intervision"', 'status-7': 'In progress', 'note-1': '1. Some data is missing. No corrections.', 'author': 'Created by Yuya Kamoshita with ChatGPT', 'file-8': 'In middle school', 'status-8': 'Limited access', 'subcat-1': 'My exam results' },
+      ja: { 'page-title': 'Information', 'page-subtitle': '公開された資料とリソースの一覧', 'col-file': 'ファイル', 'col-status': 'ステータス', 'col-update': '最終更新日', 'file-1': '基本法 — 第7版', 'status-1': '利用可能', 'file-2': '高校1年次', 'status-2': '利用可能', 'file-3': '高校2年次', 'status-3': '利用可能', 'file-4': '高校3年次', 'status-4': '利用不可', 'file-5': '臨時または特別法', 'status-5': '期限切れ', 'file-6': '第3号：SNS利用について', 'status-6': '利用可能 / アーカイブ', 'file-7': 'テレビチャンネル「インタービジョン」', 'status-7': '作業中', 'note-1': '1. 一部のデータは欠落しています。修正はありません。', 'author': '作者：鴨下友哉&ChatGPT使用', 'file-8': '中学生時代', 'status-8': '制限あり', 'subcat-1': '私の試験結果' },
+      ru: { 'page-title': 'ИНФОРМАЦИОННАЯ САЙТА', 'page-subtitle': 'Сводка опубликованных документов и ресурсов', 'col-file': 'Файлы', 'col-status': 'Статус', 'col-update': 'Последнее обновление', 'file-1': 'Основой Закон — 7-е издание', 'status-1': 'Доступный', 'file-2': 'В мой 1-й год обучения в старшей школе', 'status-2': 'Доступный', 'file-3': 'В мой 2-й год обучения в старшей школе', 'status-3': 'Доступный', 'file-4': 'В мой 3-й год обучения в старшей школе', 'status-4': 'нет в наличии', 'file-5': 'Временные или специальные законы', 'status-5': 'Истекший', 'file-6': 'Номер 3: об использовании социальных сетей', 'status-6': 'Доступно / Архив', 'file-7': 'Телеканал «Интервидение»', 'status-7': 'Работа в процессе', 'note-1': '1. Некоторые данные отсутствуют. Исправлений нет.', 'author': 'Создано: Юя Камошита с ChatGPT', 'file-8': 'В средней школе', 'status-8': 'Ограниченный доступ', 'subcat-1': 'Результаты моих экзаменов' }
+    };
     function setLang(lang) {
-      const translations = {
-        en: {
-          'page-title': 'INFORMATION SITE',
-          'page-subtitle': 'Summary of published documents and resources',
-          'col-file': 'Files', 'col-status': 'Status', 'col-update': 'Last update',
-          'file-1': 'Basic Law — 7th edition', 'status-1': 'Available', 'date-1': formatDate('2025-06-28', 'en'),
-          'file-2': 'In my 1st year of high school', 'status-2': 'Available', 'date-2': formatDate('2025-03-25', 'en'),
-          'file-3': 'In my 2nd year of high school', 'status-3': 'Available', 'date-3': formatDate('2025-06-27', 'en'),
-          'file-4': 'In my 3rd year of high school', 'status-4': 'Unavailable', 'date-4': '—',
-          'file-5': 'Temporary or special laws', 'status-5': 'Expired', 'date-5': formatDate('2025-03-05', 'en'),
-          'file-6': 'No.3: on social network usage', 'status-6': 'Available / Archive', 'date-6': formatDate('2025-03-05', 'en'),
-          'file-7': 'TV Channel "Intervision"', 'status-7': 'In progress', 'note-1': '1. Some data is missing. No corrections.', 'author': 'Created by Yuya Kamoshita with ChatGPT',
-          'file-8': 'In middle school',
-          'status-8': 'Limited access',
-          'date-8': formatDate('2024-06-02', 'en')
-        },
-        ja: {
-          'page-title': 'Information',
-          'page-subtitle': '公開された資料とリソースの一覧',
-          'col-file': 'ファイル', 'col-status': 'ステータス', 'col-update': '最終更新日',
-          'file-1': '基本法 — 第7版', 'status-1': '利用可能', 'date-1': formatDate('2025-06-28', 'ja'),
-          'file-2': '高校1年次', 'status-2': '利用可能', 'date-2': formatDate('2025-03-25', 'ja'),
-          'file-3': '高校2年次', 'status-3': '利用可能', 'date-3': formatDate('2025-06-27', 'ja'),
-          'file-4': '高校3年次', 'status-4': '利用不可', 'date-4': '—',
-          'file-5': '臨時または特別法', 'status-5': '期限切れ', 'date-5': formatDate('2025-03-05', 'ja'),
-          'file-6': '第3号：SNS利用について', 'status-6': '利用可能 / アーカイブ', 'date-6': formatDate('2025-03-05', 'ja'),
-          'file-7': 'テレビチャンネル「インタービジョン」', 'status-7': '作業中', 'note-1': '1. 一部のデータは欠落しています。修正はありません。', 'author': '作者：鴨下友哉&ChatGPT使用',
-          'file-8': '中学生時代',
-          'status-8': '制限あり',
-          'date-8': formatDate('2024-06-02', 'ja')
-        },
-        ru: {
-          'page-title': 'ИНФОРМАЦИОННАЯ САЙТА',
-          'page-subtitle': 'Сводка опубликованных документов и ресурсов',
-          'col-file': 'Файлы', 'col-status': 'Статус', 'col-update': 'Последнее обновление',
-          'file-1': 'Основой Закон — 7-е издание', 'status-1': 'Доступный', 'date-1': formatDate('2025-06-28', 'ru'),
-          'file-2': 'В мой 1-й год обучения в старшей школе', 'status-2': 'Доступный', 'date-2': formatDate('2025-03-25', 'ru'),
-          'file-3': 'В мой 2-й год обучения в старшей школе', 'status-3': 'Доступный', 'date-3': formatDate('2025-06-27', 'ru'),
-          'file-4': 'В мой 3-й год обучения в старшей школе', 'status-4': 'нет в наличии', 'date-4': '—',
-          'file-5': 'Временные или специальные законы', 'status-5': 'Истекший', 'date-5': formatDate('2025-03-05', 'ru'),
-          'file-6': 'Номер 3: об использовании социальных сетей', 'status-6': 'Доступно / Архив', 'date-6': formatDate('2025-03-05', 'ru'),
-          'file-7': 'Телеканал «Интервидение»', 'status-7': 'Работа в процессе', 'note-1': '1. Некоторые данные отсутствуют. Исправлений нет.', 'author': 'Создано: Юя Камошита с ChatGPT',
-          'file-8': 'В средней школе',
-          'status-8': '	Ограниченный доступ',
-          'date-8': formatDate('2024-06-02', 'ru')
-        }
-      };
-      Object.keys(translations[lang]).forEach(id => {
+      currentLang = lang;
+      const map = translations[lang] || translations['ru'];
+      Object.keys(map).forEach(id => {
         const el = document.querySelector(`[data-translate="${id}"]`);
-        if (el) el.textContent = translations[lang][id];
+        if (el) setPreserveInlineChildren(el, map[id]);
+      });
+      document.querySelectorAll('[data-date]').forEach(el => {
+        const iso = el.getAttribute('data-date');
+        if (!iso || iso.trim() === '') return;
+        const formatted = formatDisplayDate(iso, lang, false);
+        setPreserveInlineChildren(el, formatted);
+      });
+      updateLastModified(lang);
+      if (langSelect) langSelect.value = lang;
+    }
+    if (langSelect) {
+      langSelect.addEventListener('change', (e) => {
+        setLang(e.target.value);
       });
     }
-
+    (function init() {
+      const initial = langSelect ? langSelect.value || 'ru' : 'ru';
+      setLang(initial);
+    })();
   </script>
 </body>
 
