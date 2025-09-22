@@ -26,13 +26,25 @@
       --link-dark: #5ab6ff;
     }
 
-    html,
+    /* 修正箇所：背景の指定方法を変更 */
+    html {
+      min-height: 100%;
+      background: var(--bg) url('source/light.jpg') center/cover no-repeat;
+      /* 背景をhtml要素に設定 */
+      transition: background 0.3s ease;
+    }
+
     body {
-      height: 100%;
+      min-height: 100%;
       margin: 0;
       font-family: 'Noto Sans JP', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: var(--bg) url('source/light.jpg') center/cover no-repeat;
-      transition: background 0.3s ease;
+      /* body自体の背景は設定せず、親であるhtmlの背景を透過表示させる */
+    }
+
+    /* 修正箇所：ダークモードの背景もhtml要素に適用 */
+    .dark html {
+      background-image: url('source/dark.jpg');
+      background-color: #071024;
     }
 
     .wrap {
@@ -126,6 +138,8 @@
       margin-top: 12px;
       transition: color 0.3s ease, background 0.3s ease;
       color: #0b1220;
+      table-layout: fixed;
+      /* 文字のはみ出しを防止 */
     }
 
     th,
@@ -134,7 +148,23 @@
       text-align: left;
       font-size: 14px;
       vertical-align: middle;
+      overflow-wrap: break-word;
+      /* 文字のはみ出しを防止 */
     }
+
+    /* 各列の幅を設定 */
+    #col-file {
+      width: 55%;
+    }
+
+    #col-status {
+      width: 20%;
+    }
+
+    #col-update {
+      width: 25%;
+    }
+
 
     th {
       background: var(--header-bg-light);
@@ -249,9 +279,8 @@
     }
 
     /* Dark mode styles */
-    .dark body {
-      background-image: url('source/dark.jpg');
-      background-color: #071024;
+    .dark {
+      background: #071024 url('source/dark.jpg') center/cover no-repeat;
     }
 
     .dark .card {
