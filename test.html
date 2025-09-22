@@ -26,11 +26,9 @@
       --link-dark: #5ab6ff;
     }
 
-    /* 修正箇所：背景の指定方法を変更 */
     html {
       min-height: 100%;
       background: var(--bg) url('source/light.jpg') center/cover no-repeat;
-      /* 背景をhtml要素に設定 */
       transition: background 0.3s ease;
     }
 
@@ -38,13 +36,10 @@
       min-height: 100%;
       margin: 0;
       font-family: 'Noto Sans JP', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      /* body自体の背景は設定せず、親であるhtmlの背景を透過表示させる */
     }
 
-    /* 修正箇所：ダークモードの背景もhtml要素に適用 */
     .dark html {
-      background-image: url('source/dark.jpg');
-      background-color: #071024;
+      background: #071024 url('source/dark.jpg') center/cover no-repeat;
     }
 
     .wrap {
@@ -136,23 +131,34 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 12px;
+      table-layout: auto;
+      /* PCでは自動幅 */
       transition: color 0.3s ease, background 0.3s ease;
-      color: #0b1220;
-      table-layout: fixed;
-      /* 文字のはみ出しを防止 */
+    }
+
+
+    #col-file {
+      width: 55%;
+      /* ファイル列 */
+    }
+
+    #col-status {
+      width: 20%;
+      /* ステータス列 */
+    }
+
+    #col-update {
+      width: 25%;
+      white-space: nowrap;
     }
 
     th,
     td {
       padding: 10px 12px;
-      text-align: left;
       font-size: 14px;
       vertical-align: middle;
-      overflow-wrap: break-word;
-      /* 文字のはみ出しを防止 */
     }
 
-    /* 各列の幅を設定 */
     #col-file {
       width: 55%;
     }
@@ -191,13 +197,11 @@
     }
 
     td.status {
+      display: table-cell;
+      text-align: left;
       white-space: nowrap;
-      border-radius: 6px;
-      padding: 6px 10px;
-      display: inline-block;
     }
 
-    /* light mode status colors */
     td.status.available {
       background: #d1fae5;
       color: #065f46;
@@ -233,7 +237,6 @@
       text-decoration: none;
     }
 
-    /* 3年目リンク専用: 下線なし、取り消し線あり、ライトモード黒／ダークモード白 */
     a.broken-link {
       text-decoration: line-through;
       cursor: default;
@@ -244,6 +247,7 @@
       color: #ffffff !important;
     }
 
+    /* デスクトップ用フッターのスタイル */
     footer {
       margin-top: 18px;
       font-size: 13px;
@@ -278,7 +282,6 @@
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* Dark mode styles */
     .dark {
       background: #071024 url('source/dark.jpg') center/cover no-repeat;
     }
@@ -314,7 +317,6 @@
       color: #e5e7eb;
     }
 
-    /* ステータスの色付き中黒をライト/ダーク両方で表示 */
     td.status::before {
       content: '●';
       display: inline-block;
@@ -338,7 +340,6 @@
       color: #ef4444;
     }
 
-    /* ダークモードでは背景は控えめに */
     .dark td.status.available {
       background: rgba(16, 185, 129, 0.12);
       color: #d1fae5;
@@ -359,25 +360,323 @@
       font-weight: 700;
     }
 
-    @media (max-width:640px) {
-      .logo {
-        width: 56px;
-        height: 56px;
+    /* --- モバイル表示用のスタイル --- */
+    @media (max-width: 640px) {
+      td.status {
+        display: none;
       }
 
-      th,
-      td {
-        padding: 8px;
+      th#col-status {
+        display: none;
       }
 
-      header {
-        gap: 10px;
-        flex-direction: column;
+      #col-file {
+        width: 70%;
       }
 
-      .title-block {
-        text-align: center;
+      #col-update {
+        width: 30%;
+        white-space: normal;
       }
+    }
+
+
+    /* 改行許可 */
+    td.file-with-status.available::before {
+      color: #10b981;
+    }
+
+    td.file-with-status.limited::before {
+      color: #f59e0b;
+    }
+
+    td.file-with-status.expired::before,
+    td.file-with-status.unavailable::before {
+      color: #ef4444;
+    }
+
+    td.file-with-status {
+      position: relative;
+      padding-left: 25px;
+      /* 中黒分の余白 */
+    }
+
+    td.status {
+      display: none;
+    }
+
+    /* 元のステータス列は非表示 */
+
+
+    th,
+    td {
+      padding: 10px 12px;
+      /* 余計な二重指定を削除 */
+      text-align: left;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    td.status {
+      display: table-cell;
+      /* PC表示で復活 */
+      white-space: nowrap;
+      /* 文字を折り返さない */
+    }
+
+    /* モバイルでのフッターの改行と中央揃え */
+    footer {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 修正：ヘッダーからステータス列のみを非表示にする */
+    th#col-status {
+      display: none;
+    }
+
+    /* 修正：モバイル表示でtd.statusを完全に非表示にする */
+    td.status {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      padding-left: 25px;
+      /* 中黒と文字の間隔 */
+    }
+
+    td.status::before {
+      content: '●';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85em;
+      opacity: 0.95;
+    }
+
+    td.status .status-text {
+      margin-left: 8px;
+      /* 中黒と文字の間隔 */
+      transform: none;
+    }
+
+    /* 修正：モバイル表示でファイルと最終更新日の幅を7:3に設定 */
+    #col-file {
+      width: 70%;
+    }
+
+    #col-update {
+      width: 30%;
+    }
+
+    /* 修正：ヘッダーのレイアウトをCSS Gridに変更 */
+    header {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      justify-items: center;
+    }
+
+    .title-block {
+      text-align: center;
+      grid-row: 3;
+    }
+
+    /* 修正：ボタン類をGridの1行目・右端に配置 */
+    header>div:last-of-type {
+      grid-row: 1;
+      justify-self: end;
+    }
+
+    /* 凡例を横並びにするためのスタイル */
+    .mobile-status-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .mobile-status-legend p {
+      margin: 0;
+      width: 100%;
+      text-align: center;
+    }
+
+    .mobile-status-legend .legend-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+      /* gapを使用するためマージンを削除 */
+    }
+
+    .mobile-status-legend .legend-dot {
+      content: '●';
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 0.85em;
+      opacity: 0.95;
+    }
+
+    .mobile-status-legend .legend-dot.available {
+      color: #10b981;
+    }
+
+    .mobile-status-legend .legend-dot.limited {
+      color: #f59e0b;
+    }
+
+    .mobile-status-legend .legend-dot.expired,
+    .mobile-status-legend .legend-dot.unavailable {
+      color: #ef4444;
+    }
+
+    .dark .mobile-status-legend {
+      color: #d1d5db;
+    }
+
+    td.file-with-status {
+      position: relative;
+      padding-left: 30px;
+    }
+
+    td.file-with-status::before {
+      content: '●';
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85em;
+      opacity: 0.95;
+    }
+
+    td.file-with-status.available::before {
+      color: #10b981;
+    }
+
+    td.file-with-status.limited::before {
+      color: #f59e0b;
+    }
+
+    td.file-with-status.expired::before,
+    td.file-with-status.unavailable::before {
+      color: #ef4444;
+    }
+
+    /* モバイル表示で非表示にする列を指定 */
+    td.status {
+      display: flex;
+      align-items: center;
+      position: relative;
+      white-space: nowrap;
+      padding-left: 25px;
+      /* 中黒分の余白 */
+    }
+
+    td.status::before {
+      content: '●';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85em;
+      opacity: 0.95;
+    }
+
+    td.status.available::before {
+      color: #10b981;
+    }
+
+    td.status.limited::before {
+      color: #f59e0b;
+    }
+
+    td.status.expired,
+    td.status.unavailable,
+    td.status.progress::before {
+      color: #ef4444;
+    }
+
+    td.status .status-text {
+      margin-left: 4px;
+      /* 文字を少し左に */
+    }
+
+    /* 列幅は自動、最小幅は設定 */
+    th#col-status {
+      width: auto;
+      min-width: 120px;
+    }
+
+    th#col-update,
+    td[data-translate^="date-"] {
+      display: table-cell;
+      /* 見出しが消えないように */
+      width: auto;
+      white-space: nowrap;
+    }
+
+    /* デスクトップ表示での凡例非表示 */
+    @media (min-width: 641px) {
+      .mobile-status-legend {
+        display: none;
+      }
+
+      /* ステータス列の文字だけ左に寄せるラッパー */
+      td.status {
+        display: flex;
+        align-items: center;
+        position: relative;
+        white-space: nowrap;
+        padding-left: 25px;
+        /* 中黒分の余白 */
+      }
+
+      td.status::before {
+        content: '●';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 0.85em;
+        opacity: 0.95;
+      }
+
+      td.status.available::before {
+        color: #10b981;
+      }
+
+      td.status.limited::before {
+        color: #f59e0b;
+      }
+
+      td.status.expired,
+      td.status.unavailable,
+      td.status.progress::before {
+        color: #ef4444;
+      }
+
+      td.status .status-text {
+        margin-left: 8px;
+        /* 中黒との間隔 */
+      }
+
+      /* 列幅は自動、言語による文字数を吸収 */
+      th#col-status {
+        width: auto;
+        min-width: 120px;
+      }
+
+      /* 最終更新列は固定せず auto */
+      th#col-update,
+      td[data-translate^="date-"] {
+        display: table-cell;
+        width: auto;
+        white-space: nowrap;
+      }
+
     }
   </style>
 </head>
@@ -414,7 +713,9 @@
         <thead>
           <tr>
             <th id="col-file" data-translate="col-file">Файлы</th>
-            <th id="col-status" data-translate="col-status">Статус</th>
+            <th id="col-status" data-translate="col-status">
+              <span class="status-text">Статус</span>
+            </th>
             <th id="col-update" data-translate="col-update">Последнее обновление</th>
           </tr>
         </thead>
@@ -422,7 +723,9 @@
           <tr data-translate-row="1">
             <td data-translate="file-1"><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank"
                 rel="noopener">Основой Закон — 7-е издание</a></td>
-            <td class="status available" data-translate="status-1">Доступный</td>
+            <td class="status available" data-translate="status-1">
+              <span class="status-text">Доступный</span>
+            </td>
             <td data-translate="date-1" data-date="2025-06-28">28 июня 2025г.</td>
           </tr>
           <tr class="divider">
@@ -435,17 +738,23 @@
           </tr>
           <tr data-translate-row="8">
             <td data-translate="file-8"><a href="#">В средней школе</a></td>
-            <td class="status limited" data-translate="status-8">Ограниченный доступ</td>
+            <td class="status limited" data-translate="status-8">
+              <span class="status-text">Ограниченный доступ</span>
+            </td>
             <td data-translate="date-8" data-date="2024-06-02">2 июня 2024г.</td>
           </tr>
           <tr data-translate-row="2">
             <td data-translate="file-2"><a href="#">В мой 1-й год обучения в старшей школе</a></td>
-            <td class="status available" data-translate="status-2">Доступный</td>
+            <td class="status available" data-translate="status-2">
+              <span class="status-text">Доступный</span>
+            </td>
             <td data-translate="date-2" data-date="2025-03-25">25 марта 2025г.</td>
           </tr>
           <tr data-translate-row="3">
             <td data-translate="file-3"><a href="#">В мой 2-й год обучения в старшей школе</a></td>
-            <td class="status available" data-translate="status-3">Доступный</td>
+            <td class="status available" data-translate="status-3">
+              <span class="status-text">Доступный</span>
+            </td>
             <td data-translate="date-3" data-date="2025-06-27">27 июня 2025г.</td>
           </tr>
           <tr data-translate-row="4">
@@ -453,7 +762,9 @@
               <a href="#" class="broken-link" onclick="event.preventDefault();" aria-disabled="true">В мой 3-й год
                 обучения в старшей школе</a>
             </td>
-            <td class="status unavailable" data-translate="status-4">нет в наличии<sup>1</sup></td>
+            <td class="status unavailable" data-translate="status-4">
+              <span class="status-text">нет в наличии<sup>1</sup></span>
+            </td>
             <td data-translate="date-4">—</td>
           </tr>
           <tr class="divider">
@@ -463,12 +774,16 @@
           </tr>
           <tr data-translate-row="5">
             <td data-translate="file-5"><a href="#">Временные или специальные законы</a></td>
-            <td class="status expired" data-translate="status-5">Истекший</td>
+            <td class="status expired" data-translate="status-5">
+              <span class="status-text">Истекший</span>
+            </td>
             <td data-translate="date-5" data-date="2025-03-05">5 марта 2025г.</td>
           </tr>
           <tr data-translate-row="6">
             <td data-translate="file-6"><a href="#">Номер 3: об использовании социальных сетей</a></td>
-            <td class="status available" data-translate="status-6">Доступно / Архив</td>
+            <td class="status available" data-translate="status-6">
+              <span class="status-text">Доступно / Архив</span>
+            </td>
             <td data-translate="date-6" data-date="2025-03-05">5 марта 2025г.</td>
           </tr>
           <tr class="divider">
@@ -478,16 +793,28 @@
           </tr>
           <tr data-translate-row="7">
             <td data-translate="file-7"><a href="#">Телеканал «Интервидение»</a></td>
-            <td class="status progress" data-translate="status-7">Работа в процессе</td>
+            <td class="status available" data-translate="status-1">
+              <span class="status-text">Доступный</span>
+            </td>
             <td data-translate="date-7">—</td>
           </tr>
         </tbody>
       </table>
       <div style="margin-top:12px" class="muted" id="note-text" data-translate="note-1">1. Некоторые данные отсутствуют.
         Исправлений нет.</div>
+
+      <div class="mobile-status-legend">
+        <p><strong data-translate="legend-title">凡例：</strong></p>
+        <div class="legend-item"><span class="legend-dot available">●</span><span
+            data-translate="status-legend-available">利用可能</span></div>
+        <div class="legend-item"><span class="legend-dot limited">●</span><span
+            data-translate="status-legend-limited">制限あり</span></div>
+        <div class="legend-item"><span class="legend-dot expired">●</span><span
+            data-translate="status-legend-expired">期限切れ / 利用不可</span></div>
+      </div>
     </section>
 
-    <footer class="muted">
+    <footer>
       <span id="author-text" data-translate="author">Создано: Юя Камошита с ChatGPT</span>
       <span class="last-update" id="auto-last">—</span>
     </footer>
@@ -498,6 +825,7 @@
     const themeIcon = document.getElementById('theme-icon');
     const langSelect = document.getElementById('lang-select');
     let currentLang = 'ru';
+
     function setTheme(theme) {
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -509,11 +837,14 @@
         themeIcon.style.color = '#0f172a';
       }
     }
+
     themeBtn.addEventListener('click', () => {
       setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
     });
+
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     setTheme(prefersDark ? 'dark' : 'light');
+
     function formatDisplayDate(dateInput, lang = 'ru', withTime = false) {
       const d = new Date(dateInput);
       if (isNaN(d.getTime())) return dateInput;
@@ -522,11 +853,17 @@
       const hours = d.getHours().toString().padStart(2, '0');
       const minutes = d.getMinutes().toString().padStart(2, '0');
       if (lang === 'ru') {
-        const monthName = new Intl.DateTimeFormat('ru', { month: 'long' }).format(d);
+        const monthName = new Intl.DateTimeFormat('ru', {
+          month: 'long'
+        }).format(d);
         const datePart = `${day} ${monthName} ${year}г.`;
         return withTime ? `${datePart}, ${hours}:${minutes}` : datePart;
       } else if (lang === 'en') {
-        const datePart = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).format(d);
+        const datePart = new Intl.DateTimeFormat('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        }).format(d);
         return withTime ? `${datePart}, ${hours}:${minutes}` : datePart;
       } else if (lang === 'ja') {
         const month = d.getMonth() + 1;
@@ -536,30 +873,142 @@
         return withTime ? `${d.toLocaleString(lang)}` : `${d.toLocaleDateString(lang)}`;
       }
     }
+
     function setPreserveInlineChildren(el, text) {
       if (!el) return;
-      const a = el.querySelector('a'); if (a) { a.textContent = text; return; }
-      const s = el.querySelector('s'); if (s) { s.textContent = text; return; }
+      const span = el.querySelector('.status-text');
+      if (span) {
+        span.textContent = text;
+        return;
+      }
+
+      const a = el.querySelector('a');
+      if (a) {
+        a.textContent = text;
+        return;
+      }
+
+      const s = el.querySelector('s');
+      if (s) {
+        s.textContent = text;
+        return;
+      }
+
       const sup = el.querySelector('sup');
       if (sup) {
         const rest = Array.from(el.children).filter(ch => ch.tagName === 'SUP').map(ch => ch.outerHTML).join('');
-        el.innerHTML = text + rest; return;
+        el.innerHTML = text + rest;
+        return;
       }
+
       el.textContent = text;
     }
+
     function updateLastModified(lang = currentLang) {
       const lastModRaw = document.lastModified;
       const lastModDate = new Date(lastModRaw);
       const fallback = new Date();
       const finalDate = isNaN(lastModDate.getTime()) ? fallback : lastModDate;
-      const prefix = { ru: 'Последнее обновление:', en: 'Last updated:', ja: '最終更新：' }[lang] || 'Last updated:';
+      const prefix = {
+        ru: 'Последнее обновление:',
+        en: 'Last updated:',
+        ja: '最終更新：'
+      }[lang] || 'Last updated:';
       document.getElementById('auto-last').textContent = `${prefix} ${formatDisplayDate(finalDate.toISOString(), lang, true)}`;
     }
+
     const translations = {
-      en: { 'page-title': 'INFORMATION SITE', 'page-subtitle': 'Summary of published documents and resources', 'col-file': 'Files', 'col-status': 'Status', 'col-update': 'Last update', 'file-1': 'Basic Law — 7th edition', 'status-1': 'Available', 'file-2': 'In my 1st year of high school', 'status-2': 'Available', 'file-3': 'In my 2nd year of high school', 'status-3': 'Available', 'file-4': 'In my 3rd year of high school', 'status-4': 'Unavailable', 'file-5': 'Temporary or special laws', 'status-5': 'Expired', 'file-6': 'No.3: on social network usage', 'status-6': 'Available / Archive', 'file-7': 'TV Channel "Intervision"', 'status-7': 'In progress', 'note-1': '1. Some data is missing. No corrections.', 'author': 'Created by Yuya Kamoshita with ChatGPT', 'file-8': 'In middle school', 'status-8': 'Limited access', 'subcat-1': 'My exam results' },
-      ja: { 'page-title': 'Information', 'page-subtitle': '公開された資料とリソースの一覧', 'col-file': 'ファイル', 'col-status': 'ステータス', 'col-update': '最終更新日', 'file-1': '基本法 — 第7版', 'status-1': '利用可能', 'file-2': '高校1年次', 'status-2': '利用可能', 'file-3': '高校2年次', 'status-3': '利用可能', 'file-4': '高校3年次', 'status-4': '利用不可', 'file-5': '臨時または特別法', 'status-5': '期限切れ', 'file-6': '第3号：SNS利用について', 'status-6': '利用可能 / アーカイブ', 'file-7': 'テレビチャンネル「インタービジョン」', 'status-7': '作業中', 'note-1': '1. 一部のデータは欠落しています。修正はありません。', 'author': '作者：鴨下友哉&ChatGPT使用', 'file-8': '中学生時代', 'status-8': '制限あり', 'subcat-1': '私の試験結果' },
-      ru: { 'page-title': 'ИНФОРМАЦИОННАЯ САЙТА', 'page-subtitle': 'Сводка опубликованных документов и ресурсов', 'col-file': 'Файлы', 'col-status': 'Статус', 'col-update': 'Последнее обновление', 'file-1': 'Основой Закон — 7-е издание', 'status-1': 'Доступный', 'file-2': 'В мой 1-й год обучения в старшей школе', 'status-2': 'Доступный', 'file-3': 'В мой 2-й год обучения в старшей школе', 'status-3': 'Доступный', 'file-4': 'В мой 3-й год обучения в старшей школе', 'status-4': 'нет в наличии', 'file-5': 'Временные или специальные законы', 'status-5': 'Истекший', 'file-6': 'Номер 3: об использовании социальных сетей', 'status-6': 'Доступно / Архив', 'file-7': 'Телеканал «Интервидение»', 'status-7': 'Работа в процессе', 'note-1': '1. Некоторые данные отсутствуют. Исправлений нет.', 'author': 'Создано: Юя Камошита с ChatGPT', 'file-8': 'В средней школе', 'status-8': 'Ограниченный доступ', 'subcat-1': 'Результаты моих экзаменов' }
+      en: {
+        'page-title': 'INFORMATION SITE',
+        'page-subtitle': 'Summary of published documents and resources',
+        'col-file': 'Files',
+        'col-status': 'Status',
+        'col-update': 'Last update',
+        'file-1': 'Basic Law — 7th edition',
+        'status-1': 'Available',
+        'file-2': 'In my 1st year of high school',
+        'status-2': 'Available',
+        'file-3': 'In my 2nd year of high school',
+        'status-3': 'Available',
+        'file-4': 'In my 3rd year of high school',
+        'status-4': 'Unavailable',
+        'file-5': 'Temporary or special laws',
+        'status-5': 'Expired',
+        'file-6': 'No.3: on social network usage',
+        'status-6': 'Available / Archive',
+        'file-7': 'TV Channel "Intervision"',
+        'status-7': 'In progress',
+        'note-1': '1. Some data is missing. No corrections.',
+        'author': 'Created by Yuya Kamoshita with ChatGPT',
+        'file-8': 'In middle school',
+        'status-8': 'Limited access',
+        'legend-title': 'Legend',
+        'status-legend-available': 'Available',
+        'status-legend-limited': 'Limited Access',
+        'status-legend-expired': 'Expired / Unavailable'
+      },
+      ja: {
+        'page-title': 'Information',
+        'page-subtitle': '公開された資料とリソースの一覧',
+        'col-file': 'ファイル',
+        'col-status': 'ステータス',
+        'col-update': '最終更新日',
+        'file-1': '基本法 — 第7版',
+        'status-1': '利用可能',
+        'file-2': '高校1年次',
+        'status-2': '利用可能',
+        'file-3': '高校2年次',
+        'status-3': '利用可能',
+        'file-4': '高校3年次',
+        'status-4': '利用不可',
+        'file-5': '臨時または特別法',
+        'status-5': '期限切れ',
+        'file-6': '第3号：SNS利用について',
+        'status-6': '利用可能 / アーカイブ',
+        'file-7': 'テレビチャンネル「インタービジョン」',
+        'status-7': '作業中',
+        'note-1': '1. 一部のデータは欠落しています。修正はありません。',
+        'author': '作者：鴨下友哉&ChatGPT使用',
+        'file-8': '中学生時代',
+        'status-8': '制限あり',
+        'subcat-1': '私の試験結果',
+        'legend-title': '凡例',
+        'status-legend-available': '利用可能',
+        'status-legend-limited': '制限あり',
+        'status-legend-expired': '期限切れ / 利用不可'
+      },
+      ru: {
+        'page-title': 'ИНФОРМАЦИОННАЯ САЙТА',
+        'page-subtitle': 'Сводка опубликованных документов и ресурсов',
+        'col-file': 'Файлы',
+        'col-status': 'Статус',
+        'col-update': 'Последнее обновление',
+        'file-1': 'Основой Закон — 7-е издание',
+        'status-1': 'Доступный',
+        'file-2': 'В мой 1-й год обучения в старшей школе',
+        'status-2': 'Доступный',
+        'file-3': 'В мой 2-й год обучения в старшей школе',
+        'status-3': 'Доступный',
+        'file-4': 'В мой 3-й год обучения в старшей школе',
+        'status-4': 'нет в наличии',
+        'file-5': 'Временные или специальные законы',
+        'status-5': 'Истекший',
+        'file-6': 'Номер 3: об использовании социальных сетей',
+        'status-6': 'Доступно / Архив',
+        'file-7': 'Телеканал «Интервидение»',
+        'status-7': 'Работа в процессе',
+        'note-1': '1. Некоторые данные отсутствуют. Исправлений нет.',
+        'author': 'Создано: Юя Камошита с ChatGPT',
+        'file-8': 'В средней школе',
+        'status-8': 'Ограниченный доступ',
+        'subcat-1': 'Результаты моих экзаменов',
+        'legend-title': 'Легенда',
+        'status-legend-available': 'Доступный',
+        'status-legend-limited': 'Ограниченный доступ',
+        'status-legend-expired': 'Истекший / нет в наличии'
+      }
     };
+
     function setLang(lang) {
       currentLang = lang;
       const map = translations[lang] || translations['ru'];
@@ -575,15 +1024,47 @@
       });
       updateLastModified(lang);
       if (langSelect) langSelect.value = lang;
+      updateMobileView();
     }
+
+    // かっこ書きを削除する対象のデータ翻訳キー
+    const noParenFiles = ['file-1', 'file-8', 'file-2', 'file-3', 'file-4', 'file-7'];
+
+    function updateMobileView() {
+      const isMobile = window.matchMedia("(max-width: 640px)").matches;
+      document.querySelectorAll('#docs-table tbody tr').forEach(row => {
+        const fileCell = row.querySelector('[data-translate^="file-"]');
+        const statusCell = row.querySelector('.status');
+        if (!fileCell) return;
+
+        // ステータスクラスを判定
+        let statusClass = '';
+        if (statusCell) {
+          if (statusCell.classList.contains('available')) statusClass = 'available';
+          else if (statusCell.classList.contains('limited')) statusClass = 'limited';
+          else if (statusCell.classList.contains('expired') || statusCell.classList.contains('unavailable') || statusCell.classList.contains('progress')) statusClass = 'expired';
+        }
+
+        if (isMobile) {
+          fileCell.classList.add('file-with-status', statusClass);
+        } else {
+          fileCell.classList.remove('file-with-status', 'available', 'limited', 'expired', 'unavailable', 'progress');
+        }
+      });
+    }
+
     if (langSelect) {
       langSelect.addEventListener('change', (e) => {
         setLang(e.target.value);
       });
     }
+
+    window.addEventListener('resize', updateMobileView);
+
     (function init() {
       const initial = langSelect ? langSelect.value || 'ru' : 'ru';
       setLang(initial);
+      updateMobileView();
     })();
   </script>
 </body>
