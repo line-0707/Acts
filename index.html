@@ -720,95 +720,7 @@
             <th id="col-update" data-translate="col-update">Последнее обновление</th>
           </tr>
         </thead>
-        <tbody>
-          <tr data-translate-row="1">
-            <td data-translate="file-1"><a href="https://line-0707.github.io/Acts/cons_latest.html" target="_blank"
-                rel="noopener">Основой Закон — 7-е издание</a></td>
-            <td class="status available" data-translate="status-1">
-              <span class="status-text">Доступный</span>
-            </td>
-            <td data-translate="date-1" data-date="2025-06-28">28 июня 2025г.</td>
-          </tr>
-          <tr class="divider">
-            <td colspan="3">
-              <hr>
-            </td>
-          </tr>
-          <tr class="subcat" data-translate-row="subcat-1">
-            <td data-translate="subcat-1" colspan="3">Результаты моих экзаменов</td>
-          </tr>
-          <tr data-translate-row="8">
-            <td data-translate="file-8"><a
-                href="https://1drv.ms/x/c/99010fb379641e00/QQAeZHmzDwEggJngRgEAAAAAKEMVkXY9R_795w">В средней школе</a>
-            </td>
-            <td class="status limited" data-translate="status-8">
-              <span class="status-text">Ограниченный доступ</span>
-            </td>
-            <td data-translate="date-8" data-date="2024-06-02">2 июня 2024г.</td>
-          </tr>
-          <tr data-translate-row="2">
-            <td data-translate="file-2"><a
-                href="https://1drv.ms/x/c/99010fb379641e00/EQAeZHmzDwEggJmmyQEAAAAB4W5VuetxJJs5e_UGj-7KHg">В мой 1-й год
-                обучения в старшей школе</a></td>
-            <td class="status available" data-translate="status-2">
-              <span class="status-text">Доступный</span>
-            </td>
-            <td data-translate="date-2" data-date="2025-03-25">25 марта 2025г.</td>
-          </tr>
-          <tr data-translate-row="3">
-            <td data-translate="file-3"><a
-                href="https://1drv.ms/x/c/99010fb379641e00/EVXUlAgX2PhEtEPnpARXmG8BKY75s_HRFe84WexNXmOGAA">В мой 2-й год
-                обучения в старшей школе</a></td>
-            <td class="status available" data-translate="status-3">
-              <span class="status-text">Доступный</span>
-            </td>
-            <td data-translate="date-3" data-date="2025-10-23">23 октября 2025г.</td>
-          </tr>
-          <tr data-translate-row="4">
-            <td data-translate="file-4">
-              <a href="#" class="broken-link" onclick="event.preventDefault();" aria-disabled="true">В мой 3-й год
-                обучения в старшей школе</a>
-            </td>
-            <td class="status unavailable" data-translate="status-4">
-              <span class="status-text">нет в наличии<sup>1</sup></span>
-            </td>
-            <td data-translate="date-4">—</td>
-          </tr>
-          <tr class="divider">
-            <td colspan="3">
-              <hr>
-            </td>
-          </tr>
-          <tr data-translate-row="5">
-            <td data-translate="file-5"><a href="https://line-0707.github.io/Acts/sp_latest.html">Временные или
-                специальные законы</a></td>
-            <td class="status expired" data-translate="status-5">
-              <span class="status-text">Истекший</span>
-            </td>
-            <td data-translate="date-5" data-date="2025-03-05">5 марта 2025г.</td>
-          </tr>
-          <tr data-translate-row="6">
-            <td data-translate="file-6"><a href="https://line-0707.github.io/Acts/archive/sp_3rd.html">Номер 3: об
-                использовании социальных сетей</a></td>
-            <td class="status available" data-translate="status-6">
-              <span class="status-text">Доступно / Архив</span>
-            </td>
-            <td data-translate="date-6" data-date="2025-03-05">5 марта 2025г.</td>
-          </tr>
-          <tr class="divider">
-            <td colspan="3">
-              <hr>
-            </td>
-          </tr>
-          <tr data-translate-row="7">
-            <td data-translate="file-7"><a href="https://line-0707.github.io/Acts/intervison.html">Телеканал
-                «Интервидение»</a></td>
-            <td class="status available" data-translate="status-1">
-              <span class="status-text">Доступный</span>
-            </td>
-            <td data-translate="date-7">—</td>
-          </tr>
-        </tbody>
+
       </table>
       <div style="margin-top:12px" class="muted" id="note-text" data-translate="note-1">1. Некоторые данные отсутствуют.
         Исправлений нет.</div>
@@ -823,6 +735,18 @@
             data-translate="status-legend-expired">期限切れ / 利用不可</span></div>
       </div>
     </section>
+    <table aria-label="Документы" id="docs-table">
+      <thead>
+        <tr>
+          <th id="col-file">Файлы</th>
+          <th id="col-status">Статус</th>
+          <th id="col-update">Последнее обновление</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- CSVから自動生成 -->
+      </tbody>
+    </table>
 
     <footer>
       <span id="author-text" data-translate="author">Создано: Юя Камошита с ChatGPT</span>
@@ -934,28 +858,8 @@
         'col-file': 'Files',
         'col-status': 'Status',
         'col-update': 'Last update',
-        'file-1': 'Basic Law — 7th edition',
-        'status-1': 'Available',
-        'file-2': 'In my 1st year of high school',
-        'status-2': 'Available',
-        'file-3': 'In my 2nd year of high school',
-        'status-3': 'Available',
-        'file-4': 'In my 3rd year of high school',
-        'status-4': 'Unavailable',
-        'file-5': 'Temporary or special laws',
-        'status-5': 'Expired',
-        'file-6': 'No.3: on social network usage',
-        'status-6': 'Available / Archive',
-        'file-7': 'TV Channel "Intervision"',
-        'status-7': 'In progress',
         'note-1': '1. Some data is missing. No corrections.',
         'author': 'Created by Yuya Kamoshita with ChatGPT',
-        'file-8': 'In middle school',
-        'status-8': 'Limited access',
-        'legend-title': 'Legend',
-        'status-legend-available': 'Available',
-        'status-legend-limited': 'Limited Access',
-        'status-legend-expired': 'Expired / Unavailable'
       },
       ja: {
         'page-title': 'Information',
@@ -963,29 +867,8 @@
         'col-file': 'ファイル',
         'col-status': 'ステータス',
         'col-update': '最終更新日',
-        'file-1': '基本法 — 第7版',
-        'status-1': '利用可能',
-        'file-2': '高校1年次',
-        'status-2': '利用可能',
-        'file-3': '高校2年次',
-        'status-3': '利用可能',
-        'file-4': '高校3年次',
-        'status-4': '利用不可',
-        'file-5': '臨時または特別法',
-        'status-5': '期限切れ',
-        'file-6': '第3号：SNS利用について',
-        'status-6': '利用可能 / アーカイブ',
-        'file-7': 'テレビチャンネル「インタービジョン」',
-        'status-7': '作業中',
         'note-1': '1. 一部のデータは欠落しています。修正はありません。',
         'author': '作者：鴨下友哉&ChatGPT使用',
-        'file-8': '中学生時代',
-        'status-8': '制限あり',
-        'subcat-1': '私の試験結果',
-        'legend-title': '凡例',
-        'status-legend-available': '利用可能',
-        'status-legend-limited': '制限あり',
-        'status-legend-expired': '期限切れ / 利用不可'
       },
       ru: {
         'page-title': 'ИНФОРМАЦИОННАЯ САЙТА',
@@ -993,29 +876,8 @@
         'col-file': 'Файлы',
         'col-status': 'Статус',
         'col-update': 'Последнее обновление',
-        'file-1': 'Основой Закон — 7-е издание',
-        'status-1': 'Доступный',
-        'file-2': 'В мой 1-й год обучения в старшей школе',
-        'status-2': 'Доступный',
-        'file-3': 'В мой 2-й год обучения в старшей школе',
-        'status-3': 'Доступный',
-        'file-4': 'В мой 3-й год обучения в старшей школе',
-        'status-4': 'нет в наличии',
-        'file-5': 'Временные или специальные законы',
-        'status-5': 'Истекший',
-        'file-6': 'Номер 3: об использовании социальных сетей',
-        'status-6': 'Доступно / Архив',
-        'file-7': 'Телеканал «Интервидение»',
-        'status-7': 'Работа в процессе',
         'note-1': '1. Некоторые данные отсутствуют. Исправлений нет.',
         'author': 'Создано: Юя Камошита с ChatGPT',
-        'file-8': 'В средней школе',
-        'status-8': 'Ограниченный доступ',
-        'subcat-1': 'Результаты моих экзаменов',
-        'legend-title': 'Легенда',
-        'status-legend-available': 'Доступный',
-        'status-legend-limited': 'Ограниченный доступ',
-        'status-legend-expired': 'Истекший / нет в наличии'
       }
     };
 
@@ -1076,6 +938,145 @@
       setLang(initial);
       updateMobileView();
     })();
+    async function loadCSVData() {
+      const sheetId = "1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo";
+      const sheetName = "index-data";
+      const jsonUrl = `https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?sheet=index-data&tqx=out:json`;
+      const tableBody = document.querySelector("#docs-table tbody");
+      if (!tableBody) return;
+
+      try {
+        const response = await fetch(jsonUrl);
+        const text = await response.text();
+
+        // gvizレスポンスは "/*O_o*/ google.visualization.Query.setResponse(...)" 形式
+        const json = JSON.parse(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
+        const rows = json.table.rows;
+        const headers = json.table.cols.map(c => c.label.toLowerCase());
+
+        tableBody.innerHTML = "";
+
+        rows.forEach(row => {
+          const record = Object.fromEntries(headers.map((h, i) => [h, (row[i]?.v ?? "").trim()]));
+          const titleRu = record["files"];
+          const titleEn = record["en"];
+          const titleJa = record["jp"];
+          const url = record["link"];
+          const statusCode = record["status"];
+          const dateStr = record["last_update"];
+
+          if (!titleRu) return;
+
+          // カテゴリ行（cat[...]）
+          const catMatch = titleRu.match(/^cat\[(.+?)\]$/i);
+          if (catMatch) {
+            const tr = document.createElement("tr");
+            tr.className = "subcat";
+            const titleTextRu = catMatch[1];
+            const titleTextEn = titleEn?.match(/^cat\[(.+?)\]$/i)?.[1] ?? titleTextRu;
+            const titleTextJa = titleJa?.match(/^cat\[(.+?)\]$/i)?.[1] ?? titleTextRu;
+            const td = document.createElement("td");
+            td.colSpan = 3;
+            td.dataset.ru = titleTextRu;
+            td.dataset.en = titleTextEn;
+            td.dataset.ja = titleTextJa;
+            td.textContent = titleTextRu;
+            tr.appendChild(td);
+            tableBody.appendChild(tr);
+            return;
+          }
+
+          // 通常行
+          const tr = document.createElement("tr");
+          let statusClass = "", statusText = {};
+          if (statusCode === "g") {
+            statusClass = "available";
+            statusText = { ru: "Доступный", en: "Available", ja: "利用可能" };
+          } else if (statusCode === "e") {
+            statusClass = "limited";
+            statusText = { ru: "Ограниченный доступ", en: "Limited Access", ja: "制限あり" };
+          } else if (statusCode === "ex") {
+            statusClass = "expired";
+            statusText = { ru: "Истекший", en: "Expired", ja: "期限切れ" };
+          }
+
+          const tdFile = document.createElement("td");
+          tdFile.dataset.ru = titleRu;
+          tdFile.dataset.en = titleEn;
+          tdFile.dataset.ja = titleJa;
+          if (url && url !== "#") {
+            tdFile.innerHTML = `<a href="${url}" target="_blank" rel="noopener">${titleRu}</a>`;
+          } else {
+            tdFile.innerHTML = `<a href="#" class="broken-link" onclick="event.preventDefault();" aria-disabled="true">${titleRu}</a>`;
+          }
+
+          const tdStatus = document.createElement("td");
+          tdStatus.className = `status ${statusClass}`;
+          tdStatus.dataset.statusRu = statusText.ru;
+          tdStatus.dataset.statusEn = statusText.en;
+          tdStatus.dataset.statusJa = statusText.ja;
+          tdStatus.innerHTML = `<span class="status-text">${statusText[currentLang] ?? ""}</span>`;
+
+          const tdDate = document.createElement("td");
+          if (dateStr && !isNaN(Date.parse(dateStr))) {
+            const iso = new Date(dateStr).toISOString();
+            tdDate.setAttribute("data-date", iso);
+            tdDate.textContent = formatDisplayDate(iso, currentLang);
+          } else {
+            tdDate.textContent = "—";
+          }
+
+          tr.appendChild(tdFile);
+          tr.appendChild(tdStatus);
+          tr.appendChild(tdDate);
+          tableBody.appendChild(tr);
+        });
+
+        updateMobileView();
+      } catch (err) {
+        console.error("❌ シート読み込みエラー:", err);
+      }
+    }
+    document.addEventListener("DOMContentLoaded", loadCSVData);
+
+
+    // 言語切替時にCSV部分も翻訳
+    function updateCSVLang(lang) {
+      document.querySelectorAll("#docs-table tbody tr").forEach(tr => {
+        const td = tr.querySelector("td:first-child");
+        const tdStatus = tr.querySelector("td.status");
+        const tdDate = tr.querySelector("td[data-date]");
+
+        if (tr.classList.contains("subcat")) {
+          td.textContent = td.dataset[lang] ?? td.dataset.ru;
+          return;
+        }
+
+        if (td && td.dataset[lang]) {
+          const a = td.querySelector("a");
+          if (a) a.textContent = td.dataset[lang];
+        }
+
+        if (tdStatus && tdStatus.dataset[`status${lang.charAt(0).toUpperCase() + lang.slice(1)}`]) {
+          tdStatus.querySelector(".status-text").textContent =
+            tdStatus.dataset[`status${lang.charAt(0).toUpperCase() + lang.slice(1)}`];
+        }
+
+        if (tdDate && tdDate.dataset.date) {
+          tdDate.textContent = formatDisplayDate(tdDate.dataset.date, lang);
+        }
+      });
+    }
+
+    // setLangの拡張
+    const originalSetLang = setLang;
+    setLang = function (lang) {
+      originalSetLang(lang);
+      updateCSVLang(lang);
+    };
+
+    // ページ読み込み時にCSVをロード
+    document.addEventListener("DOMContentLoaded", loadCSVData);
   </script>
 </body>
 
