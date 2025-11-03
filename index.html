@@ -167,7 +167,6 @@
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
 
-    // --- TRANSLATION DATA ---
     const translations = {
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
@@ -191,29 +190,64 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link']);
 
-    // --- MAIN LOGIC ---
+    // --- NEW, ROBUST CSV PARSER ---
+    function parseCSV(csvText) {
+      const rows = [];
+      let currentRow = [];
+      let currentCell = '';
+      let inQuotes = false;
+      // Normalize line endings
+      csvText = csvText.replace(/\r\n/g, '\n');
+      for (let i = 0; i < csvText.length; i++) {
+        const char = csvText[i];
+        if (inQuotes) {
+          if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') {
+            currentCell += '"';
+            i++; // Skip next quote
+          } else if (char === '"') {
+            inQuotes = false;
+          } else {
+            currentCell += char;
+          }
+        } else {
+          if (char === '"') {
+            inQuotes = true;
+          } else if (char === ',') {
+            currentRow.push(currentCell.trim());
+            currentCell = '';
+          } else if (char === '\n') {
+            currentRow.push(currentCell.trim());
+            rows.push(currentRow);
+            currentRow = [];
+            currentCell = '';
+          } else {
+            currentCell += char;
+          }
+        }
+      }
+      if (currentCell || currentRow.length > 0) {
+        currentRow.push(currentCell.trim());
+        rows.push(currentRow);
+      }
+      return rows;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
-        button.addEventListener('click', () => {
-          renderPage(button.dataset.lang);
-        });
+        button.addEventListener('click', () => renderPage(button.dataset.lang));
       });
       fetchAndRender();
     });
 
     function fetchAndRender() {
       fetch(sheetUrl)
-        .then(response => response.ok ? response.text() : Promise.reject('Network response was not ok.'))
+        .then(response => response.ok ? response.text() : Promise.reject('Network error'))
         .then(csvText => {
-          const rows = csvText.trim().split('\n').map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
-          if (rows.length < 1) throw new Error('No data found in the sheet.');
+          fullData = parseCSV(csvText); // Use the new parser
+          if (fullData.length < 1) throw new Error('No data found');
 
-          fullData = rows;
           const headers = fullData[0];
-
-          headers.forEach((header, index) => {
-            columnIndices[header] = index;
-          });
+          headers.forEach((header, index) => { columnIndices[header] = index; });
 
           visibleHeadersInfo = headers
             .map((header, index) => ({ header, index }))
@@ -222,8 +256,8 @@
           renderPage('ru');
         })
         .catch(error => {
-          console.error('Error fetching or parsing sheet data:', error);
-          document.getElementById('table-container').textContent = 'Error: Could not load data. Please ensure the Google Sheet is "Published to the web" as a CSV.';
+          console.error('Error:', error);
+          document.getElementById('table-container').textContent = 'Error: Could not load data. Ensure the Google Sheet is "Published to the web" as a CSV.';
         });
     }
 
@@ -275,19 +309,12 @@
             const td = document.createElement('td');
             let cellText;
 
-            // ===================================================================
-            //  THIS IS THE LOGIC FOR TRANSLATING THE 'FILES' COLUMN CONTENT
-            // ===================================================================
             if (header === 'files') {
-              if (lang === 'en') {
-                cellText = rowData[columnIndices.en]; // Use 'en' column for English
-              } else if (lang === 'ja') {
-                cellText = rowData[columnIndices.jp]; // Use 'jp' column for Japanese
-              } else {
-                cellText = rowData[columnIndices.files]; // Use 'files' column for Russian (default)
-              }
+              if (lang === 'en') cellText = rowData[columnIndices.en];
+              else if (lang === 'ja') cellText = rowData[columnIndices.jp];
+              else cellText = rowData[columnIndices.files];
             } else {
-              cellText = rowData[index]; // For all other columns, use the default text
+              cellText = rowData[index];
             }
 
             cellText = cellText || '';
@@ -295,7 +322,7 @@
             if (header === 'files' && linkUrl) {
               const a = document.createElement('a');
               a.href = linkUrl;
-              a.textContent = cellText; // The translated text is placed here
+              a.textContent = cellText;
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
               td.appendChild(a);
