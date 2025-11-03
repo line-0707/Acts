@@ -188,7 +188,8 @@
     let fullData = [];
     let columnIndices = {};
     let visibleHeadersInfo = [];
-    const columnsToHide = new Set(['en', 'jp', 'link']);
+    // Added 'desc_en' and 'desc_ja' to the list of columns to hide
+    const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
 
     function parseCSV(csvText) {
       const rows = [];
@@ -246,12 +247,9 @@
 
           const headers = fullData[0];
           headers.forEach((header, index) => {
-            // Normalize headers to prevent matching issues
             columnIndices[header.trim().toLowerCase()] = index;
           });
 
-          // --- CRITICAL FIX IS HERE ---
-          // This filter is now robust against whitespace and case differences.
           visibleHeadersInfo = headers
             .map((header, index) => ({ header, index }))
             .filter(h => !columnsToHide.has(h.header.trim().toLowerCase()));
@@ -284,7 +282,6 @@
       const translatedHeaders = translations[lang].headers;
       visibleHeadersInfo.forEach(({ header }) => {
         const th = document.createElement('th');
-        // Use normalized header for lookup
         th.textContent = translatedHeaders[header.trim().toLowerCase()] || header;
         headerRow.appendChild(th);
       });
@@ -313,28 +310,26 @@
             const td = document.createElement('td');
             let cellText;
 
-            // Use normalized header for logic
             const normalizedHeader = header.trim().toLowerCase();
 
+            // --- CORRECTED LOGIC BLOCK ---
             if (normalizedHeader === 'files') {
-              // 'files' 列の言語切り替え
+              // Handle 'files' column translation
               if (lang === 'en') cellText = rowData[columnIndices['en']];
               else if (lang === 'ja') cellText = rowData[columnIndices['jp']];
               else cellText = rowData[columnIndices['files']];
 
-            } else if (normalizedHeader === 'files') {
-              // 'description' 列の言語切り替え
-              // スプレッドシートの列名を 'description_en', 'description_ja' と仮定
-              if (lang === 'en' && columnIndices['en']) {
-                cellText = rowData[columnIndices['en']];
-              } else if (lang === 'ja' && columnIndices['ja']) {
-                cellText = rowData[columnIndices['ja']];
+            } else if (normalizedHeader === 'description') {
+              // Handle 'description' column translation
+              if (lang === 'en' && columnIndices['desc_en']) {
+                cellText = rowData[columnIndices['desc_en']];
+              } else if (lang === 'ja' && columnIndices['desc_ja']) {
+                cellText = rowData[columnIndices['desc_ja']];
               } else {
-                cellText = rowData[index]; // デフォルト (RU)
+                cellText = rowData[index]; // Default (RU)
               }
-
             } else {
-              // 'date' 列など、その他の列
+              // Handle all other columns (like 'date')
               cellText = rowData[index];
             }
 
