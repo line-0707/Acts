@@ -115,14 +115,17 @@
       background-color: #e9ecef;
     }
 
-    .category-row {
+    /* --- ここが修正点です --- */
+    /* カテゴリー行のセル(td)に直接スタイルを適用 */
+    .category-row td {
       background-color: #6c757d;
       color: white;
       font-weight: bold;
       text-align: center !important;
     }
 
-    .category-row:hover {
+    /* ホバー時もセル(td)のスタイルを変更 */
+    .category-row:hover td {
       background-color: #5a6268;
     }
 
@@ -237,7 +240,6 @@
           fullData = parseCSV(csvText);
           if (fullData.length < 1) throw new Error('No data found');
 
-          // --- 結合された行を修復する特別なロジック ---
           const firstRowRaw = fullData[0];
           if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
             console.log("行の結合を検出。データを強制的に修復します。");
@@ -261,9 +263,9 @@
               }
             });
 
-            fullData.shift(); // 不正な行を削除
-            fullData.unshift(correctedFirstDataRow); // 修正したデータ行を追加
-            fullData.unshift(correctedHeaders); // 修正したヘッダー行を追加
+            fullData.shift();
+            fullData.unshift(correctedFirstDataRow);
+            fullData.unshift(correctedHeaders);
           }
 
           const headers = fullData[0];
@@ -315,12 +317,13 @@
         const rowData = fullData[i];
         if (rowData.length <= 1 && !(rowData[0] || '').trim()) continue;
 
+        // --- JavaScript側の修正は不要ですが、念のためクラス付与は残します ---
         const firstCell = (rowData[0] || '').trim();
         if (firstCell.startsWith('cat[')) {
           const match = firstCell.match(/\[(.*?)\]/);
           if (match) {
             const tr = document.createElement('tr');
-            tr.className = 'category-row';
+            tr.className = 'category-row'; // このクラスをCSSが参照します
             const td = document.createElement('td');
             td.colSpan = visibleHeadersInfo.length;
             td.textContent = match[1];
