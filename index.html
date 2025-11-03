@@ -386,6 +386,7 @@
         subtitle: 'Сводка опубликованных документов и ресурсов',
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
+        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
         site_last_updated: 'Последнее обновление сайта:'
       },
@@ -394,6 +395,7 @@
         subtitle: 'Summary of published documents and resources',
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
+        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         site_last_updated: 'Site last updated:'
       },
@@ -625,11 +627,13 @@
                 td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
               } else { td.textContent = (rowData[index] || '').trim(); }
               tr.appendChild(td); return;
+              // --- ここからが修正点です ---
             } else if (normalizedHeader === 'last_update') {
-              cellText = formatDate((rowData[index] || '').trim(), lang, true);
+              cellText = formatDate((rowData[index] || '').trim(), lang, isMobile);
             } else {
               cellText = formatDate((rowData[index] || '').trim(), lang, false);
             }
+            // --- ここまで ---
             if (normalizedHeader === 'files') {
               const contentWrapper = document.createDocumentFragment();
               if (statusConfig) {
@@ -638,7 +642,12 @@
               }
               const a = document.createElement('a');
               a.textContent = cellText;
-              if (linkUrl) { a.href = linkUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+              if (linkUrl) {
+                const viewerUrl = 'pdfviewer.html'; // PDF.js viewer relative path
+                a.href = `${viewerUrl}?file=${encodeURIComponent(linkUrl)}`;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+              }
               contentWrapper.appendChild(a);
               td.appendChild(contentWrapper);
             } else { td.textContent = cellText; }
