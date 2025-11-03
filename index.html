@@ -23,7 +23,6 @@
       --link-color: #0366d6;
     }
 
-    /* --- ここからが修正点です --- */
     .dark-mode {
       --bg-color: #202124;
       --text-color: #E8EAED;
@@ -35,10 +34,7 @@
       --category-bg-color: #495057;
       --category-hover-bg-color: #5c636a;
       --link-color: #8ab4f8;
-      /* ダークモード用にリンク色も調整 */
     }
-
-    /* --- ここまで --- */
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -244,7 +240,6 @@
       background-color: var(--category-hover-bg-color);
     }
 
-    /* --- ここが修正点です --- */
     table a {
       color: var(--link-color);
       text-decoration: none;
@@ -478,25 +473,31 @@
       }
     }
 
-    // --- ここが修正点です ---
+    // --- ここからが修正点です ---
     function getStatusConfig(statusCode, lang, isDarkMode) {
-      let config = null;
+      let colors = null;
       switch (statusCode) {
         case 'g':
-          config = { text: translations[lang].status_text.g, bgColor: '#d1fae5', color: '#065f46', bulletColor: '#16a34a' };
-          if (isDarkMode) config.bgColor = '#062214';
+          colors = { light: '#d1fae5', dark: '#065f46', bullet: '#16a34a' };
           break;
         case 'ex':
-          config = { text: translations[lang].status_text.ex, bgColor: '#fecaca', color: '#991b1b', bulletColor: '#dc2626' };
-          if (isDarkMode) config.bgColor = '#3b0909';
+          colors = { light: '#fecaca', dark: '#991b1b', bullet: '#dc2626' };
           break;
         case 'e':
-          config = { text: translations[lang].status_text.e, bgColor: '#fef9c3', color: '#92400e', bulletColor: '#f59e0b' };
-          if (isDarkMode) config.bgColor = '#3d1c02';
+          colors = { light: '#fef9c3', dark: '#92400e', bullet: '#f59e0b' };
           break;
+        default:
+          return null;
       }
-      return config;
+
+      return {
+        text: translations[lang].status_text[statusCode],
+        bgColor: isDarkMode ? colors.dark : colors.light,
+        color: isDarkMode ? colors.light : colors.dark,
+        bulletColor: colors.bullet
+      };
     }
+    // --- ここまで ---
 
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
