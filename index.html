@@ -21,21 +21,16 @@
       --category-hover-bg-color: #5a6268;
     }
 
-    /* --- ここからが修正点です --- */
     .dark-mode {
       --bg-color: #181818;
-      /* Google/Youtubeに近い背景色 */
       --text-color: #e0e0e0;
       --card-bg-color: #282828;
-      /* Google/Youtubeに近いカード色 */
       --border-color: #444;
       --hover-bg-color: #383838;
       --even-row-bg-color: #303030;
       --category-bg-color: #495057;
       --category-hover-bg-color: #5c636a;
     }
-
-    /* --- ここまで --- */
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -61,7 +56,33 @@
       right: 20px;
     }
 
-    .control-container {
+    /* --- ここからが修正点です --- */
+    #theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--card-bg-color);
+      border: none;
+      padding: 8px;
+      /* 高さを言語ボタンと合わせる */
+      aspect-ratio: 1 / 1;
+      /* 正方形にする */
+      cursor: pointer;
+      border-radius: 8px;
+      /* 角丸 */
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.2s;
+    }
+
+    #theme-toggle .material-symbols-outlined {
+      color: var(--text-color);
+    }
+
+    #theme-toggle:hover {
+      background-color: var(--hover-bg-color);
+    }
+
+    .lang-switcher {
       display: flex;
       gap: 5px;
       background-color: var(--card-bg-color);
@@ -70,7 +91,7 @@
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .control-button {
+    .lang-switcher button {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -84,18 +105,16 @@
       transition: background-color 0.2s, color 0.2s;
     }
 
-    .control-button .material-symbols-outlined {
-      color: var(--text-color);
-    }
-
-    .control-button:hover {
+    .lang-switcher button:hover {
       background-color: var(--hover-bg-color);
     }
 
-    .lang-switcher .control-button.active {
+    .lang-switcher button.active {
       background-color: #007bff;
       color: white;
     }
+
+    /* --- ここまで --- */
 
     .header {
       display: flex;
@@ -207,10 +226,8 @@
       background-color: var(--hover-bg-color);
     }
 
-    /* --- ここが修正点です --- */
     .category-row {
       display: block;
-      /* Flexboxコンテナから通常のブロック要素に変更 */
     }
 
     .category-row td {
@@ -218,9 +235,7 @@
       color: white;
       font-weight: bold;
       width: 100%;
-      /* 幅を100%に */
       box-sizing: border-box;
-      /* paddingを含めて100%にする */
     }
 
     tr.category-row:hover td {
@@ -323,13 +338,11 @@
   <div class="content-wrapper">
 
     <div class="top-controls">
-      <div class="control-container">
-        <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
-      </div>
-      <div class="control-container lang-switcher">
-        <button data-lang="ru" class="control-button active">RU</button>
-        <button data-lang="en" class="control-button">EN</button>
-        <button data-lang="ja" class="control-button">JP</button>
+      <button id="theme-toggle" title="Toggle theme"></button>
+      <div class="lang-switcher">
+        <button data-lang="ru" class="active">RU</button>
+        <button data-lang="en">EN</button>
+        <button data-lang="ja">JP</button>
       </div>
     </div>
 
@@ -450,7 +463,6 @@
       }
     }
 
-    // --- ここが修正点です ---
     function getStatusConfig(statusCode, lang, isDarkMode) {
       let config = null;
       switch (statusCode) {
