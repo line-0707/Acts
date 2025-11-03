@@ -12,18 +12,20 @@
     :root {
       --bg-color: #f4f4f9;
       --text-color: #333;
+      --text-color-subtle: #888;
       --card-bg-color: #fff;
       --border-color: #ccc;
       --header-bg-color: #007bff;
       --hover-bg-color: #e9ecef;
       --even-row-bg-color: #f8f9fa;
       --category-bg-color: #6c757d;
-      --category-hover-bg-color: #5a6268;
+      --category-hover-bg-color: #5a626a;
     }
 
     .dark-mode {
       --bg-color: #181818;
       --text-color: #e0e0e0;
+      --text-color-subtle: #aaa;
       --card-bg-color: #282828;
       --border-color: #444;
       --hover-bg-color: #383838;
@@ -56,7 +58,6 @@
       right: 20px;
     }
 
-    /* --- ここからが修正点です --- */
     #theme-toggle {
       display: flex;
       align-items: center;
@@ -64,12 +65,9 @@
       background-color: var(--card-bg-color);
       border: none;
       padding: 8px;
-      /* 高さを言語ボタンと合わせる */
       aspect-ratio: 1 / 1;
-      /* 正方形にする */
       cursor: pointer;
       border-radius: 8px;
-      /* 角丸 */
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       transition: background-color 0.2s;
     }
@@ -114,8 +112,6 @@
       color: white;
     }
 
-    /* --- ここまで --- */
-
     .header {
       display: flex;
       align-items: center;
@@ -147,7 +143,7 @@
     .header h2 {
       font-size: 1.2em;
       font-weight: normal;
-      color: #888;
+      color: var(--text-color-subtle);
     }
 
     #table-container {
@@ -262,6 +258,16 @@
       display: none;
     }
 
+    /* --- ここからが修正点です --- */
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-color-subtle);
+      font-size: 0.9em;
+    }
+
+    /* --- ここまで --- */
+
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -338,11 +344,11 @@
   <div class="content-wrapper">
 
     <div class="top-controls">
-      <button id="theme-toggle" title="Toggle theme"></button>
+      <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
       <div class="lang-switcher">
-        <button data-lang="ru" class="active">RU</button>
-        <button data-lang="en">EN</button>
-        <button data-lang="ja">JP</button>
+        <button data-lang="ru" class="control-button active">RU</button>
+        <button data-lang="en" class="control-button">EN</button>
+        <button data-lang="ja" class="control-button">JP</button>
       </div>
     </div>
 
@@ -359,6 +365,12 @@
     <div id="table-container">
       <div class="loader">Loading data from Google Sheet...</div>
     </div>
+
+    <!-- --- ここが修正点です --- -->
+    <footer>
+      <p id="last-updated"></p>
+    </footer>
+    <!-- --- ここまで --- -->
   </div>
 
   <script>
@@ -371,7 +383,8 @@
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
         months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
-        months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
+        months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+        last_updated: 'Последнее обновление:'
       },
       en: {
         title: 'INFORMATION SITE',
@@ -379,7 +392,8 @@
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-        months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        last_updated: 'Last updated:'
       },
       ja: {
         title: '情報サイト',
@@ -387,7 +401,8 @@
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' },
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
         months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-        months_short: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+        months_short: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+        last_updated: '最終更新日時:'
       }
     };
 
@@ -613,6 +628,14 @@
       }
       table.appendChild(thead); table.appendChild(tbody);
       tableContainer.appendChild(table);
+
+      // --- ここからが修正点です ---
+      const now = new Date();
+      const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
+      const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+      const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(now);
+      document.getElementById('last-updated').textContent = `${translations[lang].last_updated} ${formattedDateTime}`;
+      // --- ここまで ---
     }
   </script>
 
