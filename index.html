@@ -13,7 +13,6 @@
       padding: 20px;
       background-color: #f4f4f9;
       color: #333;
-      position: relative;
     }
 
     .content-wrapper {
@@ -21,10 +20,15 @@
       margin: 0 auto;
     }
 
-    .lang-switcher {
+    .lang-switcher-container {
+      display: flex;
+      justify-content: flex-end;
       position: absolute;
       top: 20px;
       right: 20px;
+    }
+
+    .lang-switcher {
       display: flex;
       gap: 5px;
       background-color: #fff;
@@ -110,6 +114,20 @@
       vertical-align: middle;
     }
 
+    /* --- デスクトップ用の列幅設定 --- */
+    .th-status {
+      width: 18%;
+    }
+
+    .th-last_update {
+      width: 22%;
+    }
+
+    .th-date {
+      width: 18%;
+    }
+
+
     thead th {
       background-color: #007bff;
       color: white;
@@ -153,18 +171,84 @@
       padding: 20px;
       font-size: 1.2em;
     }
+
+    /* --- ここからがモバイル用のレスポンシブ設定 --- */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        flex-direction: column;
+        /* 縦並びにする */
+        align-items: center;
+        /* 中央揃え */
+        margin-top: 50px;
+        /* 言語セレクター分のスペース確保 */
+      }
+
+      .header img {
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+
+      .header div {
+        text-align: center;
+        /* タイトル・サブタイトルを中央揃え */
+      }
+
+      .header h1 {
+        font-size: 1.8em;
+      }
+
+      .header h2 {
+        font-size: 1.1em;
+      }
+
+      .lang-switcher-container {
+        position: static;
+        /* 絶対配置を解除 */
+        width: 100%;
+        justify-content: flex-end;
+        /* 右寄せ */
+        margin-bottom: 20px;
+        order: -1;
+        /* ヘッダーより上に表示 */
+      }
+
+      .status-text {
+        display: none;
+        /* ステータスのテキストを非表示 */
+      }
+
+      /* モバイル用の列幅設定 */
+      .th-status {
+        width: 12%;
+      }
+
+      .th-last_update {
+        width: 30%;
+      }
+
+      .th-date {
+        width: 25%;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-  <div class="lang-switcher">
-    <button data-lang="ru" class="active">RU</button>
-    <button data-lang="en">EN</button>
-    <button data-lang="ja">JP</button>
-  </div>
-
   <div class="content-wrapper">
+
+    <div class="lang-switcher-container">
+      <div class="lang-switcher">
+        <button data-lang="ru" class="active">RU</button>
+        <button data-lang="en">EN</button>
+        <button data-lang="ja">JP</button>
+      </div>
+    </div>
+
     <div class="header">
       <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
       <div>
@@ -187,21 +271,24 @@
         subtitle: 'Сводка опубликованных документов и ресурсов',
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
-        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
+        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+        months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек']
       },
       en: {
         title: 'INFORMATION SITE',
         subtitle: 'Summary of published documents and resources',
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
-        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
       },
       ja: {
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' },
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
-        months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+        months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+        months_short: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
       }
     };
 
@@ -247,7 +334,7 @@
       return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
     }
 
-    function formatDate(dateString, lang) {
+    function formatDate(dateString, lang, useShort = false) {
       if (!dateString) return dateString;
 
       let date;
@@ -267,14 +354,15 @@
       const year = date.getFullYear();
       const monthIndex = date.getMonth();
       const day = date.getDate();
+      const monthArray = useShort ? translations[lang].months_short : translations[lang].months;
 
       switch (lang) {
         case 'ru':
-          return `${day} ${translations.ru.months[monthIndex]} ${year}г.`;
+          return `${day} ${monthArray[monthIndex]} ${year}г.`;
         case 'en':
-          return `${translations.en.months[monthIndex]} ${day}, ${year}`;
+          return `${monthArray[monthIndex]} ${day}, ${year}`;
         case 'ja':
-          return `${toFullWidth(year)}年${toFullWidth(monthIndex + 1)}月${toFullWidth(day)}日`;
+          return `${toFullWidth(year)}年${monthArray[monthIndex]}${toFullWidth(day)}日`;
         default:
           return dateString;
       }
@@ -360,22 +448,8 @@
       visibleHeadersInfo.forEach(({ header }) => {
         const th = document.createElement('th');
         const normalizedHeader = normalizeHeader(header);
+        th.className = 'th-' + normalizedHeader;
         th.textContent = translatedHeaders[normalizedHeader] || header;
-
-        // --- ここからが列幅を設定するロジック ---
-        switch (normalizedHeader) {
-          case 'status':
-            th.style.width = '18%';
-            break;
-          case 'last_update':
-            th.style.width = '22%';
-            break;
-          case 'date':
-            th.style.width = '18%';
-            break;
-        }
-        // --- ここまで ---
-
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
@@ -443,6 +517,7 @@
                 bulletSpan.style.color = statusConfig.bulletColor;
 
                 const textSpan = document.createElement('span');
+                textSpan.className = 'status-text';
                 textSpan.textContent = statusConfig.text;
                 textSpan.style.fontWeight = 'bold';
 
@@ -458,9 +533,9 @@
               return;
 
             } else if (normalizedHeader === 'last_update') {
-              cellText = formatDate((rowData[index] || '').trim(), lang);
+              cellText = formatDate((rowData[index] || '').trim(), lang, true);
             } else {
-              cellText = (rowData[index] || '').trim();
+              cellText = formatDate((rowData[index] || '').trim(), lang, false);
             }
 
             if (normalizedHeader === 'files' && linkUrl) {
