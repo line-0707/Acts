@@ -112,9 +112,7 @@
 
     tr {
       display: flex;
-      /* --- ここが修正点です --- */
       align-items: stretch;
-      /* セルの高さを一番高いものに合わせる */
     }
 
     th,
@@ -125,6 +123,9 @@
       flex-shrink: 0;
       white-space: normal;
       word-break: break-word;
+      /* --- ここが修正点です --- */
+      display: flex;
+      align-items: center;
     }
 
     /* デスクトップ用の列幅と順序 */
@@ -404,11 +405,10 @@
         case 'en':
           return `${monthArray[monthIndex]} ${day}, ${year}`;
         case 'ja':
-          // --- ここが修正点です ---
           if (isMobile) {
-            return `${year}年${monthIndex + 1}月${day}日`; // モバイルでは半角
+            return `${year}年${monthIndex + 1}月${day}日`;
           }
-          return `${toFullWidth(year)}年${monthArray[monthIndex]}${toFullWidth(day)}日`; // デスクトップでは全角
+          return `${toFullWidth(year)}年${monthArray[monthIndex]}${toFullWidth(day)}日`;
         default:
           return dateString;
       }
@@ -487,7 +487,6 @@
       document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
       document.documentElement.lang = lang;
 
-      // --- ここが修正点です ---
       const isMobile = window.innerWidth <= 768;
 
       document.querySelectorAll('.lang-switcher button').forEach(button => {
@@ -595,18 +594,18 @@
                 contentWrapper.appendChild(bulletSpan);
               }
 
-              contentWrapper.appendChild(document.createTextNode(cellText));
+              const a = document.createElement('a');
+              a.textContent = cellText; // テキストは直接リンクに
 
               if (linkUrl) {
-                const a = document.createElement('a');
                 a.href = linkUrl;
-                a.appendChild(contentWrapper);
                 a.target = '_blank';
                 a.rel = 'noopener noreferrer';
-                td.appendChild(a);
-              } else {
-                td.appendChild(contentWrapper);
               }
+
+              contentWrapper.appendChild(a);
+              td.appendChild(contentWrapper);
+
             } else {
               td.textContent = cellText;
             }
