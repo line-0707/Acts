@@ -236,16 +236,18 @@
       return (header || '').trim().replace(/^"|"$/g, '').toLowerCase();
     }
 
-    // --- 日付フォーマット用のヘルパー関数 ---
     function toFullWidth(str) {
       return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
     }
 
-    function formatDate(isoString, lang) {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(isoString)) return isoString;
-
-      const parts = isoString.split('-');
-      const date = new Date(parts[0], parts[1] - 1, parts[2]);
+    // --- 改善された日付フォーマット関数 ---
+    function formatDate(dateString, lang) {
+      if (!dateString) return dateString;
+      const date = new Date(dateString);
+      // Dateオブジェクトが不正な場合は、元の文字列をそのまま返す
+      if (isNaN(date.getTime())) {
+        return dateString;
+      }
 
       const year = date.getFullYear();
       const monthIndex = date.getMonth();
@@ -259,10 +261,9 @@
         case 'ja':
           return `${toFullWidth(year)}年${toFullWidth(monthIndex + 1)}月${toFullWidth(day)}日`;
         default:
-          return isoString;
+          return dateString;
       }
     }
-
 
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
@@ -395,28 +396,34 @@
 
               switch (statusCode) {
                 case 'g':
-                  statusConfig = { text: translations[lang].status_text.g, bgColor: '#d1fae5', color: '#065f46' };
+                  statusConfig = { text: translations[lang].status_text.g, bgColor: '#d1fae5', color: '#065f46', bulletColor: '#16a34a' };
                   break;
                 case 'ex':
-                  statusConfig = { text: translations[lang].status_text.ex, bgColor: '#fecaca', color: '#991b1b' };
+                  statusConfig = { text: translations[lang].status_text.ex, bgColor: '#fecaca', color: '#991b1b', bulletColor: '#dc2626' };
                   break;
                 case 'e':
-                  statusConfig = { text: translations[lang].status_text.e, bgColor: '#fef9c3', color: '#92400e' };
+                  statusConfig = { text: translations[lang].status_text.e, bgColor: '#fef9c3', color: '#92400e', bulletColor: '#f59e0b' };
                   break;
               }
 
               if (statusConfig) {
                 const bulletSpan = document.createElement('span');
                 bulletSpan.textContent = '● ';
+                bulletSpan.style.color = statusConfig.bulletColor;
+
+                const textNode = document.createTextNode(statusConfig.text);
+
                 td.appendChild(bulletSpan);
-                td.appendChild(document.createTextNode(statusConfig.text));
+                td.appendChild(textNode);
+
                 td.style.backgroundColor = statusConfig.bgColor;
                 td.style.color = statusConfig.color;
+                td.style.fontWeight = 'bold';
               } else {
                 td.textContent = (rowData[index] || '').trim();
               }
               tr.appendChild(td);
-              return; // ステータス列は特別処理なのでここで終了
+              return;
 
             } else if (normalizedHeader === 'last_update') {
               cellText = formatDate((rowData[index] || '').trim(), lang);
