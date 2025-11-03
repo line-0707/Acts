@@ -258,15 +258,12 @@
       display: none;
     }
 
-    /* --- ここからが修正点です --- */
     footer {
       text-align: center;
       margin-top: 40px;
       color: var(--text-color-subtle);
       font-size: 0.9em;
     }
-
-    /* --- ここまで --- */
 
     @media (max-width: 768px) {
       body {
@@ -366,11 +363,9 @@
       <div class="loader">Loading data from Google Sheet...</div>
     </div>
 
-    <!-- --- ここが修正点です --- -->
     <footer>
       <p id="last-updated"></p>
     </footer>
-    <!-- --- ここまで --- -->
   </div>
 
   <script>
@@ -384,7 +379,7 @@
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
         months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
-        last_updated: 'Последнее обновление:'
+        last_updated: 'Последнее обновление сайта:'
       },
       en: {
         title: 'INFORMATION SITE',
@@ -393,7 +388,7 @@
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        last_updated: 'Last updated:'
+        last_updated: 'Site last updated:'
       },
       ja: {
         title: '情報サイト',
@@ -402,7 +397,7 @@
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
         months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         months_short: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-        last_updated: '最終更新日時:'
+        last_updated: 'サイト最終更新日時:'
       }
     };
 
@@ -410,17 +405,15 @@
     let columnIndices = {};
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
+    let fileLastModifiedDate = null; // --- ここが修正点です ---
 
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
 
     function applyTheme(theme) {
       const iconName = theme === 'dark' ? 'light_mode' : 'dark_mode';
-      if (theme === 'dark') {
-        body.classList.add('dark-mode');
-      } else {
-        body.classList.remove('dark-mode');
-      }
+      if (theme === 'dark') { body.classList.add('dark-mode'); }
+      else { body.classList.remove('dark-mode'); }
       themeToggle.innerHTML = `<span class="material-symbols-outlined">${iconName}</span>`;
     }
 
@@ -504,10 +497,18 @@
       fetchAndRender();
     });
 
+    // --- ここからが修正点です ---
     function fetchAndRender() {
-      fetch(sheetUrl)
-        .then(response => response.ok ? response.text() : Promise.reject('Network error'))
-        .then(csvText => {
+      const dataPromise = fetch(sheetUrl).then(res => res.ok ? res.text() : Promise.reject('Data fetch failed'));
+      const headersPromise = fetch(window.location.href, { method: 'HEAD' })
+        .then(res => {
+          if (res.ok && res.headers.has('Last-Modified')) {
+            fileLastModifiedDate = new Date(res.headers.get('Last-Modified'));
+          }
+        });
+
+      Promise.all([dataPromise, headersPromise])
+        .then(([csvText]) => {
           fullData = parseCSV(csvText);
           if (fullData.length < 1) throw new Error('No data found');
           const firstRowRaw = fullData[0];
@@ -542,6 +543,7 @@
           document.getElementById('table-container').textContent = 'Error: Could not load data. Ensure the Google Sheet is "Published to the web" as a CSV.';
         });
     }
+    // --- ここまで ---
 
     function renderPage(lang) {
       document.getElementById('site-title').textContent = translations[lang].title;
@@ -630,11 +632,12 @@
       tableContainer.appendChild(table);
 
       // --- ここからが修正点です ---
-      const now = new Date();
-      const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
-      const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-      const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(now);
-      document.getElementById('last-updated').textContent = `${translations[lang].last_updated} ${formattedDateTime}`;
+      if (fileLastModifiedDate) {
+        const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
+        const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(fileLastModifiedDate);
+        document.getElementById('last-updated').textContent = `${translations[lang].last_updated} ${formattedDateTime}`;
+      }
       // --- ここまで ---
     }
   </script>
