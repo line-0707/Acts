@@ -124,9 +124,13 @@
       font-weight: bold;
     }
 
-    /* カテゴリー行はホバーしても色が変わらないように、通常のホバー効果を上書き */
     tr.category-row:hover {
       background-color: transparent;
+    }
+
+    tr.category-row:hover td {
+      background-color: #6c757d;
+      /* ホバーしても色が変わらないように */
     }
 
     table a {
@@ -320,41 +324,34 @@
         const rowData = fullData[i];
         if (rowData.length <= 1 && !(rowData[0] || '').trim()) continue;
 
-        const firstCell = (rowData[columnIndices['files']] || '').trim();
-        if (firstCell.startsWith('cat[')) {
-          // --- ここからがカテゴリー行の翻訳ロジック ---
-          let categoryText = '';
-          let categoryCellContent = '';
+        // --- 修正点：シンプル化されたロジック ---
+        // 1. まず言語に応じた「ファイル」列のテキストを取得
+        let fileCellText = '';
+        const ruFileText = (rowData[columnIndices['files']] || '').trim();
+        if (lang === 'en') {
+          fileCellText = (rowData[columnIndices['en']] || ruFileText).trim();
+        } else if (lang === 'ja') {
+          fileCellText = (rowData[columnIndices['jp']] || ruFileText).trim();
+        } else {
+          fileCellText = ruFileText;
+        }
 
-          // 言語に応じて適切な列のセル内容を取得
-          if (lang === 'en') {
-            categoryCellContent = (rowData[columnIndices['en']] || '').trim();
-          } else if (lang === 'ja') {
-            categoryCellContent = (rowData[columnIndices['jp']] || '').trim();
-          } else {
-            categoryCellContent = firstCell;
-          }
-
-          // 翻訳先のセルが空の場合、ロシア語にフォールバック
-          if (!categoryCellContent.startsWith('cat[')) {
-            categoryCellContent = firstCell;
-          }
-
-          const match = categoryCellContent.match(/\[(.*?)\]/);
+        // 2. 取得したテキストが 'cat[' で始まるかチェック
+        if (fileCellText.startsWith('cat[')) {
+          const match = fileCellText.match(/\[(.*?)\]/);
           if (match) {
-            categoryText = match[1];
             const tr = document.createElement('tr');
             tr.className = 'category-row';
             const td = document.createElement('td');
             td.colSpan = visibleHeadersInfo.length;
-            td.textContent = categoryText;
+            td.textContent = match[1];
             tr.appendChild(td);
             tbody.appendChild(tr);
           }
-          // --- ここまで ---
         } else {
+          // 3. 通常のデータ行として処理
           const tr = document.createElement('tr');
-          const linkUrl = rowData[columnIndices['link']];
+          const linkUrl = (rowData[columnIndices['link']] || '').trim();
 
           visibleHeadersInfo.forEach(({ header, index }) => {
             const td = document.createElement('td');
@@ -362,20 +359,18 @@
             const normalizedHeader = normalizeHeader(header);
 
             if (normalizedHeader === 'files') {
-              if (lang === 'en') cellText = rowData[columnIndices['en']];
-              else if (lang === 'ja') cellText = rowData[columnIndices['jp']];
-              else cellText = rowData[columnIndices['files']];
+              cellText = fileCellText; // 1で取得済みの翻訳されたテキストを使用
             } else if (normalizedHeader === 'description') {
-              if (lang === 'en' && columnIndices['desc_en']) cellText = rowData[columnIndices['desc_en']];
-              else if (lang === 'ja' && columnIndices['desc_ja']) cellText = rowData[columnIndices['desc_ja']];
-              else cellText = rowData[index];
+              // description列の翻訳ロジックはそのまま
+              const ruDescText = (rowData[columnIndices['description']] || '').trim();
+              if (lang === 'en') cellText = (rowData[columnIndices['desc_en']] || ruDescText).trim();
+              else if (lang === 'ja') cellText = (rowData[columnIndices['desc_ja']] || ruDescText).trim();
+              else cellText = ruDescText;
             } else {
-              cellText = rowData[index];
+              cellText = (rowData[index] || '').trim();
             }
 
-            cellText = (cellText || '').trim();
-
-            if (normalizedHeader === 'files' && linkUrl && linkUrl.trim()) {
+            if (normalizedHeader === 'files' && linkUrl) {
               const a = document.createElement('a');
               a.href = linkUrl;
               a.textContent = cellText;
