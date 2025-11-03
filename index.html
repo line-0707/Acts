@@ -376,7 +376,7 @@
   </div>
 
   <script>
-    const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbwL5gQ3r_2H-K20W7tT5T2H-k2g5T2T-K2wL5g/exec'; // This is a placeholder, replace with your actual URL
+    const gasWebAppUrl = 'ここに、あなたのGoogle Apps ScriptのウェブアプリURLを貼り付けてください';
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
 
     const translations = {
@@ -411,7 +411,6 @@
     let fullData = [];
     let columnIndices = {};
     let visibleHeadersInfo = [];
-    // --- ここが修正点です ---
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
     let siteLastModifiedDate = null;
     let dataLastModifiedDate = null;
@@ -516,10 +515,14 @@
             siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
           }
         });
-      const dataHeadersPromise = fetch(gasWebAppUrl).then(res => res.ok ? res.text() : Promise.reject('GAS fetch failed'))
-        .then(isoString => {
-          dataLastModifiedDate = new Date(isoString);
-        });
+      // --- ここからが修正点です ---
+      const dataHeadersPromise = fetch(gasWebAppUrl).then(res => res.ok ? res.json() : Promise.reject('GAS fetch failed'))
+        .then(data => {
+          if (data && data.lastUpdated) {
+            dataLastModifiedDate = new Date(data.lastUpdated);
+          }
+        }).catch(err => console.error("GAS Error:", err)); // エラーをコンソールに出力
+      // --- ここまで ---
 
       Promise.all([dataPromise, siteHeadersPromise, dataHeadersPromise])
         .then(([csvText]) => {
