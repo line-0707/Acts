@@ -193,14 +193,11 @@
 
     // --- MAIN LOGIC ---
     document.addEventListener('DOMContentLoaded', function () {
-      // Setup language switcher
       document.querySelectorAll('.lang-switcher button').forEach(button => {
         button.addEventListener('click', () => {
           renderPage(button.dataset.lang);
         });
       });
-
-      // Fetch data and do initial render
       fetchAndRender();
     });
 
@@ -222,7 +219,7 @@
             .map((header, index) => ({ header, index }))
             .filter(h => !columnsToHide.has(h.header));
 
-          renderPage('ru'); // Initial render in Russian
+          renderPage('ru');
         })
         .catch(error => {
           console.error('Error fetching or parsing sheet data:', error);
@@ -231,34 +228,30 @@
     }
 
     function renderPage(lang) {
-      // Update static text
       document.getElementById('site-title').textContent = translations[lang].title;
       document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
       document.documentElement.lang = lang;
 
-      // Update language switcher active state
       document.querySelectorAll('.lang-switcher button').forEach(button => {
         button.classList.toggle('active', button.dataset.lang === lang);
       });
 
       const tableContainer = document.getElementById('table-container');
-      tableContainer.innerHTML = ''; // Clear previous content
+      tableContainer.innerHTML = '';
 
       const table = document.createElement('table');
       const thead = document.createElement('thead');
       const tbody = document.createElement('tbody');
 
-      // --- CREATE TABLE HEADER ---
       const headerRow = document.createElement('tr');
       const translatedHeaders = translations[lang].headers;
       visibleHeadersInfo.forEach(({ header }) => {
         const th = document.createElement('th');
-        th.textContent = translatedHeaders[header] || header; // Fallback to original header name
+        th.textContent = translatedHeaders[header] || header;
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
 
-      // --- CREATE TABLE BODY ---
       for (let i = 1; i < fullData.length; i++) {
         const rowData = fullData[i];
         if (rowData.length <= 1 && !rowData[0]) continue;
@@ -282,21 +275,27 @@
             const td = document.createElement('td');
             let cellText;
 
-            // --- DYNAMIC CONTENT SELECTION ---
+            // ===================================================================
+            //  THIS IS THE LOGIC FOR TRANSLATING THE 'FILES' COLUMN CONTENT
+            // ===================================================================
             if (header === 'files') {
-              if (lang === 'en') cellText = rowData[columnIndices.en];
-              else if (lang === 'ja') cellText = rowData[columnIndices.jp];
-              else cellText = rowData[columnIndices.files]; // Default to 'files' for RU
+              if (lang === 'en') {
+                cellText = rowData[columnIndices.en]; // Use 'en' column for English
+              } else if (lang === 'ja') {
+                cellText = rowData[columnIndices.jp]; // Use 'jp' column for Japanese
+              } else {
+                cellText = rowData[columnIndices.files]; // Use 'files' column for Russian (default)
+              }
             } else {
-              cellText = rowData[index];
+              cellText = rowData[index]; // For all other columns, use the default text
             }
 
-            cellText = cellText || ''; // Ensure text is not undefined
+            cellText = cellText || '';
 
             if (header === 'files' && linkUrl) {
               const a = document.createElement('a');
               a.href = linkUrl;
-              a.textContent = cellText;
+              a.textContent = cellText; // The translated text is placed here
               a.target = '_blank';
               a.rel = 'noopener noreferrer';
               td.appendChild(a);
