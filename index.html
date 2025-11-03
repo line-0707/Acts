@@ -395,7 +395,7 @@
         subtitle: '公開されたドキュメントとリソースの概要',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' },
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
-        months: ['１月', '２月', '３月', '４月', '５月', '６月', '７月', '８月', '９月', '１０月', '１１月', '１２月'],
+        months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         months_short: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         last_updated: 'サイト最終更新日時:'
       }
@@ -405,7 +405,7 @@
     let columnIndices = {};
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
-    let fileLastModifiedDate = null; // --- ここが修正点です ---
+    let fileLastModifiedDate = null;
 
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
@@ -449,9 +449,9 @@
     }
 
     function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); }
-    function toFullWidth(str) { return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0)); }
 
-    function formatDate(dateString, lang, useShort = false, isMobile = false) {
+    // --- ここからが修正点です ---
+    function formatDate(dateString, lang, useShort = false) {
       if (!dateString) return dateString;
       let date;
       if (/^\d{8}$/.test(dateString)) {
@@ -464,12 +464,11 @@
       switch (lang) {
         case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`;
         case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`;
-        case 'ja':
-          if (isMobile) return `${year}年${monthIndex + 1}月${day}日`;
-          return `${toFullWidth(year)}年${monthArray[monthIndex]}${toFullWidth(day)}日`;
+        case 'ja': return `${year}年${monthIndex + 1}月${day}日`;
         default: return dateString;
       }
     }
+    // --- ここまで ---
 
     function getStatusConfig(statusCode, lang, isDarkMode) {
       let config = null;
@@ -497,7 +496,6 @@
       fetchAndRender();
     });
 
-    // --- ここからが修正点です ---
     function fetchAndRender() {
       const dataPromise = fetch(sheetUrl).then(res => res.ok ? res.text() : Promise.reject('Data fetch failed'));
       const headersPromise = fetch(window.location.href, { method: 'HEAD' })
@@ -543,13 +541,11 @@
           document.getElementById('table-container').textContent = 'Error: Could not load data. Ensure the Google Sheet is "Published to the web" as a CSV.';
         });
     }
-    // --- ここまで ---
 
     function renderPage(lang) {
       document.getElementById('site-title').textContent = translations[lang].title;
       document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
       document.documentElement.lang = lang;
-      const isMobile = window.innerWidth <= 768;
       const isDarkMode = body.classList.contains('dark-mode');
       document.querySelectorAll('.lang-switcher button').forEach(button => { button.classList.toggle('active', button.dataset.lang === lang); });
       const tableContainer = document.getElementById('table-container');
@@ -609,8 +605,8 @@
               } else { td.textContent = (rowData[index] || '').trim(); }
               tr.appendChild(td); return;
             } else if (normalizedHeader === 'last_update') {
-              cellText = formatDate((rowData[index] || '').trim(), lang, true, isMobile);
-            } else { cellText = formatDate((rowData[index] || '').trim(), lang, false, isMobile); }
+              cellText = formatDate((rowData[index] || '').trim(), lang, true);
+            } else { cellText = formatDate((rowData[index] || '').trim(), lang, false); }
             if (normalizedHeader === 'files') {
               const contentWrapper = document.createDocumentFragment();
               if (statusConfig) {
@@ -631,14 +627,12 @@
       table.appendChild(thead); table.appendChild(tbody);
       tableContainer.appendChild(table);
 
-      // --- ここからが修正点です ---
       if (fileLastModifiedDate) {
         const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
         const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
         const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(fileLastModifiedDate);
         document.getElementById('last-updated').textContent = `${translations[lang].last_updated} ${formattedDateTime}`;
       }
-      // --- ここまで ---
     }
   </script>
 
