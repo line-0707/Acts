@@ -99,10 +99,20 @@
       background-color: #fff;
     }
 
+    /* --- ここからがFlexboxによるテーブルレイアウトの修正点 --- */
     table {
       width: 100%;
       border-collapse: collapse;
-      table-layout: fixed;
+      display: table;
+    }
+
+    thead,
+    tbody {
+      display: block;
+    }
+
+    tr {
+      display: flex;
     }
 
     th,
@@ -114,26 +124,46 @@
       overflow: hidden;
       text-overflow: ellipsis;
       vertical-align: middle;
+      flex-shrink: 0;
+      /* 縮まないように設定 */
     }
 
-    .th-status {
-      width: 18%;
+    /* デスクトップ用の列幅と順序 */
+    .th-files,
+    .td-files {
+      flex: 1 1 auto;
     }
 
-    .th-last_update {
-      width: 22%;
+    /* 残りのスペースを全て取る */
+    .th-description,
+    .td-description {
+      flex: 0 1 25%;
     }
 
-    .th-date {
-      width: 18%;
+    .th-date,
+    .td-date {
+      flex: 0 0 16%;
     }
 
+    .th-status,
+    .td-status {
+      flex: 0 0 18%;
+    }
+
+    .th-last_update,
+    .td-last_update {
+      flex: 0 0 20%;
+      order: 99;
+      /* この列を常に右端に配置 */
+    }
 
     thead th {
       background-color: #007bff;
       color: white;
       font-weight: bold;
     }
+
+    /* --- ここまで --- */
 
     tbody tr:nth-child(even) {
       background-color: #f8f9fa;
@@ -147,6 +177,7 @@
       background-color: #6c757d;
       color: white;
       font-weight: bold;
+      flex: 1 0 100%;
     }
 
     tr.category-row:hover {
@@ -227,21 +258,27 @@
         font-weight: bold;
       }
 
-      /* --- ここが修正点です --- */
       /* モバイル用の列幅を再調整 */
-      .th-date {
-        width: 25%;
+      .th-files,
+      .td-files {
+        flex: 1 1 auto;
       }
 
-      .th-last_update {
-        width: 30%;
+      .th-date,
+      .td-date {
+        flex: 0 0 25%;
       }
 
-      .th-description {
-        width: 15%;
+      .th-description,
+      .td-description {
+        flex: 0 0 15%;
       }
 
-      /* .th-files の幅は指定しないことで、残りのスペースを全て使うようにする */
+      .th-last_update,
+      .td-last_update {
+        flex: 0 0 30%;
+        order: 99;
+      }
     }
   </style>
 </head>
