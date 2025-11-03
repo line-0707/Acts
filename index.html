@@ -415,11 +415,15 @@
       themeToggle.innerHTML = `<span class="material-symbols-outlined">${iconName}</span>`;
     }
 
+    // --- ここからが修正点です ---
     themeToggle.addEventListener('click', () => {
       const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
       localStorage.setItem('theme', newTheme);
       applyTheme(newTheme);
+      // テーブルを再描画してステータスの色を更新
+      renderPage(document.documentElement.lang);
     });
+    // --- ここまで ---
 
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -473,7 +477,6 @@
       }
     }
 
-    // --- ここからが修正点です ---
     function getStatusConfig(statusCode, lang, isDarkMode) {
       let colors = null;
       switch (statusCode) {
@@ -489,7 +492,6 @@
         default:
           return null;
       }
-
       return {
         text: translations[lang].status_text[statusCode],
         bgColor: isDarkMode ? colors.dark : colors.light,
@@ -497,7 +499,6 @@
         bulletColor: colors.bullet
       };
     }
-    // --- ここまで ---
 
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
