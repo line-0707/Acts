@@ -102,6 +102,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      vertical-align: middle;
     }
 
     thead th {
@@ -178,19 +179,22 @@
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
-        status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' }
+        status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
+        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
       },
       en: {
         title: 'INFORMATION SITE',
         subtitle: 'Summary of published documents and resources',
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
-        status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' }
+        status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
+        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
       },
       ja: {
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' },
-        status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' }
+        status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
+        months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
       }
     };
 
@@ -231,6 +235,34 @@
     function normalizeHeader(header) {
       return (header || '').trim().replace(/^"|"$/g, '').toLowerCase();
     }
+
+    // --- 日付フォーマット用のヘルパー関数 ---
+    function toFullWidth(str) {
+      return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
+    }
+
+    function formatDate(isoString, lang) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(isoString)) return isoString;
+
+      const parts = isoString.split('-');
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);
+
+      const year = date.getFullYear();
+      const monthIndex = date.getMonth();
+      const day = date.getDate();
+
+      switch (lang) {
+        case 'ru':
+          return `${day} ${translations.ru.months[monthIndex]} ${year}г.`;
+        case 'en':
+          return `${translations.en.months[monthIndex]} ${day}, ${year}`;
+        case 'ja':
+          return `${toFullWidth(year)}年${toFullWidth(monthIndex + 1)}月${toFullWidth(day)}日`;
+        default:
+          return isoString;
+      }
+    }
+
 
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
@@ -358,27 +390,36 @@
               else if (lang === 'ja') cellText = (rowData[columnIndices['desc_ja']] || ruDescText).trim();
               else cellText = ruDescText;
             } else if (normalizedHeader === 'status') {
-              // --- ここからがステータスの条件付き書式ロジック ---
               const statusCode = (rowData[index] || '').trim().toLowerCase();
+              let statusConfig = null;
+
               switch (statusCode) {
                 case 'g':
-                  cellText = translations[lang].status_text.g;
-                  td.style.backgroundColor = '#d1fae5';
-                  td.style.color = '#065f46';
+                  statusConfig = { text: translations[lang].status_text.g, bgColor: '#d1fae5', color: '#065f46' };
                   break;
                 case 'ex':
-                  cellText = translations[lang].status_text.ex;
-                  td.style.backgroundColor = '#fecaca';
-                  td.style.color = '#991b1b';
+                  statusConfig = { text: translations[lang].status_text.ex, bgColor: '#fecaca', color: '#991b1b' };
                   break;
                 case 'e':
-                  cellText = translations[lang].status_text.e;
-                  td.style.backgroundColor = '#fef9c3';
-                  td.style.color = '#92400e';
+                  statusConfig = { text: translations[lang].status_text.e, bgColor: '#fef9c3', color: '#92400e' };
                   break;
-                default:
-                  cellText = (rowData[index] || '').trim();
               }
+
+              if (statusConfig) {
+                const bulletSpan = document.createElement('span');
+                bulletSpan.textContent = '● ';
+                td.appendChild(bulletSpan);
+                td.appendChild(document.createTextNode(statusConfig.text));
+                td.style.backgroundColor = statusConfig.bgColor;
+                td.style.color = statusConfig.color;
+              } else {
+                td.textContent = (rowData[index] || '').trim();
+              }
+              tr.appendChild(td);
+              return; // ステータス列は特別処理なのでここで終了
+
+            } else if (normalizedHeader === 'last_update') {
+              cellText = formatDate((rowData[index] || '').trim(), lang);
             } else {
               cellText = (rowData[index] || '').trim();
             }
