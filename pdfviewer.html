@@ -7,15 +7,26 @@
    <link rel="shortcut icon" type="image/x-icon" href="acts.ico">
    <title>Information</title>
    <style>
-      body {
+      /* ページの余白をなくし、iframeが画面全体に広がるようにする */
+      body,
+      html {
          margin: 0;
+         padding: 0;
+         width: 100%;
+         height: 100%;
+         overflow: hidden;
+         /* スクロールバーを非表示 */
       }
 
-      embed {
-         width: 100vw;
-         height: 100vh;
+      iframe {
+         width: 100%;
+         height: 100%;
+         /* iframeの枠線を消す */
       }
    </style>
+</head>
+
+<body>
    <script>
       document.addEventListener("DOMContentLoaded", function () {
          // ブラウザの言語を取得
@@ -37,32 +48,32 @@
       });
    </script>
 
-</head>
+   </head>
 
-<body>
+   <body>
 
-   <iframe id="pdf-viewer"></iframe>
+      <iframe id="pdf-viewer"></iframe>
 
-   <script>
-      // ページが読み込まれたときに実行
-      window.onload = function () {
-         // 1. 現在のページのURLからクエリパラメータ（?以降の部分）を取得
-         const params = new URLSearchParams(window.location.search);
+      <script>
+         // ページが読み込まれたときに実行
+         window.onload = function () {
+            // 1. 現在のページのURLからクエリパラメータ（?以降の部分）を取得
+            const params = new URLSearchParams(window.location.search);
 
-         // 2. 'pdf'という名前のパラメータの値（PDFファイルのパス）を取得
-         const pdfUrl = params.get('pdf');
+            // 2. 'pdf'という名前のパラメータの値（PDFファイルのパス）を取得
+            const pdfUrl = params.get('pdf');
 
-         // 3. PDFのURLが正しく取得できたかチェック
-         if (pdfUrl) {
-            // 取得できたら、iframeのsrcに設定してPDFを表示
-            document.getElementById('pdf-viewer').src = pdfUrl;
-         } else {
-            // 取得できなかった場合は、エラーメッセージを表示
-            document.body.innerHTML = '<p style="padding: 20px;">PDFファイルが指定されていません。</p>';
-         }
-      };
-   </script>
+            // 3. PDFのURLが正しく取得できたかチェック
+            if (pdfUrl) {
+               // 取得できたら、iframeのsrcに設定してPDFを表示
+               document.getElementById('pdf-viewer').src = pdfUrl;
+            } else {
+               // 取得できなかった場合は、エラーメッセージを表示
+               document.body.innerHTML = '<p style="padding: 20px;">PDFファイルが指定されていません。</p>';
+            }
+         };
+      </script>
 
-</body>
+   </body>
 
 </html>
