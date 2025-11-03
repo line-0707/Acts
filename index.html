@@ -7,12 +7,40 @@
   <title>ИНФОРМАЦИОННАЯ САЙТА</title>
   <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Acts/favicon.ico">
   <style>
+    /* --- ライトモード用の変数定義 (デフォルト) --- */
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #333;
+      --card-bg-color: #fff;
+      --border-color: #ccc;
+      --header-bg-color: #007bff;
+      --hover-bg-color: #e9ecef;
+      --even-row-bg-color: #f8f9fa;
+      --category-bg-color: #6c757d;
+      --category-hover-bg-color: #5a6268;
+    }
+
+    /* --- ダークモード用の変数定義 --- */
+    .dark-mode {
+      --bg-color: #121212;
+      --text-color: #e0e0e0;
+      --card-bg-color: #1e1e1e;
+      --border-color: #444;
+      --header-bg-color: #007bff;
+      /* 変更しない、または #0d6efd などに */
+      --hover-bg-color: #333;
+      --even-row-bg-color: #2a2a2a;
+      --category-bg-color: #495057;
+      --category-hover-bg-color: #5c636a;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background-color: #f4f4f9;
-      color: #333;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .content-wrapper {
@@ -20,18 +48,30 @@
       margin: 0 auto;
     }
 
-    .lang-switcher-container {
+    .top-controls {
       display: flex;
       justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
       position: absolute;
       top: 20px;
       right: 20px;
     }
 
+    #theme-toggle {
+      background: var(--card-bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 9px 12px;
+      font-size: 1.2em;
+      line-height: 1;
+    }
+
     .lang-switcher {
       display: flex;
       gap: 5px;
-      background-color: #fff;
+      background-color: var(--card-bg-color);
       padding: 5px;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -49,7 +89,7 @@
     }
 
     .lang-switcher button:hover {
-      background-color: #e9ecef;
+      background-color: var(--hover-bg-color);
     }
 
     .lang-switcher button.active {
@@ -88,15 +128,15 @@
     .header h2 {
       font-size: 1.2em;
       font-weight: normal;
-      color: #555;
+      color: #888;
     }
 
     #table-container {
-      border: 1px solid #ccc;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       overflow-x: auto;
-      background-color: #fff;
+      background-color: var(--card-bg-color);
     }
 
     table {
@@ -119,16 +159,14 @@
     td {
       padding: 12px 15px;
       text-align: left;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid var(--border-color);
       flex-shrink: 0;
       white-space: normal;
       word-break: break-word;
-      /* --- ここが修正点です --- */
       display: flex;
       align-items: center;
     }
 
-    /* デスクトップ用の列幅と順序 */
     .th-files,
     .td-files {
       flex: 1 1 auto;
@@ -156,21 +194,21 @@
     }
 
     thead th {
-      background-color: #007bff;
+      background-color: var(--header-bg-color);
       color: white;
       font-weight: bold;
     }
 
     tbody tr:nth-child(even) {
-      background-color: #f8f9fa;
+      background-color: var(--even-row-bg-color);
     }
 
     tbody tr:hover {
-      background-color: #e9ecef;
+      background-color: var(--hover-bg-color);
     }
 
     .category-row td {
-      background-color: #6c757d;
+      background-color: var(--category-bg-color);
       color: white;
       font-weight: bold;
       flex: 1 0 100%;
@@ -181,7 +219,7 @@
     }
 
     tr.category-row:hover td {
-      background-color: #6c757d;
+      background-color: var(--category-hover-bg-color);
     }
 
     table a {
@@ -232,7 +270,7 @@
         font-size: 1.1em;
       }
 
-      .lang-switcher-container {
+      .top-controls {
         position: static;
         width: 100%;
         justify-content: flex-end;
@@ -240,10 +278,7 @@
         order: -1;
       }
 
-      .status-text {
-        display: none;
-      }
-
+      .status-text,
       .th-status,
       .td-status {
         display: none;
@@ -282,7 +317,8 @@
 
   <div class="content-wrapper">
 
-    <div class="lang-switcher-container">
+    <div class="top-controls">
+      <button id="theme-toggle" title="Toggle dark mode">🌙</button>
       <div class="lang-switcher">
         <button data-lang="ru" class="active">RU</button>
         <button data-lang="en">EN</button>
@@ -340,6 +376,32 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
 
+    // --- ここからダークモード用のJavaScript ---
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        body.classList.add('dark-mode');
+        themeToggle.textContent = '☀️';
+      } else {
+        body.classList.remove('dark-mode');
+        themeToggle.textContent = '🌙';
+      }
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      applyTheme(newTheme);
+    });
+
+    // 初期表示時のテーマを決定
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+    // --- ここまで ---
+
     function parseCSV(csvText) {
       const lines = csvText.replace(/\r\n/g, '\n').split('\n');
       return lines.map(line => {
@@ -349,68 +411,38 @@
         for (let i = 0; i < line.length; i++) {
           const char = line[i];
           if (char === '"' && inQuotes) {
-            if (i + 1 < line.length && line[i + 1] === '"') {
-              cell += '"';
-              i++;
-            } else {
-              inQuotes = false;
-            }
+            if (i + 1 < line.length && line[i + 1] === '"') { cell += '"'; i++; } else { inQuotes = false; }
           } else if (char === '"' && !inQuotes) {
             inQuotes = true;
           } else if (char === ',' && !inQuotes) {
-            row.push(cell);
-            cell = '';
-          } else {
-            cell += char;
-          }
+            row.push(cell); cell = '';
+          } else { cell += char; }
         }
         row.push(cell);
         return row;
       });
     }
 
-    function normalizeHeader(header) {
-      return (header || '').trim().replace(/^"|"$/g, '').toLowerCase();
-    }
-
-    function toFullWidth(str) {
-      return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
-    }
+    function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); }
+    function toFullWidth(str) { return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0)); }
 
     function formatDate(dateString, lang, useShort = false, isMobile = false) {
       if (!dateString) return dateString;
-
       let date;
       if (/^\d{8}$/.test(dateString)) {
-        const year = dateString.substring(0, 4);
-        const month = dateString.substring(4, 6);
-        const day = dateString.substring(6, 8);
+        const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
         date = new Date(year, month - 1, day);
-      } else {
-        date = new Date(dateString.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
-      }
-
-      if (isNaN(date.getTime())) {
-        return dateString;
-      }
-
-      const year = date.getFullYear();
-      const monthIndex = date.getMonth();
-      const day = date.getDate();
+      } else { date = new Date(dateString.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3')); }
+      if (isNaN(date.getTime())) { return dateString; }
+      const year = date.getFullYear(), monthIndex = date.getMonth(), day = date.getDate();
       const monthArray = useShort ? translations[lang].months_short : translations[lang].months;
-
       switch (lang) {
-        case 'ru':
-          return `${day} ${monthArray[monthIndex]} ${year}г.`;
-        case 'en':
-          return `${monthArray[monthIndex]} ${day}, ${year}`;
+        case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`;
+        case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`;
         case 'ja':
-          if (isMobile) {
-            return `${year}年${monthIndex + 1}月${day}日`;
-          }
+          if (isMobile) return `${year}年${monthIndex + 1}月${day}日`;
           return `${toFullWidth(year)}年${monthArray[monthIndex]}${toFullWidth(day)}日`;
-        default:
-          return dateString;
+        default: return dateString;
       }
     }
 
@@ -436,11 +468,9 @@
         .then(csvText => {
           fullData = parseCSV(csvText);
           if (fullData.length < 1) throw new Error('No data found');
-
           const firstRowRaw = fullData[0];
           if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
-            const correctedHeaders = [];
-            const correctedFirstDataRow = [];
+            const correctedHeaders = [], correctedFirstDataRow = [];
             firstRowRaw.forEach(cellContent => {
               const catIndex = cellContent.indexOf('cat[');
               if (catIndex !== -1) {
@@ -457,24 +487,13 @@
                 }
               }
             });
-            fullData.shift();
-            fullData.unshift(correctedFirstDataRow);
-            fullData.unshift(correctedHeaders);
+            fullData.shift(); fullData.unshift(correctedFirstDataRow); fullData.unshift(correctedHeaders);
           }
-
           const headers = fullData[0];
-          const normalizedHeaders = headers.map(h => normalizeHeader(h));
-          console.log("最終的に認識されたヘッダー名:", normalizedHeaders);
-
-          headers.forEach((header, index) => {
-            columnIndices[normalizeHeader(header)] = index;
-          });
-
-          visibleHeadersInfo = headers
-            .map((header, index) => ({ header, index }))
-            .filter(h => !columnsToHide.has(normalizeHeader(h.header)));
-
-          renderPage('ru');
+          console.log("最終的に認識されたヘッダー名:", headers.map(h => normalizeHeader(h)));
+          headers.forEach((header, index) => { columnIndices[normalizeHeader(header)] = index; });
+          visibleHeadersInfo = headers.map((header, index) => ({ header, index })).filter(h => !columnsToHide.has(normalizeHeader(h.header)));
+          renderPage(document.documentElement.lang || 'ru');
         })
         .catch(error => {
           console.error('Error:', error);
@@ -486,68 +505,49 @@
       document.getElementById('site-title').textContent = translations[lang].title;
       document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
       document.documentElement.lang = lang;
-
       const isMobile = window.innerWidth <= 768;
-
-      document.querySelectorAll('.lang-switcher button').forEach(button => {
-        button.classList.toggle('active', button.dataset.lang === lang);
-      });
-
+      document.querySelectorAll('.lang-switcher button').forEach(button => { button.classList.toggle('active', button.dataset.lang === lang); });
       const tableContainer = document.getElementById('table-container');
       tableContainer.innerHTML = '';
-
-      const table = document.createElement('table');
-      const thead = document.createElement('thead');
-      const tbody = document.createElement('tbody');
-
+      const table = document.createElement('table'), thead = document.createElement('thead'), tbody = document.createElement('tbody');
       const headerRow = document.createElement('tr');
       const translatedHeaders = translations[lang].headers;
       visibleHeadersInfo.forEach(({ header }) => {
-        const th = document.createElement('th');
-        const normalizedHeader = normalizeHeader(header);
+        const th = document.createElement('th'), normalizedHeader = normalizeHeader(header);
         th.className = 'th-' + normalizedHeader;
         th.textContent = translatedHeaders[normalizedHeader] || header;
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
-
       for (let i = 1; i < fullData.length; i++) {
         const rowData = fullData[i];
         if (rowData.length <= 1 && !(rowData[0] || '').trim()) continue;
-
         let fileCellText = '';
         const ruFileText = (rowData[columnIndices['files']] || '').trim();
         if (lang === 'en') {
           fileCellText = (rowData[columnIndices['en']] || ruFileText).trim();
         } else if (lang === 'ja') {
           fileCellText = (rowData[columnIndices['jp']] || ruFileText).trim();
-        } else {
-          fileCellText = ruFileText;
-        }
-
+        } else { fileCellText = ruFileText; }
         if (fileCellText.startsWith('cat[')) {
           const match = fileCellText.match(/\[(.*?)\]/);
           if (match) {
             const tr = document.createElement('tr');
             tr.className = 'category-row';
             const td = document.createElement('td');
-            td.colSpan = visibleHeadersInfo.length;
-            td.textContent = match[1];
-            tr.appendChild(td);
-            tbody.appendChild(tr);
+            td.colSpan = visibleHeadersInfo.length; td.textContent = match[1];
+            tr.appendChild(td); tbody.appendChild(tr);
           }
         } else {
           const tr = document.createElement('tr');
           const linkUrl = (rowData[columnIndices['link']] || '').trim();
           const statusCode = (rowData[columnIndices['status']] || '').trim().toLowerCase();
           const statusConfig = getStatusConfig(statusCode, lang);
-
           visibleHeadersInfo.forEach(({ header, index }) => {
             const td = document.createElement('td');
             let cellText;
             const normalizedHeader = normalizeHeader(header);
             td.className = 'td-' + normalizedHeader;
-
             if (normalizedHeader === 'files') {
               cellText = fileCellText;
             } else if (normalizedHeader === 'description') {
@@ -557,66 +557,33 @@
               else cellText = ruDescText;
             } else if (normalizedHeader === 'status') {
               if (statusConfig) {
-                const bulletSpan = document.createElement('span');
-                bulletSpan.textContent = '● ';
-                bulletSpan.style.color = statusConfig.bulletColor;
-
-                const textSpan = document.createElement('span');
-                textSpan.className = 'status-text';
-                textSpan.textContent = statusConfig.text;
-                textSpan.style.fontWeight = 'bold';
-
-                td.appendChild(bulletSpan);
-                td.appendChild(textSpan);
-
-                td.style.backgroundColor = statusConfig.bgColor;
-                td.style.color = statusConfig.color;
-              } else {
-                td.textContent = (rowData[index] || '').trim();
-              }
-              tr.appendChild(td);
-              return;
-
+                const bulletSpan = document.createElement('span'); bulletSpan.textContent = '● '; bulletSpan.style.color = statusConfig.bulletColor;
+                const textSpan = document.createElement('span'); textSpan.className = 'status-text'; textSpan.textContent = statusConfig.text; textSpan.style.fontWeight = 'bold';
+                td.appendChild(bulletSpan); td.appendChild(textSpan);
+                td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
+              } else { td.textContent = (rowData[index] || '').trim(); }
+              tr.appendChild(td); return;
             } else if (normalizedHeader === 'last_update') {
               cellText = formatDate((rowData[index] || '').trim(), lang, true, isMobile);
-            } else {
-              cellText = formatDate((rowData[index] || '').trim(), lang, false, isMobile);
-            }
-
+            } else { cellText = formatDate((rowData[index] || '').trim(), lang, false, isMobile); }
             if (normalizedHeader === 'files') {
               const contentWrapper = document.createDocumentFragment();
-
               if (statusConfig) {
-                const bulletSpan = document.createElement('span');
-                bulletSpan.className = 'status-bullet-mobile';
-                bulletSpan.textContent = '● ';
-                bulletSpan.style.color = statusConfig.bulletColor;
+                const bulletSpan = document.createElement('span'); bulletSpan.className = 'status-bullet-mobile'; bulletSpan.textContent = '● '; bulletSpan.style.color = statusConfig.bulletColor;
                 contentWrapper.appendChild(bulletSpan);
               }
-
               const a = document.createElement('a');
-              a.textContent = cellText; // テキストは直接リンクに
-
-              if (linkUrl) {
-                a.href = linkUrl;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-              }
-
+              a.textContent = cellText;
+              if (linkUrl) { a.href = linkUrl; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
               contentWrapper.appendChild(a);
               td.appendChild(contentWrapper);
-
-            } else {
-              td.textContent = cellText;
-            }
+            } else { td.textContent = cellText; }
             tr.appendChild(td);
           });
           tbody.appendChild(tr);
         }
       }
-
-      table.appendChild(thead);
-      table.appendChild(tbody);
+      table.appendChild(thead); table.appendChild(tbody);
       tableContainer.appendChild(table);
     }
   </script>
