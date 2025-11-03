@@ -245,11 +245,16 @@
           if (fullData.length < 1) throw new Error('No data found');
 
           const headers = fullData[0];
-          headers.forEach((header, index) => { columnIndices[header] = index; });
+          headers.forEach((header, index) => {
+            // Normalize headers to prevent matching issues
+            columnIndices[header.trim().toLowerCase()] = index;
+          });
 
+          // --- CRITICAL FIX IS HERE ---
+          // This filter is now robust against whitespace and case differences.
           visibleHeadersInfo = headers
             .map((header, index) => ({ header, index }))
-            .filter(h => !columnsToHide.has(h.header));
+            .filter(h => !columnsToHide.has(h.header.trim().toLowerCase()));
 
           renderPage('ru');
         })
@@ -279,7 +284,8 @@
       const translatedHeaders = translations[lang].headers;
       visibleHeadersInfo.forEach(({ header }) => {
         const th = document.createElement('th');
-        th.textContent = translatedHeaders[header] || header;
+        // Use normalized header for lookup
+        th.textContent = translatedHeaders[header.trim().toLowerCase()] || header;
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
@@ -301,23 +307,26 @@
           }
         } else {
           const tr = document.createElement('tr');
-          const linkUrl = rowData[columnIndices.link];
+          const linkUrl = rowData[columnIndices['link']];
 
           visibleHeadersInfo.forEach(({ header, index }) => {
             const td = document.createElement('td');
             let cellText;
 
-            if (header === 'files') {
-              if (lang === 'en') cellText = rowData[columnIndices.en];
-              else if (lang === 'ja') cellText = rowData[columnIndices.jp];
-              else cellText = rowData[columnIndices.files];
+            // Use normalized header for logic
+            const normalizedHeader = header.trim().toLowerCase();
+
+            if (normalizedHeader === 'files') {
+              if (lang === 'en') cellText = rowData[columnIndices['en']];
+              else if (lang === 'ja') cellText = rowData[columnIndices['jp']];
+              else cellText = rowData[columnIndices['files']];
             } else {
               cellText = rowData[index];
             }
 
             cellText = cellText || '';
 
-            if (header === 'files' && linkUrl) {
+            if (normalizedHeader === 'files' && linkUrl) {
               const a = document.createElement('a');
               a.href = linkUrl;
               a.textContent = cellText;
