@@ -211,7 +211,7 @@
           if (char === '"') {
             inQuotes = true;
           } else if (char === ',') {
-            currentRow.push(currentCell); // Keep original content, trim later
+            currentRow.push(currentCell);
             currentCell = '';
           } else if (char === '\n') {
             currentRow.push(currentCell);
@@ -230,10 +230,9 @@
       return rows;
     }
 
-    // --- 新しい、より強力なヘッダー正規化関数 ---
     function normalizeHeader(header) {
-      // 見えない文字、空白、記号などをすべて削除し、小文字に変換
-      return header.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
+      // CSVから来た引用符を削除し、前後の空白を削除し、小文字に変換
+      return header.trim().replace(/^"|"$/g, '').toLowerCase();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -251,12 +250,16 @@
           if (fullData.length < 1) throw new Error('No data found');
 
           const headers = fullData[0];
+
+          // --- デバッグ用：ヘッダーがどう認識されているか確認 ---
+          const normalizedHeaders = headers.map(h => normalizeHeader(h));
+          console.log("認識されたヘッダー名:", normalizedHeaders);
+          // ---------------------------------------------
+
           headers.forEach((header, index) => {
-            // 正規化されたヘッダーをキーとしてインデックスを保存
             columnIndices[normalizeHeader(header)] = index;
           });
 
-          // 正規化されたヘッダーを使って表示する列をフィルタリング
           visibleHeadersInfo = headers
             .map((header, index) => ({ header, index }))
             .filter(h => !columnsToHide.has(normalizeHeader(h.header)));
@@ -295,11 +298,11 @@
       thead.appendChild(headerRow);
 
       for (let i = 1; i < fullData.length; i++) {
-        const rowData = fullData[i].map(cell => cell.trim()); // 各セルの前後の空白を削除
+        const rowData = fullData[i];
         if (rowData.length <= 1 && !rowData[0]) continue;
 
-        if (rowData[0] && rowData[0].startsWith('cat[')) {
-          const match = rowData[0].match(/\[(.*?)\]/);
+        if (rowData[0] && rowData[0].trim().startsWith('cat[')) {
+          const match = rowData[0].trim().match(/\[(.*?)\]/);
           if (match) {
             const tr = document.createElement('tr');
             tr.className = 'category-row';
@@ -331,7 +334,7 @@
               cellText = rowData[index];
             }
 
-            cellText = cellText || '';
+            cellText = (cellText || '').trim();
 
             if (normalizedHeader === 'files' && linkUrl) {
               const a = document.createElement('a');
