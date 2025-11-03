@@ -112,8 +112,9 @@
 
     tr {
       display: flex;
-      align-items: center;
-      /* 縦方向の中央揃え */
+      /* --- ここが修正点です --- */
+      align-items: stretch;
+      /* セルの高さを一番高いものに合わせる */
     }
 
     th,
@@ -122,11 +123,8 @@
       text-align: left;
       border-bottom: 1px solid #ddd;
       flex-shrink: 0;
-      /* --- ここからが修正点です --- */
       white-space: normal;
-      /* テキストの折り返しを許可 */
       word-break: break-word;
-      /* 単語の途中でも改行する */
     }
 
     /* デスクトップ用の列幅と順序 */
@@ -378,7 +376,7 @@
       return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
     }
 
-    function formatDate(dateString, lang, useShort = false) {
+    function formatDate(dateString, lang, useShort = false, isMobile = false) {
       if (!dateString) return dateString;
 
       let date;
@@ -406,7 +404,11 @@
         case 'en':
           return `${monthArray[monthIndex]} ${day}, ${year}`;
         case 'ja':
-          return `${toFullWidth(year)}年${monthArray[monthIndex]}${toFullWidth(day)}日`;
+          // --- ここが修正点です ---
+          if (isMobile) {
+            return `${year}年${monthIndex + 1}月${day}日`; // モバイルでは半角
+          }
+          return `${toFullWidth(year)}年${monthArray[monthIndex]}${toFullWidth(day)}日`; // デスクトップでは全角
         default:
           return dateString;
       }
@@ -484,6 +486,9 @@
       document.getElementById('site-title').textContent = translations[lang].title;
       document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
       document.documentElement.lang = lang;
+
+      // --- ここが修正点です ---
+      const isMobile = window.innerWidth <= 768;
 
       document.querySelectorAll('.lang-switcher button').forEach(button => {
         button.classList.toggle('active', button.dataset.lang === lang);
@@ -574,9 +579,9 @@
               return;
 
             } else if (normalizedHeader === 'last_update') {
-              cellText = formatDate((rowData[index] || '').trim(), lang, true);
+              cellText = formatDate((rowData[index] || '').trim(), lang, true, isMobile);
             } else {
-              cellText = formatDate((rowData[index] || '').trim(), lang, false);
+              cellText = formatDate((rowData[index] || '').trim(), lang, false, isMobile);
             }
 
             if (normalizedHeader === 'files') {
