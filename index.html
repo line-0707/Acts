@@ -317,10 +317,24 @@
             const normalizedHeader = header.trim().toLowerCase();
 
             if (normalizedHeader === 'files') {
+              // 'files' 列の言語切り替え
               if (lang === 'en') cellText = rowData[columnIndices['en']];
               else if (lang === 'ja') cellText = rowData[columnIndices['jp']];
               else cellText = rowData[columnIndices['files']];
+
+            } else if (normalizedHeader === 'description') {
+              // 'description' 列の言語切り替え
+              // スプレッドシートの列名を 'description_en', 'description_ja' と仮定
+              if (lang === 'en' && columnIndices['description_en']) {
+                cellText = rowData[columnIndices['description_en']];
+              } else if (lang === 'ja' && columnIndices['description_ja']) {
+                cellText = rowData[columnIndices['description_ja']];
+              } else {
+                cellText = rowData[index]; // デフォルト (RU)
+              }
+
             } else {
+              // 'date' 列など、その他の列
               cellText = rowData[index];
             }
 
