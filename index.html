@@ -377,7 +377,6 @@
         subtitle: 'Сводка опубликованных документов и ресурсов',
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
-        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
         last_updated: 'Последнее обновление сайта:'
       },
@@ -386,7 +385,6 @@
         subtitle: 'Summary of published documents and resources',
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
-        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         last_updated: 'Site last updated:'
       },
@@ -395,8 +393,6 @@
         subtitle: '公開されたドキュメントとリソースの概要',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' },
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
-        months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-        months_short: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         last_updated: 'サイト最終更新日時:'
       }
     };
@@ -451,20 +447,37 @@
     function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); }
 
     // --- ここからが修正点です ---
-    function formatDate(dateString, lang, useShort = false) {
+    function formatDate(dateString, lang, useShort = false, isMobile = false) {
       if (!dateString) return dateString;
       let date;
       if (/^\d{8}$/.test(dateString)) {
         const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
         date = new Date(year, month - 1, day);
       } else { date = new Date(dateString.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3')); }
+
       if (isNaN(date.getTime())) { return dateString; }
+
+      if (lang === 'ja') {
+        const options = { era: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const fullWarekiDate = new Intl.DateTimeFormat('ja-JP-u-ca-japanese', options).format(date);
+
+        if (isMobile) {
+          const eraAbbreviations = { '令和': 'R', '平成': 'H', '昭和': 'S', '大正': 'T', '明治': 'M' };
+          for (const [era, abbr] of Object.entries(eraAbbreviations)) {
+            if (fullWarekiDate.startsWith(era)) {
+              return fullWarekiDate.replace(era, abbr);
+            }
+          }
+        }
+        return fullWarekiDate;
+      }
+
       const year = date.getFullYear(), monthIndex = date.getMonth(), day = date.getDate();
-      const monthArray = useShort ? translations[lang].months_short : translations[lang].months;
+      const monthArray = useShort ? translations[lang].months_short : translations[en].months_short; // Fallback to English
+
       switch (lang) {
         case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`;
         case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`;
-        case 'ja': return `${year}年${monthIndex + 1}月${day}日`;
         default: return dateString;
       }
     }
@@ -546,6 +559,7 @@
       document.getElementById('site-title').textContent = translations[lang].title;
       document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
       document.documentElement.lang = lang;
+      const isMobile = window.innerWidth <= 768;
       const isDarkMode = body.classList.contains('dark-mode');
       document.querySelectorAll('.lang-switcher button').forEach(button => { button.classList.toggle('active', button.dataset.lang === lang); });
       const tableContainer = document.getElementById('table-container');
@@ -605,8 +619,8 @@
               } else { td.textContent = (rowData[index] || '').trim(); }
               tr.appendChild(td); return;
             } else if (normalizedHeader === 'last_update') {
-              cellText = formatDate((rowData[index] || '').trim(), lang, true);
-            } else { cellText = formatDate((rowData[index] || '').trim(), lang, false); }
+              cellText = formatDate((rowData[index] || '').trim(), lang, true, isMobile);
+            } else { cellText = formatDate((rowData[index] || '').trim(), lang, false, isMobile); }
             if (normalizedHeader === 'files') {
               const contentWrapper = document.createDocumentFragment();
               if (statusConfig) {
