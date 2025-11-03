@@ -91,6 +91,8 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      /* --- 修正点: 列幅を固定 --- */
+      table-layout: fixed;
     }
 
     th,
@@ -115,19 +117,16 @@
       background-color: #e9ecef;
     }
 
-    /* --- ここが修正点です --- */
-    /* カテゴリー行のセル(td)に直接スタイルを適用 */
     .category-row td {
       background-color: #6c757d;
       color: white;
       font-weight: bold;
-      text-align: center !important;
+      /* --- 修正点: 中央寄せを削除 --- */
+      /* text-align: center !important; */
     }
 
-    /* ホバー時もセル(td)のスタイルを変更 */
-    .category-row:hover td {
-      background-color: #5a6268;
-    }
+    /* --- 修正点: カテゴリー行のホバー効果を削除 --- */
+    /* .category-row:hover td { ... } のブロック全体を削除 */
 
     table a {
       color: #007bff;
@@ -174,7 +173,14 @@
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
-        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'status', last_update: 'last_update' }
+        headers: {
+          date: 'дата',
+          files: 'файлы',
+          description: 'описание',
+          /* --- 修正点: ロシア語の翻訳を追加 --- */
+          status: 'статус',
+          last_update: 'последнее обновление'
+        }
       },
       en: {
         title: 'INFORMATION SITE',
@@ -242,10 +248,8 @@
 
           const firstRowRaw = fullData[0];
           if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
-            console.log("行の結合を検出。データを強制的に修復します。");
             const correctedHeaders = [];
             const correctedFirstDataRow = [];
-
             firstRowRaw.forEach(cellContent => {
               const catIndex = cellContent.indexOf('cat[');
               if (catIndex !== -1) {
@@ -262,7 +266,6 @@
                 }
               }
             });
-
             fullData.shift();
             fullData.unshift(correctedFirstDataRow);
             fullData.unshift(correctedHeaders);
@@ -317,13 +320,12 @@
         const rowData = fullData[i];
         if (rowData.length <= 1 && !(rowData[0] || '').trim()) continue;
 
-        // --- JavaScript側の修正は不要ですが、念のためクラス付与は残します ---
         const firstCell = (rowData[0] || '').trim();
         if (firstCell.startsWith('cat[')) {
           const match = firstCell.match(/\[(.*?)\]/);
           if (match) {
             const tr = document.createElement('tr');
-            tr.className = 'category-row'; // このクラスをCSSが参照します
+            tr.className = 'category-row';
             const td = document.createElement('td');
             td.colSpan = visibleHeadersInfo.length;
             td.textContent = match[1];
