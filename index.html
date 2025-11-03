@@ -99,7 +99,6 @@
       background-color: #fff;
     }
 
-    /* --- ここからがFlexboxによるテーブルレイアウトの修正点 --- */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -113,6 +112,8 @@
 
     tr {
       display: flex;
+      align-items: center;
+      /* 縦方向の中央揃え */
     }
 
     th,
@@ -120,12 +121,12 @@
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid #ddd;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      vertical-align: middle;
       flex-shrink: 0;
-      /* 縮まないように設定 */
+      /* --- ここからが修正点です --- */
+      white-space: normal;
+      /* テキストの折り返しを許可 */
+      word-break: break-word;
+      /* 単語の途中でも改行する */
     }
 
     /* デスクトップ用の列幅と順序 */
@@ -134,7 +135,6 @@
       flex: 1 1 auto;
     }
 
-    /* 残りのスペースを全て取る */
     .th-description,
     .td-description {
       flex: 0 1 25%;
@@ -154,7 +154,6 @@
     .td-last_update {
       flex: 0 0 20%;
       order: 99;
-      /* この列を常に右端に配置 */
     }
 
     thead th {
@@ -162,8 +161,6 @@
       color: white;
       font-weight: bold;
     }
-
-    /* --- ここまで --- */
 
     tbody tr:nth-child(even) {
       background-color: #f8f9fa;
@@ -258,7 +255,6 @@
         font-weight: bold;
       }
 
-      /* モバイル用の列幅を再調整 */
       .th-files,
       .td-files {
         flex: 1 1 auto;
