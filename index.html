@@ -91,7 +91,6 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      /* --- 修正点: 列幅を固定 --- */
       table-layout: fixed;
     }
 
@@ -101,6 +100,8 @@
       text-align: left;
       border-bottom: 1px solid #ddd;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     thead th {
@@ -121,12 +122,12 @@
       background-color: #6c757d;
       color: white;
       font-weight: bold;
-      /* --- 修正点: 中央寄せを削除 --- */
-      /* text-align: center !important; */
     }
 
-    /* --- 修正点: カテゴリー行のホバー効果を削除 --- */
-    /* .category-row:hover td { ... } のブロック全体を削除 */
+    /* カテゴリー行はホバーしても色が変わらないように、通常のホバー効果を上書き */
+    tr.category-row:hover {
+      background-color: transparent;
+    }
 
     table a {
       color: #007bff;
@@ -177,7 +178,6 @@
           date: 'дата',
           files: 'файлы',
           description: 'описание',
-          /* --- 修正点: ロシア語の翻訳を追加 --- */
           status: 'статус',
           last_update: 'последнее обновление'
         }
@@ -320,18 +320,38 @@
         const rowData = fullData[i];
         if (rowData.length <= 1 && !(rowData[0] || '').trim()) continue;
 
-        const firstCell = (rowData[0] || '').trim();
+        const firstCell = (rowData[columnIndices['files']] || '').trim();
         if (firstCell.startsWith('cat[')) {
-          const match = firstCell.match(/\[(.*?)\]/);
+          // --- ここからがカテゴリー行の翻訳ロジック ---
+          let categoryText = '';
+          let categoryCellContent = '';
+
+          // 言語に応じて適切な列のセル内容を取得
+          if (lang === 'en') {
+            categoryCellContent = (rowData[columnIndices['en']] || '').trim();
+          } else if (lang === 'ja') {
+            categoryCellContent = (rowData[columnIndices['jp']] || '').trim();
+          } else {
+            categoryCellContent = firstCell;
+          }
+
+          // 翻訳先のセルが空の場合、ロシア語にフォールバック
+          if (!categoryCellContent.startsWith('cat[')) {
+            categoryCellContent = firstCell;
+          }
+
+          const match = categoryCellContent.match(/\[(.*?)\]/);
           if (match) {
+            categoryText = match[1];
             const tr = document.createElement('tr');
             tr.className = 'category-row';
             const td = document.createElement('td');
             td.colSpan = visibleHeadersInfo.length;
-            td.textContent = match[1];
+            td.textContent = categoryText;
             tr.appendChild(td);
             tbody.appendChild(tr);
           }
+          // --- ここまで ---
         } else {
           const tr = document.createElement('tr');
           const linkUrl = rowData[columnIndices['link']];
