@@ -36,6 +36,12 @@
       font-size: 2em;
     }
 
+    /* Style for the new link */
+    .header h1 a {
+      text-decoration: none;
+      color: inherit;
+    }
+
     .header h2 {
       font-size: 1.2em;
       font-weight: normal;
@@ -89,7 +95,7 @@
   <div class="header">
     <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
     <div>
-      <h1>ИНФОРМАЦИОННАЯ САЙТА</h1>
+      <h1><a href="https://line-0707.github.io/Acts/index.html">ИНФОРМАЦИОННАЯ САЙТА</a></h1>
       <h2>Сводка опубликованных документов и ресурсов</h2>
     </div>
   </div>
@@ -100,7 +106,6 @@
 
   <script>
     // URL of the Google Sheet published as a CSV.
-    // The /gviz/tq?tqx=out:csv part is important for direct CSV download.
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv';
 
     // Wait for the webpage to fully load before running the script.
@@ -110,9 +115,8 @@
         .then(csvText => {
           const tableContainer = document.getElementById('table-container');
 
-          // Parse the CSV text into a 2D array (rows and cells).
-          // This handles potential commas inside quoted strings.
-          const rows = csvText.split('\\n').map(row => {
+          // Parse the CSV text into a 2D array.
+          const rows = csvText.split('\n').map(row => {
             const results = [];
             let inQuote = false;
             let cell = '';
@@ -145,7 +149,7 @@
           thead.appendChild(headerRow);
           table.appendChild(thead);
 
-          // Create the table body with the rest of the data.
+          // Create the table body.
           const tbody = document.createElement('tbody');
           for (let i = 1; i < rows.length; i++) {
             const rowData = rows[i];
