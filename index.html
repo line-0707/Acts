@@ -171,17 +171,17 @@
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
-        headers: { date: 'дата', files: 'файлы', description: 'описание' }
+        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'status', last_update: 'last_update' }
       },
       en: {
         title: 'INFORMATION SITE',
         subtitle: 'Summary of published documents and resources',
-        headers: { date: 'date', files: 'files', description: 'description' }
+        headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' }
       },
       ja: {
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
-        headers: { date: '日付', files: 'ファイル', description: '説明' }
+        headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' }
       }
     };
 
@@ -190,48 +190,39 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
 
+    // --- 新しく、より確実なCSV解析関数 ---
     function parseCSV(csvText) {
-      const rows = [];
-      let currentRow = [];
-      let currentCell = '';
-      let inQuotes = false;
-      csvText = csvText.replace(/\r\n/g, '\n');
-      for (let i = 0; i < csvText.length; i++) {
-        const char = csvText[i];
-        if (inQuotes) {
-          if (char === '"' && i + 1 < csvText.length && csvText[i + 1] === '"') {
-            currentCell += '"';
-            i++;
-          } else if (char === '"') {
-            inQuotes = false;
-          } else {
-            currentCell += char;
-          }
-        } else {
-          if (char === '"') {
+      // 1. テキスト全体を改行で分割し、行の配列を作成
+      const lines = csvText.replace(/\r\n/g, '\n').split('\n');
+
+      return lines.map(line => {
+        const row = [];
+        let cell = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"' && inQuotes) {
+            if (i + 1 < line.length && line[i + 1] === '"') {
+              cell += '"';
+              i++; // エスケープされた引用符をスキップ
+            } else {
+              inQuotes = false;
+            }
+          } else if (char === '"' && !inQuotes) {
             inQuotes = true;
-          } else if (char === ',') {
-            currentRow.push(currentCell);
-            currentCell = '';
-          } else if (char === '\n') {
-            currentRow.push(currentCell);
-            rows.push(currentRow);
-            currentRow = [];
-            currentCell = '';
+          } else if (char === ',' && !inQuotes) {
+            row.push(cell);
+            cell = '';
           } else {
-            currentCell += char;
+            cell += char;
           }
         }
-      }
-      if (currentCell || currentRow.length > 0) {
-        currentRow.push(currentCell);
-        rows.push(currentRow);
-      }
-      return rows;
+        row.push(cell); // 最後のセルを追加
+        return row;
+      });
     }
 
     function normalizeHeader(header) {
-      // CSVから来た引用符を削除し、前後の空白を削除し、小文字に変換
       return header.trim().replace(/^"|"$/g, '').toLowerCase();
     }
 
@@ -250,11 +241,8 @@
           if (fullData.length < 1) throw new Error('No data found');
 
           const headers = fullData[0];
-
-          // --- デバッグ用：ヘッダーがどう認識されているか確認 ---
           const normalizedHeaders = headers.map(h => normalizeHeader(h));
           console.log("認識されたヘッダー名:", normalizedHeaders);
-          // ---------------------------------------------
 
           headers.forEach((header, index) => {
             columnIndices[normalizeHeader(header)] = index;
@@ -297,12 +285,13 @@
       });
       thead.appendChild(headerRow);
 
+      // ヘッダー行を除いたデータ部分をループ (i = 1 から開始)
       for (let i = 1; i < fullData.length; i++) {
-        const rowData = fullData[i];
-        if (rowData.length <= 1 && !rowData[0]) continue;
+        const rowData = fullData[i].map(cell => (cell || '').trim());
+        if (rowData.length <= 1 && !rowData[0]) continue; // 空行をスキップ
 
-        if (rowData[0] && rowData[0].trim().startsWith('cat[')) {
-          const match = rowData[0].trim().match(/\[(.*?)\]/);
+        if (rowData[0] && rowData[0].startsWith('cat[')) {
+          const match = rowData[0].match(/\[(.*?)\]/);
           if (match) {
             const tr = document.createElement('tr');
             tr.className = 'category-row';
@@ -334,7 +323,7 @@
               cellText = rowData[index];
             }
 
-            cellText = (cellText || '').trim();
+            cellText = cellText || '';
 
             if (normalizedHeader === 'files' && linkUrl) {
               const a = document.createElement('a');
