@@ -322,13 +322,13 @@
               else if (lang === 'ja') cellText = rowData[columnIndices['jp']];
               else cellText = rowData[columnIndices['files']];
 
-            } else if (normalizedHeader === 'description') {
+            } else if (normalizedHeader === 'files') {
               // 'description' 列の言語切り替え
               // スプレッドシートの列名を 'description_en', 'description_ja' と仮定
-              if (lang === 'en' && columnIndices['description_en']) {
-                cellText = rowData[columnIndices['description_en']];
-              } else if (lang === 'ja' && columnIndices['description_ja']) {
-                cellText = rowData[columnIndices['description_ja']];
+              if (lang === 'en' && columnIndices['en']) {
+                cellText = rowData[columnIndices['en']];
+              } else if (lang === 'ja' && columnIndices['ja']) {
+                cellText = rowData[columnIndices['ja']];
               } else {
                 cellText = rowData[index]; // デフォルト (RU)
               }
