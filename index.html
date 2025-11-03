@@ -173,28 +173,7 @@
 
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
-    // スプレッドシートから取得したISO形式の日付データ
-    const dateFromSheet = '2025-01-01';
 
-    // 現在の表示言語に応じてロケールコードを設定
-    let locale;
-    const currentSiteLanguage = 'JP'; // 例: サイトの現在の設定がJPの場合
-
-    if (currentSiteLanguage === 'RU') {
-      locale = 'ru-RU';
-    } else if (currentSiteLanguage === 'EN') {
-      locale = 'en-US';
-    } else if (currentSiteLanguage === 'JP') {
-      locale = 'ja-JP';
-    }
-    // ...他の言語も同様...
-
-    // 変換後の日付を取得
-    const formattedDate = formatLocaleDate(dateFromSheet, locale);
-
-    // 例: HTML要素に設定
-    // console.log(formattedDate); // ロシア語なら "1 января 2025 г."
-    document.getElementById('date-field').textContent = formattedDate;
     const translations = {
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
@@ -261,6 +240,30 @@
       return String(str).replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
     }
 
+    // --- 改善された日付フォーマット関数 ---
+    function formatDate(dateString, lang) {
+      if (!dateString) return dateString;
+      const date = new Date(dateString);
+      // Dateオブジェクトが不正な場合は、元の文字列をそのまま返す
+      if (isNaN(date.getTime())) {
+        return dateString;
+      }
+
+      const year = date.getFullYear();
+      const monthIndex = date.getMonth();
+      const day = date.getDate();
+
+      switch (lang) {
+        case 'ru':
+          return `${day} ${translations.ru.months[monthIndex]} ${year}г.`;
+        case 'en':
+          return `${translations.en.months[monthIndex]} ${day}, ${year}`;
+        case 'ja':
+          return `${toFullWidth(year)}年${toFullWidth(monthIndex + 1)}月${toFullWidth(day)}日`;
+        default:
+          return dateString;
+      }
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
