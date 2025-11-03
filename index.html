@@ -188,7 +188,6 @@
     let fullData = [];
     let columnIndices = {};
     let visibleHeadersInfo = [];
-    // Added 'desc_en' and 'desc_ja' to the list of columns to hide
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
 
     function parseCSV(csvText) {
@@ -212,10 +211,10 @@
           if (char === '"') {
             inQuotes = true;
           } else if (char === ',') {
-            currentRow.push(currentCell.trim());
+            currentRow.push(currentCell); // Keep original content, trim later
             currentCell = '';
           } else if (char === '\n') {
-            currentRow.push(currentCell.trim());
+            currentRow.push(currentCell);
             rows.push(currentRow);
             currentRow = [];
             currentCell = '';
@@ -225,10 +224,16 @@
         }
       }
       if (currentCell || currentRow.length > 0) {
-        currentRow.push(currentCell.trim());
+        currentRow.push(currentCell);
         rows.push(currentRow);
       }
       return rows;
+    }
+
+    // --- 新しい、より強力なヘッダー正規化関数 ---
+    function normalizeHeader(header) {
+      // 見えない文字、空白、記号などをすべて削除し、小文字に変換
+      return header.replace(/[^a-zA-Z0-9_]/g, '').toLowerCase();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -247,12 +252,14 @@
 
           const headers = fullData[0];
           headers.forEach((header, index) => {
-            columnIndices[header.trim().toLowerCase()] = index;
+            // 正規化されたヘッダーをキーとしてインデックスを保存
+            columnIndices[normalizeHeader(header)] = index;
           });
 
+          // 正規化されたヘッダーを使って表示する列をフィルタリング
           visibleHeadersInfo = headers
             .map((header, index) => ({ header, index }))
-            .filter(h => !columnsToHide.has(h.header.trim().toLowerCase()));
+            .filter(h => !columnsToHide.has(normalizeHeader(h.header)));
 
           renderPage('ru');
         })
@@ -282,13 +289,13 @@
       const translatedHeaders = translations[lang].headers;
       visibleHeadersInfo.forEach(({ header }) => {
         const th = document.createElement('th');
-        th.textContent = translatedHeaders[header.trim().toLowerCase()] || header;
+        th.textContent = translatedHeaders[normalizeHeader(header)] || header;
         headerRow.appendChild(th);
       });
       thead.appendChild(headerRow);
 
       for (let i = 1; i < fullData.length; i++) {
-        const rowData = fullData[i];
+        const rowData = fullData[i].map(cell => cell.trim()); // 各セルの前後の空白を削除
         if (rowData.length <= 1 && !rowData[0]) continue;
 
         if (rowData[0] && rowData[0].startsWith('cat[')) {
@@ -310,26 +317,17 @@
             const td = document.createElement('td');
             let cellText;
 
-            const normalizedHeader = header.trim().toLowerCase();
+            const normalizedHeader = normalizeHeader(header);
 
-            // --- CORRECTED LOGIC BLOCK ---
             if (normalizedHeader === 'files') {
-              // Handle 'files' column translation
               if (lang === 'en') cellText = rowData[columnIndices['en']];
               else if (lang === 'ja') cellText = rowData[columnIndices['jp']];
               else cellText = rowData[columnIndices['files']];
-
             } else if (normalizedHeader === 'description') {
-              // Handle 'description' column translation
-              if (lang === 'en' && columnIndices['desc_en']) {
-                cellText = rowData[columnIndices['desc_en']];
-              } else if (lang === 'ja' && columnIndices['desc_ja']) {
-                cellText = rowData[columnIndices['desc_ja']];
-              } else {
-                cellText = rowData[index]; // Default (RU)
-              }
+              if (lang === 'en' && columnIndices['desc_en']) cellText = rowData[columnIndices['desc_en']];
+              else if (lang === 'ja' && columnIndices['desc_ja']) cellText = rowData[columnIndices['desc_ja']];
+              else cellText = rowData[index];
             } else {
-              // Handle all other columns (like 'date')
               cellText = rowData[index];
             }
 
