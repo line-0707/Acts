@@ -67,6 +67,11 @@
       width: 50px;
       height: 50px;
       margin-right: 15px;
+      /* --- ここが修正点です --- */
+      border-radius: 50%;
+      /* 画像を丸くする */
+      object-fit: cover;
+      /* 画像が歪まないように調整 */
     }
 
     .header h1,
@@ -114,7 +119,6 @@
       vertical-align: middle;
     }
 
-    /* --- デスクトップ用の列幅設定 --- */
     .th-status {
       width: 18%;
     }
@@ -126,7 +130,6 @@
     .th-date {
       width: 18%;
     }
-
 
     thead th {
       background-color: #007bff;
@@ -172,7 +175,11 @@
       font-size: 1.2em;
     }
 
-    /* --- ここからがモバイル用のレスポンシブ設定 --- */
+    /* --- モバイル用の中黒はデフォルトで非表示 --- */
+    .status-bullet-mobile {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -180,11 +187,8 @@
 
       .header {
         flex-direction: column;
-        /* 縦並びにする */
         align-items: center;
-        /* 中央揃え */
         margin-top: 50px;
-        /* 言語セレクター分のスペース確保 */
       }
 
       .header img {
@@ -194,7 +198,6 @@
 
       .header div {
         text-align: center;
-        /* タイトル・サブタイトルを中央揃え */
       }
 
       .header h1 {
@@ -207,31 +210,36 @@
 
       .lang-switcher-container {
         position: static;
-        /* 絶対配置を解除 */
         width: 100%;
         justify-content: flex-end;
-        /* 右寄せ */
         margin-bottom: 20px;
         order: -1;
-        /* ヘッダーより上に表示 */
       }
 
+      /* --- ここからがモバイル用のステータス表示ロジック --- */
       .status-text {
         display: none;
-        /* ステータスのテキストを非表示 */
       }
 
-      /* モバイル用の列幅設定 */
-      .th-status {
-        width: 12%;
+      .th-status,
+      .td-status {
+        display: none;
+        /* ステータス列全体を非表示 */
+      }
+
+      .status-bullet-mobile {
+        display: inline;
+        /* ファイル名の前の中黒を表示 */
+        font-weight: bold;
+      }
+
+      /* モバイル用の列幅を再調整 */
+      .th-date {
+        width: 35%;
       }
 
       .th-last_update {
-        width: 30%;
-      }
-
-      .th-date {
-        width: 25%;
+        width: 35%;
       }
     }
   </style>
@@ -250,7 +258,10 @@
     </div>
 
     <div class="header">
-      <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
+      <!-- --- ここが修正点です --- */ -->
+      <a href="https://line-0707.github.io/Acts/index.html">
+        <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
+      </a>
       <div>
         <h1><a href="https://line-0707.github.io/Acts/index.html" id="site-title">ИНФОРМАЦИОННАЯ САЙТА</a></h1>
         <h2 id="site-subtitle">Сводка опубликованных документов и ресурсов</h2>
@@ -368,6 +379,15 @@
       }
     }
 
+    function getStatusConfig(statusCode, lang) {
+      switch (statusCode) {
+        case 'g': return { text: translations[lang].status_text.g, bgColor: '#d1fae5', color: '#065f46', bulletColor: '#16a34a' };
+        case 'ex': return { text: translations[lang].status_text.ex, bgColor: '#fecaca', color: '#991b1b', bulletColor: '#dc2626' };
+        case 'e': return { text: translations[lang].status_text.e, bgColor: '#fef9c3', color: '#92400e', bulletColor: '#f59e0b' };
+        default: return null;
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
         button.addEventListener('click', () => renderPage(button.dataset.lang));
@@ -482,11 +502,14 @@
         } else {
           const tr = document.createElement('tr');
           const linkUrl = (rowData[columnIndices['link']] || '').trim();
+          const statusCode = (rowData[columnIndices['status']] || '').trim().toLowerCase();
+          const statusConfig = getStatusConfig(statusCode, lang);
 
           visibleHeadersInfo.forEach(({ header, index }) => {
             const td = document.createElement('td');
             let cellText;
             const normalizedHeader = normalizeHeader(header);
+            td.className = 'td-' + normalizedHeader;
 
             if (normalizedHeader === 'files') {
               cellText = fileCellText;
@@ -496,21 +519,6 @@
               else if (lang === 'ja') cellText = (rowData[columnIndices['desc_ja']] || ruDescText).trim();
               else cellText = ruDescText;
             } else if (normalizedHeader === 'status') {
-              const statusCode = (rowData[index] || '').trim().toLowerCase();
-              let statusConfig = null;
-
-              switch (statusCode) {
-                case 'g':
-                  statusConfig = { text: translations[lang].status_text.g, bgColor: '#d1fae5', color: '#065f46', bulletColor: '#16a34a' };
-                  break;
-                case 'ex':
-                  statusConfig = { text: translations[lang].status_text.ex, bgColor: '#fecaca', color: '#991b1b', bulletColor: '#dc2626' };
-                  break;
-                case 'e':
-                  statusConfig = { text: translations[lang].status_text.e, bgColor: '#fef9c3', color: '#92400e', bulletColor: '#f59e0b' };
-                  break;
-              }
-
               if (statusConfig) {
                 const bulletSpan = document.createElement('span');
                 bulletSpan.textContent = '● ';
@@ -538,13 +546,29 @@
               cellText = formatDate((rowData[index] || '').trim(), lang, false);
             }
 
-            if (normalizedHeader === 'files' && linkUrl) {
-              const a = document.createElement('a');
-              a.href = linkUrl;
-              a.textContent = cellText;
-              a.target = '_blank';
-              a.rel = 'noopener noreferrer';
-              td.appendChild(a);
+            if (normalizedHeader === 'files') {
+              const contentWrapper = document.createDocumentFragment();
+
+              if (statusConfig) {
+                const bulletSpan = document.createElement('span');
+                bulletSpan.className = 'status-bullet-mobile';
+                bulletSpan.textContent = '● ';
+                bulletSpan.style.color = statusConfig.bulletColor;
+                contentWrapper.appendChild(bulletSpan);
+              }
+
+              contentWrapper.appendChild(document.createTextNode(cellText));
+
+              if (linkUrl) {
+                const a = document.createElement('a');
+                a.href = linkUrl;
+                a.appendChild(contentWrapper);
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                td.appendChild(a);
+              } else {
+                td.appendChild(contentWrapper);
+              }
             } else {
               td.textContent = cellText;
             }
