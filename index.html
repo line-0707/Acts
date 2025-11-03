@@ -409,6 +409,7 @@
     let fullData = [];
     let columnIndices = {};
     let visibleHeadersInfo = [];
+    const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
     let siteLastModifiedDate = null;
 
     const themeToggle = document.getElementById('theme-toggle');
@@ -455,24 +456,18 @@
 
     function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); }
 
-    // --- ここからが修正点です ---
     function formatDate(dateString, lang, useShort = false) {
       if (!dateString || typeof dateString !== 'string') return dateString;
-
       let date;
-      // yyyymmdd形式のチェック
       if (/^\d{8}$/.test(dateString)) {
         const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
         date = new Date(year, month - 1, day);
-        // dd.mm.yyyy形式のチェック
       } else if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(dateString)) {
         const parts = dateString.split('.');
         date = new Date(parts[2], parts[1] - 1, parts[0]);
-        // その他の一般的な形式 (YYYY-MM-DD, MM/DD/YYYYなど)
       } else {
         date = new Date(dateString);
       }
-
       if (isNaN(date.getTime())) { return dateString; }
 
       if (lang === 'ja') {
@@ -490,7 +485,6 @@
         default: return date.toLocaleDateString();
       }
     }
-    // --- ここまで ---
 
     function getStatusConfig(statusCode, lang, isDarkMode) {
       let colors = null;
