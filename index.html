@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ИНФОРМАЦИОННАЯ САЙТА</title>
-  <!-- Favicon for the browser tab -->
   <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Acts/favicon.ico">
   <style>
     body {
@@ -52,7 +51,8 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
+      overflow-x: auto;
+      /* For responsiveness */
       background-color: #fff;
     }
 
@@ -66,6 +66,8 @@
       padding: 12px 15px;
       text-align: left;
       border-bottom: 1px solid #ddd;
+      white-space: nowrap;
+      /* Prevent text wrapping */
     }
 
     thead th {
@@ -75,11 +77,34 @@
     }
 
     tbody tr:nth-child(even) {
-      background-color: #f2f2f2;
+      background-color: #f8f9fa;
     }
 
     tbody tr:hover {
       background-color: #e9ecef;
+    }
+
+    /* Style for category rows */
+    .category-row {
+      background-color: #6c757d;
+      color: white;
+      font-weight: bold;
+      text-align: center !important;
+    }
+
+    .category-row:hover {
+      background-color: #5a6268;
+    }
+
+    /* Style for links in the table */
+    table a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    table a:hover {
+      text-decoration: underline;
     }
 
     .loader {
@@ -93,7 +118,6 @@
 <body>
 
   <div class="header">
-    <!-- Site icon displayed on the page -->
     <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
     <div>
       <h1><a href="https://line-0707.github.io/Acts/index.html">ИНФОРМАЦИОННАЯ САЙТА</a></h1>
@@ -106,67 +130,96 @@
   </div>
 
   <script>
-    // URL of the Google Sheet published as a CSV.
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv';
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
 
     document.addEventListener('DOMContentLoaded', function () {
       fetch(sheetUrl)
-        .then(response => response.text())
+        .then(response => response.ok ? response.text() : Promise.reject('Network response was not ok.'))
         .then(csvText => {
           const tableContainer = document.getElementById('table-container');
 
-          const rows = csvText.split('\n').map(row => {
-            const results = [];
-            let inQuote = false;
-            let cell = '';
-            for (let i = 0; i < row.length; i++) {
-              const char = row[i];
-              if (char === '"') {
-                inQuote = !inQuote;
-              } else if (char === ',' && !inQuote) {
-                results.push(cell.trim());
-                cell = '';
-              } else {
-                cell += char;
-              }
-            }
-            results.push(cell.trim());
-            return results;
-          });
+          // Simple CSV parser
+          const rows = csvText.trim().split('\n').map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
 
+          if (rows.length < 1) {
+            tableContainer.textContent = 'No data found in the sheet.';
+            return;
+          }
+
+          // --- LOGIC FOR HANDLING COLUMNS ---
+          const headers = rows[0];
+          const columnsToHide = new Set(['en', 'jp', 'link']);
+          const linkColumnIndex = headers.indexOf('link');
+          const filesColumnIndex = headers.indexOf('files');
+
+          const visibleHeaders = headers.map((header, index) => ({ header, index }))
+            .filter(h => !columnsToHide.has(h.header));
+
+          // --- CREATE TABLE STRUCTURE ---
           const table = document.createElement('table');
-
           const thead = document.createElement('thead');
+          const tbody = document.createElement('tbody');
+
+          // Create table header
           const headerRow = document.createElement('tr');
-          rows[0].forEach(headerText => {
+          visibleHeaders.forEach(({ header }) => {
             const th = document.createElement('th');
-            th.textContent = headerText;
+            th.textContent = header;
             headerRow.appendChild(th);
           });
           thead.appendChild(headerRow);
-          table.appendChild(thead);
 
-          const tbody = document.createElement('tbody');
+          // Create table body
           for (let i = 1; i < rows.length; i++) {
             const rowData = rows[i];
-            if (rowData.length > 1 || (rowData.length === 1 && rowData[0] !== '')) {
-              const tr = document.createElement('tr');
-              rowData.forEach(cellText => {
+            if (rowData.length === 1 && rowData[0] === '') continue; // Skip empty rows
+
+            // Check for category row: "cat[...]"
+            if (rowData[0] && rowData[0].startsWith('cat[')) {
+              const match = rowData[0].match(/\[(.*?)\]/);
+              if (match) {
+                const tr = document.createElement('tr');
+                tr.className = 'category-row';
                 const td = document.createElement('td');
-                td.textContent = cellText;
+                td.colSpan = visibleHeaders.length;
+                td.textContent = match[1]; // Text inside brackets
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+              }
+            } else { // It's a regular data row
+              const tr = document.createElement('tr');
+              const linkUrl = (linkColumnIndex !== -1) ? rowData[linkColumnIndex] : null;
+
+              visibleHeaders.forEach(({ index }) => {
+                const td = document.createElement('td');
+                const cellText = rowData[index] || '';
+
+                // If this is the 'files' column and a link exists, create a hyperlink
+                if (index === filesColumnIndex && linkUrl) {
+                  const a = document.createElement('a');
+                  a.href = linkUrl;
+                  a.textContent = cellText;
+                  a.target = '_blank'; // Open in new tab
+                  a.rel = 'noopener noreferrer';
+                  td.appendChild(a);
+                } else {
+                  td.textContent = cellText;
+                }
                 tr.appendChild(td);
               });
               tbody.appendChild(tr);
             }
           }
+
+          table.appendChild(thead);
           table.appendChild(tbody);
 
-          tableContainer.innerHTML = '';
+          tableContainer.innerHTML = ''; // Clear "Loading..." message
           tableContainer.appendChild(table);
         })
         .catch(error => {
           console.error('Error fetching or parsing sheet data:', error);
-          document.getElementById('table-container').textContent = 'Error: Could not load data from the Google Sheet. Please ensure it is published to the web as a CSV.';
+          document.getElementById('table-container').textContent = 'Error: Could not load data from Google Sheet. Please ensure it is "Published to the web" as a CSV.';
         });
     });
   </script>
