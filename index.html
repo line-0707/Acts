@@ -13,6 +13,39 @@
       padding: 20px;
       background-color: #f4f4f9;
       color: #333;
+      position: relative;
+    }
+
+    .lang-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 5px;
+      background-color: #fff;
+      padding: 5px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .lang-switcher button {
+      border: none;
+      background-color: transparent;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #007bff;
+      border-radius: 5px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .lang-switcher button:hover {
+      background-color: #e9ecef;
+    }
+
+    .lang-switcher button.active {
+      background-color: #007bff;
+      color: white;
     }
 
     .header {
@@ -52,7 +85,6 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       overflow-x: auto;
-      /* For responsiveness */
       background-color: #fff;
     }
 
@@ -67,7 +99,6 @@
       text-align: left;
       border-bottom: 1px solid #ddd;
       white-space: nowrap;
-      /* Prevent text wrapping */
     }
 
     thead th {
@@ -84,7 +115,6 @@
       background-color: #e9ecef;
     }
 
-    /* Style for category rows */
     .category-row {
       background-color: #6c757d;
       color: white;
@@ -96,7 +126,6 @@
       background-color: #5a6268;
     }
 
-    /* Style for links in the table */
     table a {
       color: #007bff;
       text-decoration: none;
@@ -117,11 +146,17 @@
 
 <body>
 
+  <div class="lang-switcher">
+    <button data-lang="ru" class="active">RU</button>
+    <button data-lang="en">EN</button>
+    <button data-lang="ja">JP</button>
+  </div>
+
   <div class="header">
     <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
     <div>
-      <h1><a href="https://line-0707.github.io/Acts/index.html">ИНФОРМАЦИОННАЯ САЙТА</a></h1>
-      <h2>Сводка опубликованных документов и ресурсов</h2>
+      <h1><a href="https://line-0707.github.io/Acts/index.html" id="site-title">ИНФОРМАЦИОННАЯ САЙТА</a></h1>
+      <h2 id="site-subtitle">Сводка опубликованных документов и ресурсов</h2>
     </div>
   </div>
 
@@ -132,96 +167,152 @@
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
 
+    // --- TRANSLATION DATA ---
+    const translations = {
+      ru: {
+        title: 'ИНФОРМАЦИОННАЯ САЙТА',
+        subtitle: 'Сводка опубликованных документов и ресурсов',
+        headers: { date: 'дата', files: 'файлы', description: 'описание' }
+      },
+      en: {
+        title: 'INFORMATION SITE',
+        subtitle: 'Summary of published documents and resources',
+        headers: { date: 'date', files: 'files', description: 'description' }
+      },
+      ja: {
+        title: '情報サイト',
+        subtitle: '公開されたドキュメントとリソースの概要',
+        headers: { date: '日付', files: 'ファイル', description: '説明' }
+      }
+    };
+
+    let fullData = [];
+    let columnIndices = {};
+    let visibleHeadersInfo = [];
+    const columnsToHide = new Set(['en', 'jp', 'link']);
+
+    // --- MAIN LOGIC ---
     document.addEventListener('DOMContentLoaded', function () {
+      // Setup language switcher
+      document.querySelectorAll('.lang-switcher button').forEach(button => {
+        button.addEventListener('click', () => {
+          renderPage(button.dataset.lang);
+        });
+      });
+
+      // Fetch data and do initial render
+      fetchAndRender();
+    });
+
+    function fetchAndRender() {
       fetch(sheetUrl)
         .then(response => response.ok ? response.text() : Promise.reject('Network response was not ok.'))
         .then(csvText => {
-          const tableContainer = document.getElementById('table-container');
-
-          // Simple CSV parser
           const rows = csvText.trim().split('\n').map(row => row.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
+          if (rows.length < 1) throw new Error('No data found in the sheet.');
 
-          if (rows.length < 1) {
-            tableContainer.textContent = 'No data found in the sheet.';
-            return;
-          }
+          fullData = rows;
+          const headers = fullData[0];
 
-          // --- LOGIC FOR HANDLING COLUMNS ---
-          const headers = rows[0];
-          const columnsToHide = new Set(['en', 'jp', 'link']);
-          const linkColumnIndex = headers.indexOf('link');
-          const filesColumnIndex = headers.indexOf('files');
+          headers.forEach((header, index) => {
+            columnIndices[header] = index;
+          });
 
-          const visibleHeaders = headers.map((header, index) => ({ header, index }))
+          visibleHeadersInfo = headers
+            .map((header, index) => ({ header, index }))
             .filter(h => !columnsToHide.has(h.header));
 
-          // --- CREATE TABLE STRUCTURE ---
-          const table = document.createElement('table');
-          const thead = document.createElement('thead');
-          const tbody = document.createElement('tbody');
-
-          // Create table header
-          const headerRow = document.createElement('tr');
-          visibleHeaders.forEach(({ header }) => {
-            const th = document.createElement('th');
-            th.textContent = header;
-            headerRow.appendChild(th);
-          });
-          thead.appendChild(headerRow);
-
-          // Create table body
-          for (let i = 1; i < rows.length; i++) {
-            const rowData = rows[i];
-            if (rowData.length === 1 && rowData[0] === '') continue; // Skip empty rows
-
-            // Check for category row: "cat[...]"
-            if (rowData[0] && rowData[0].startsWith('cat[')) {
-              const match = rowData[0].match(/\[(.*?)\]/);
-              if (match) {
-                const tr = document.createElement('tr');
-                tr.className = 'category-row';
-                const td = document.createElement('td');
-                td.colSpan = visibleHeaders.length;
-                td.textContent = match[1]; // Text inside brackets
-                tr.appendChild(td);
-                tbody.appendChild(tr);
-              }
-            } else { // It's a regular data row
-              const tr = document.createElement('tr');
-              const linkUrl = (linkColumnIndex !== -1) ? rowData[linkColumnIndex] : null;
-
-              visibleHeaders.forEach(({ index }) => {
-                const td = document.createElement('td');
-                const cellText = rowData[index] || '';
-
-                // If this is the 'files' column and a link exists, create a hyperlink
-                if (index === filesColumnIndex && linkUrl) {
-                  const a = document.createElement('a');
-                  a.href = linkUrl;
-                  a.textContent = cellText;
-                  a.target = '_blank'; // Open in new tab
-                  a.rel = 'noopener noreferrer';
-                  td.appendChild(a);
-                } else {
-                  td.textContent = cellText;
-                }
-                tr.appendChild(td);
-              });
-              tbody.appendChild(tr);
-            }
-          }
-
-          table.appendChild(thead);
-          table.appendChild(tbody);
-
-          tableContainer.innerHTML = ''; // Clear "Loading..." message
-          tableContainer.appendChild(table);
+          renderPage('ru'); // Initial render in Russian
         })
         .catch(error => {
           console.error('Error fetching or parsing sheet data:', error);
-          document.getElementById('table-container').textContent = 'Error: Could not load data from Google Sheet. Please ensure it is "Published to the web" as a CSV.';
+          document.getElementById('table-container').textContent = 'Error: Could not load data. Please ensure the Google Sheet is "Published to the web" as a CSV.';
         });
-    });
+    }
+
+    function renderPage(lang) {
+      // Update static text
+      document.getElementById('site-title').textContent = translations[lang].title;
+      document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
+      document.documentElement.lang = lang;
+
+      // Update language switcher active state
+      document.querySelectorAll('.lang-switcher button').forEach(button => {
+        button.classList.toggle('active', button.dataset.lang === lang);
+      });
+
+      const tableContainer = document.getElementById('table-container');
+      tableContainer.innerHTML = ''; // Clear previous content
+
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const tbody = document.createElement('tbody');
+
+      // --- CREATE TABLE HEADER ---
+      const headerRow = document.createElement('tr');
+      const translatedHeaders = translations[lang].headers;
+      visibleHeadersInfo.forEach(({ header }) => {
+        const th = document.createElement('th');
+        th.textContent = translatedHeaders[header] || header; // Fallback to original header name
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      // --- CREATE TABLE BODY ---
+      for (let i = 1; i < fullData.length; i++) {
+        const rowData = fullData[i];
+        if (rowData.length <= 1 && !rowData[0]) continue;
+
+        if (rowData[0] && rowData[0].startsWith('cat[')) {
+          const match = rowData[0].match(/\[(.*?)\]/);
+          if (match) {
+            const tr = document.createElement('tr');
+            tr.className = 'category-row';
+            const td = document.createElement('td');
+            td.colSpan = visibleHeadersInfo.length;
+            td.textContent = match[1];
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+          }
+        } else {
+          const tr = document.createElement('tr');
+          const linkUrl = rowData[columnIndices.link];
+
+          visibleHeadersInfo.forEach(({ header, index }) => {
+            const td = document.createElement('td');
+            let cellText;
+
+            // --- DYNAMIC CONTENT SELECTION ---
+            if (header === 'files') {
+              if (lang === 'en') cellText = rowData[columnIndices.en];
+              else if (lang === 'ja') cellText = rowData[columnIndices.jp];
+              else cellText = rowData[columnIndices.files]; // Default to 'files' for RU
+            } else {
+              cellText = rowData[index];
+            }
+
+            cellText = cellText || ''; // Ensure text is not undefined
+
+            if (header === 'files' && linkUrl) {
+              const a = document.createElement('a');
+              a.href = linkUrl;
+              a.textContent = cellText;
+              a.target = '_blank';
+              a.rel = 'noopener noreferrer';
+              td.appendChild(a);
+            } else {
+              td.textContent = cellText;
+            }
+            tr.appendChild(td);
+          });
+          tbody.appendChild(tr);
+        }
+      }
+
+      table.appendChild(thead);
+      table.appendChild(tbody);
+      tableContainer.appendChild(table);
+    }
   </script>
 
 </body>
