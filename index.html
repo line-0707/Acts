@@ -370,13 +370,11 @@
     </div>
 
     <footer>
-      <p id="data-last-updated"></p>
       <p id="site-last-updated"></p>
     </footer>
   </div>
 
   <script>
-    const gasWebAppUrl = 'https://script.google.com/macros/s/AKfycbyX3GkU-MrOpoXprJZ5QdIrbHNkTqlhrzqiKG67xrrXDGcARBlj3EIr0oh552OjyLL13w/exec';
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
 
     const translations = {
@@ -386,8 +384,7 @@
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
-        site_last_updated: 'Последнее обновление сайта:',
-        data_last_updated: 'Последнее обновление данных:'
+        site_last_updated: 'Последнее обновление сайта:'
       },
       en: {
         title: 'INFORMATION SITE',
@@ -395,16 +392,14 @@
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        site_last_updated: 'Site last updated:',
-        data_last_updated: 'Data last updated:'
+        site_last_updated: 'Site last updated:'
       },
       ja: {
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' },
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
-        site_last_updated: 'サイト最終更新日時:',
-        data_last_updated: 'データ最終更新日時:'
+        site_last_updated: 'サイト最終更新日時:'
       }
     };
 
@@ -413,7 +408,6 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
     let siteLastModifiedDate = null;
-    let dataLastModifiedDate = null;
 
     const themeToggle = document.getElementById('theme-toggle');
     const body = document.body;
@@ -459,22 +453,32 @@
 
     function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); }
 
-    function formatDate(dateObj, lang, useShort = false) {
-      if (!dateObj || isNaN(dateObj.getTime())) return '';
+    function formatDate(dateString, lang, useShort = false) {
+      if (!dateString) return dateString;
+
+      let date;
+      if (/^\d{8}$/.test(dateString)) {
+        const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
+        date = new Date(year, month - 1, day);
+      } else {
+        date = new Date(dateString.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
+      }
+
+      if (isNaN(date.getTime())) { return dateString; }
 
       if (lang === 'ja') {
         const isMobile = window.innerWidth <= 768;
         const options = { era: isMobile ? 'narrow' : 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        return new Intl.DateTimeFormat('ja-JP-u-ca-japanese', options).format(dateObj);
+        return new Intl.DateTimeFormat('ja-JP-u-ca-japanese', options).format(date);
       }
 
-      const year = dateObj.getFullYear(), monthIndex = dateObj.getMonth(), day = dateObj.getDate();
+      const year = date.getFullYear(), monthIndex = date.getMonth(), day = date.getDate();
       const monthArray = useShort ? translations[lang].months_short : (translations[lang].months || translations.en.months);
 
       switch (lang) {
         case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`;
         case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`;
-        default: return dateObj.toLocaleDateString();
+        default: return date.toLocaleDateString();
       }
     }
 
@@ -515,16 +519,8 @@
             siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
           }
         });
-      // --- ここからが修正点です ---
-      const dataHeadersPromise = fetch(gasWebAppUrl).then(res => res.ok ? res.json() : Promise.reject('GAS fetch failed'))
-        .then(data => {
-          if (data && data.lastUpdated) {
-            dataLastModifiedDate = new Date(data.lastUpdated);
-          }
-        }).catch(err => console.error("GAS Error:", err)); // エラーをコンソールに出力
-      // --- ここまで ---
 
-      Promise.all([dataPromise, siteHeadersPromise, dataHeadersPromise])
+      Promise.all([dataPromise, siteHeadersPromise])
         .then(([csvText]) => {
           fullData = parseCSV(csvText);
           if (fullData.length < 1) throw new Error('No data found');
@@ -569,6 +565,7 @@
       const isDarkMode = body.classList.contains('dark-mode');
       document.querySelectorAll('.lang-switcher button').forEach(button => { button.classList.toggle('active', button.dataset.lang === lang); });
       const tableContainer = document.getElementById('table-container');
+      if (fullData.length === 0) return; // データがまだない場合は何もしない
       tableContainer.innerHTML = '';
       const table = document.createElement('table'), thead = document.createElement('thead'), tbody = document.createElement('tbody');
       const headerRow = document.createElement('tr');
@@ -625,13 +622,22 @@
               } else { td.textContent = (rowData[index] || '').trim(); }
               tr.appendChild(td); return;
             } else {
-              const dateObj = new Date((rowData[index] || '').trim().replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
-              if (!isNaN(dateObj.getTime())) {
-                if (normalizedHeader === 'last_update') cellText = formatDate(dateObj, lang, true);
-                else cellText = formatDate(dateObj, lang, false);
-              } else {
-                cellText = (rowData[index] || '').trim();
+              const dateString = (rowData[index] || '').trim();
+              let finalDateString = dateString;
+
+              let dateObj = null;
+              if (/^\d{8}$/.test(dateString)) {
+                const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
+                dateObj = new Date(year, month - 1, day);
+              } else if (dateString) {
+                dateObj = new Date(dateString.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
               }
+
+              if (dateObj && !isNaN(dateObj.getTime())) {
+                if (normalizedHeader === 'last_update') finalDateString = formatDate(dateObj, lang, true);
+                else finalDateString = formatDate(dateObj, lang, false);
+              }
+              cellText = finalDateString;
             }
             if (normalizedHeader === 'files') {
               const contentWrapper = document.createDocumentFragment();
@@ -656,10 +662,6 @@
       const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
       const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
 
-      if (dataLastModifiedDate) {
-        const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(dataLastModifiedDate);
-        document.getElementById('data-last-updated').textContent = `${translations[lang].data_last_updated} ${formattedDateTime}`;
-      }
       if (siteLastModifiedDate) {
         const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(siteLastModifiedDate);
         document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
