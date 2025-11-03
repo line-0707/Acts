@@ -190,11 +190,8 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
 
-    // --- 新しく、より確実なCSV解析関数 ---
     function parseCSV(csvText) {
-      // 1. テキスト全体を改行で分割し、行の配列を作成
       const lines = csvText.replace(/\r\n/g, '\n').split('\n');
-
       return lines.map(line => {
         const row = [];
         let cell = '';
@@ -204,7 +201,7 @@
           if (char === '"' && inQuotes) {
             if (i + 1 < line.length && line[i + 1] === '"') {
               cell += '"';
-              i++; // エスケープされた引用符をスキップ
+              i++;
             } else {
               inQuotes = false;
             }
@@ -217,13 +214,13 @@
             cell += char;
           }
         }
-        row.push(cell); // 最後のセルを追加
+        row.push(cell);
         return row;
       });
     }
 
     function normalizeHeader(header) {
-      return header.trim().replace(/^"|"$/g, '').toLowerCase();
+      return (header || '').trim().replace(/^"|"$/g, '').toLowerCase();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -240,9 +237,38 @@
           fullData = parseCSV(csvText);
           if (fullData.length < 1) throw new Error('No data found');
 
+          // --- 結合された行を修復する特別なロジック ---
+          const firstRowRaw = fullData[0];
+          if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
+            console.log("行の結合を検出。データを強制的に修復します。");
+            const correctedHeaders = [];
+            const correctedFirstDataRow = [];
+
+            firstRowRaw.forEach(cellContent => {
+              const catIndex = cellContent.indexOf('cat[');
+              if (catIndex !== -1) {
+                correctedHeaders.push(cellContent.substring(0, catIndex).trim());
+                correctedFirstDataRow.push(cellContent.substring(catIndex).trim());
+              } else {
+                const spaceIndex = cellContent.indexOf(' ');
+                if (spaceIndex !== -1) {
+                  correctedHeaders.push(cellContent.substring(0, spaceIndex).trim());
+                  correctedFirstDataRow.push(cellContent.substring(spaceIndex + 1).trim());
+                } else {
+                  correctedHeaders.push(cellContent.trim());
+                  correctedFirstDataRow.push('');
+                }
+              }
+            });
+
+            fullData.shift(); // 不正な行を削除
+            fullData.unshift(correctedFirstDataRow); // 修正したデータ行を追加
+            fullData.unshift(correctedHeaders); // 修正したヘッダー行を追加
+          }
+
           const headers = fullData[0];
           const normalizedHeaders = headers.map(h => normalizeHeader(h));
-          console.log("認識されたヘッダー名:", normalizedHeaders);
+          console.log("最終的に認識されたヘッダー名:", normalizedHeaders);
 
           headers.forEach((header, index) => {
             columnIndices[normalizeHeader(header)] = index;
@@ -285,13 +311,13 @@
       });
       thead.appendChild(headerRow);
 
-      // ヘッダー行を除いたデータ部分をループ (i = 1 から開始)
       for (let i = 1; i < fullData.length; i++) {
-        const rowData = fullData[i].map(cell => (cell || '').trim());
-        if (rowData.length <= 1 && !rowData[0]) continue; // 空行をスキップ
+        const rowData = fullData[i];
+        if (rowData.length <= 1 && !(rowData[0] || '').trim()) continue;
 
-        if (rowData[0] && rowData[0].startsWith('cat[')) {
-          const match = rowData[0].match(/\[(.*?)\]/);
+        const firstCell = (rowData[0] || '').trim();
+        if (firstCell.startsWith('cat[')) {
+          const match = firstCell.match(/\[(.*?)\]/);
           if (match) {
             const tr = document.createElement('tr');
             tr.className = 'category-row';
@@ -308,7 +334,6 @@
           visibleHeadersInfo.forEach(({ header, index }) => {
             const td = document.createElement('td');
             let cellText;
-
             const normalizedHeader = normalizeHeader(header);
 
             if (normalizedHeader === 'files') {
@@ -323,9 +348,9 @@
               cellText = rowData[index];
             }
 
-            cellText = cellText || '';
+            cellText = (cellText || '').trim();
 
-            if (normalizedHeader === 'files' && linkUrl) {
+            if (normalizedHeader === 'files' && linkUrl && linkUrl.trim()) {
               const a = document.createElement('a');
               a.href = linkUrl;
               a.textContent = cellText;
