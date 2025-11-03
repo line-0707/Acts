@@ -643,13 +643,20 @@
               const a = document.createElement('a');
               a.textContent = cellText;
               if (linkUrl) {
-                const viewerUrl = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html'; // PDF.js viewer relative path
-                a.href = `${viewerUrl}?file=${encodeURIComponent(linkUrl)}`;
+                // --- ここからが修正点です ---
+                if (linkUrl.toLowerCase().endsWith('.pdf')) {
+                  const viewerUrl = 'pdfviewer/web/viewer.html';
+                  a.href = `${viewerUrl}?file=${encodeURIComponent(linkUrl)}`;
+                } else {
+                  a.href = linkUrl;
+                }
+                // --- ここまで ---
                 a.target = '_blank';
                 a.rel = 'noopener noreferrer';
               }
               contentWrapper.appendChild(a);
               td.appendChild(contentWrapper);
+
             } else { td.textContent = cellText; }
             tr.appendChild(td);
           });
