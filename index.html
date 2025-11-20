@@ -385,8 +385,7 @@
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
-        status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке' },
-        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+        status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
         site_last_updated: 'Последнее обновление сайта:'
       },
@@ -394,8 +393,7 @@
         title: 'INFORMATION SITE',
         subtitle: 'Summary of published documents and resources',
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
-        status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete' },
-        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         site_last_updated: 'Site last updated:'
       },
@@ -403,7 +401,7 @@
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新' },
-        status_text: { g: '利用可能', ex: '期限切れ', e: '未完成' },
+        status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '非公開' },
         site_last_updated: 'サイト最終更新日時:'
       }
     };
@@ -488,6 +486,7 @@
       }
     }
 
+    // --- ここからが修正点です ---
     function getStatusConfig(statusCode, lang, isDarkMode) {
       let colors = null;
       switch (statusCode) {
@@ -500,6 +499,9 @@
         case 'e':
           colors = { light: '#fef9c3', dark: '#92400e', bullet: '#f59e0b' };
           break;
+        case 'b':
+          colors = { light: '#e5e7eb', dark: '#374151', bullet: '#6b7280' };
+          break;
         default: return null;
       }
       return {
@@ -509,6 +511,7 @@
         bulletColor: colors.bullet
       };
     }
+    // --- ここまで ---
 
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
@@ -627,13 +630,24 @@
                 td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
               } else { td.textContent = (rowData[index] || '').trim(); }
               tr.appendChild(td); return;
-              // --- ここからが修正点です ---
-            } else if (normalizedHeader === 'last_update') {
-              cellText = formatDate((rowData[index] || '').trim(), lang, isMobile);
             } else {
-              cellText = formatDate((rowData[index] || '').trim(), lang, false);
+              const dateString = (rowData[index] || '').trim();
+              let finalDateString = dateString;
+
+              let dateObj = null;
+              if (/^\d{8}$/.test(dateString)) {
+                const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
+                dateObj = new Date(year, month - 1, day);
+              } else if (dateString) {
+                dateObj = new Date(dateString.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
+              }
+
+              if (dateObj && !isNaN(dateObj.getTime())) {
+                if (normalizedHeader === 'last_update') finalDateString = formatDate(dateObj, lang, true);
+                else finalDateString = formatDate(dateObj, lang, false);
+              }
+              cellText = finalDateString;
             }
-            // --- ここまで ---
             if (normalizedHeader === 'files') {
               const contentWrapper = document.createDocumentFragment();
               if (statusConfig) {
@@ -643,14 +657,12 @@
               const a = document.createElement('a');
               a.textContent = cellText;
               if (linkUrl) {
-                // --- ここからが修正点です ---
                 if (linkUrl.toLowerCase().endsWith('.pdf')) {
                   const viewerUrl = 'pdfviewer/web/viewer.html';
                   a.href = `${viewerUrl}?file=${encodeURIComponent(linkUrl)}`;
                 } else {
                   a.href = linkUrl;
                 }
-                // --- ここまで ---
                 a.target = '_blank';
                 a.rel = 'noopener noreferrer';
               }
