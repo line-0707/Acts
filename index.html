@@ -513,14 +513,12 @@
       };
     }
 
-    // --- ここからが修正点です ---
     document.addEventListener('DOMContentLoaded', function () {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
         button.addEventListener('click', () => renderPage(button.dataset.lang));
       });
-      fetchAndRender(); // この呼び出しが重要です
+      fetchAndRender();
     });
-    // --- ここまで ---
 
     function fetchAndRender() {
       const dataPromise = fetch(sheetUrl).then(res => res.ok ? res.text() : Promise.reject('Data fetch failed'));
@@ -632,11 +630,13 @@
                 td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
               } else { td.textContent = (rowData[index] || '').trim(); }
               tr.appendChild(td); return;
+              // --- ここからが修正点です ---
             } else if (normalizedHeader === 'last_update') {
-              cellText = formatDate((rowData[index] || '').trim(), lang, true);
+              cellText = formatDate((rowData[index] || '').trim(), lang, isMobile);
             } else {
               cellText = formatDate((rowData[index] || '').trim(), lang, false);
             }
+            // --- ここまで ---
             if (normalizedHeader === 'files') {
               const contentWrapper = document.createDocumentFragment();
               if (statusConfig) {
