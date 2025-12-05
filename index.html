@@ -12,9 +12,145 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  <link rel="stylesheet" href="common.css">
   <style>
-    /* index.html 専用のスタイル */
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #333;
+      --text-color-subtle: #888;
+      --card-bg-color: #fff;
+      --border-color: #ccc;
+      --header-bg-color: #007bff;
+      --hover-bg-color: #e9ecef;
+      --even-row-bg-color: #f8f9fa;
+      --category-bg-color: #6c757d;
+      --category-hover-bg-color: #5a626a;
+      --link-color: #0366d6;
+    }
+
+    .dark-mode {
+      --bg-color: #202124;
+      --text-color: #E8EAED;
+      --text-color-subtle: #969ba1;
+      --card-bg-color: #282828;
+      --border-color: #3c4043;
+      --hover-bg-color: #383838;
+      --even-row-bg-color: #303030;
+      --category-bg-color: #495057;
+      --category-hover-bg-color: #5c636a;
+      --link-color: #8ab4f8;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .content-wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    #theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--card-bg-color);
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      aspect-ratio: 1 / 1;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background-color 0.2s;
+    }
+
+    #theme-toggle .material-symbols-outlined {
+      color: var(--text-color);
+    }
+
+    #theme-toggle:hover {
+      background-color: var(--hover-bg-color);
+    }
+
+    .lang-switcher {
+      display: flex;
+      gap: 5px;
+      background-color: var(--card-bg-color);
+      padding: 5px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .lang-switcher button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background-color: transparent;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: var(--link-color);
+      border-radius: 5px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .lang-switcher button:hover {
+      background-color: var(--hover-bg-color);
+    }
+
+    .lang-switcher button.active {
+      background-color: var(--header-bg-color);
+      color: white;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      width: 50px;
+      height: 50px;
+      margin-right: 15px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .header h1,
+    .header h2 {
+      margin: 0;
+    }
+
+    .header h1 {
+      font-size: 2em;
+    }
+
+    .header h1 a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .header h2 {
+      font-size: 1.2em;
+      font-weight: normal;
+      color: var(--text-color-subtle);
+    }
+
     #table-container {
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -108,6 +244,16 @@
       background-color: var(--category-hover-bg-color);
     }
 
+    table a {
+      color: var(--link-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    table a:hover {
+      text-decoration: underline;
+    }
+
     .loader {
       text-align: center;
       padding: 20px;
@@ -118,7 +264,52 @@
       display: none;
     }
 
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: var(--text-color-subtle);
+      font-size: 0.9em;
+    }
+
+    footer p {
+      margin: 5px 0;
+    }
+
     @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .header {
+        flex-direction: column;
+        align-items: center;
+        margin-top: 50px;
+      }
+
+      .header img {
+        margin-right: 0;
+        margin-bottom: 10px;
+      }
+
+      .header div {
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 1.8em;
+      }
+
+      .header h2 {
+        font-size: 1.1em;
+      }
+
+      .top-controls {
+        position: static;
+        width: 100%;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+        order: -1;
+      }
 
       .status-text,
       .th-status,
@@ -158,6 +349,7 @@
 <body>
 
   <div class="content-wrapper">
+
     <div class="top-controls">
       <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
       <div class="lang-switcher">
@@ -166,6 +358,7 @@
         <button data-lang="ja" class="control-button">JP</button>
       </div>
     </div>
+
     <div class="header">
       <a href="https://line-0707.github.io/Acts/index.html">
         <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
@@ -175,15 +368,16 @@
         <h2 id="site-subtitle"></h2>
       </div>
     </div>
+
     <div id="table-container">
       <div class="loader">Loading data from Google Sheet...</div>
     </div>
+
     <footer>
       <p id="site-last-updated"></p>
     </footer>
   </div>
 
-  <script src="common.js"></script>
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
 
@@ -193,6 +387,7 @@
         subtitle: 'Сводка опубликованных документов и ресурсов',
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
+        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
         site_last_updated: 'Последнее обновление сайта:'
       },
@@ -201,6 +396,7 @@
         subtitle: 'Summary of published documents and resources',
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update' },
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
+        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         site_last_updated: 'Site last updated:'
       },
@@ -218,6 +414,27 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
     let siteLastModifiedDate = null;
+
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    function applyTheme(theme) {
+      const iconName = theme === 'dark' ? 'light_mode' : 'dark_mode';
+      if (theme === 'dark') { body.classList.add('dark-mode'); }
+      else { body.classList.remove('dark-mode'); }
+      themeToggle.innerHTML = `<span class="material-symbols-outlined">${iconName}</span>`;
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      applyTheme(newTheme);
+      renderPage(document.documentElement.lang);
+    });
+
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
 
     function parseCSV(csvText) {
       const lines = csvText.replace(/\r\n/g, '\n').split('\n');
@@ -297,17 +514,32 @@
       };
     }
 
+    // --- ここからが修正点です ---
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('.lang-switcher button').forEach(button => {
+        button.addEventListener('click', () => renderPage(button.dataset.lang));
+      });
+      fetchAndRender();
+    });
+
     function fetchAndRender() {
-      const dataPromise = fetch(sheetUrl).then(res => res.ok ? res.text() : Promise.reject('Data fetch failed'));
-      const siteHeadersPromise = fetch(window.location.href, { method: 'HEAD' })
+      // サイト更新日時の取得を試みる (失敗してもエラーにしない)
+      fetch(window.location.href, { method: 'HEAD' })
         .then(res => {
           if (res.ok && res.headers.has('Last-Modified')) {
             siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
           }
-        });
+        }).catch(err => console.error("Could not fetch site last modified date:", err));
 
-      Promise.all([dataPromise, siteHeadersPromise])
-        .then(([csvText]) => {
+      // スプレッドシートデータの取得 (これがメインの処理)
+      fetch(sheetUrl)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Data fetch failed');
+          }
+          return res.text();
+        })
+        .then(csvText => {
           fullData = parseCSV(csvText);
           if (fullData.length < 1) throw new Error('No data found');
           const firstRowRaw = fullData[0];
@@ -342,13 +574,14 @@
           document.getElementById('table-container').textContent = 'Error: Could not load data. Ensure the Google Sheet is "Published to the web" as a CSV.';
         });
     }
+    // --- ここまで ---
 
     function renderPage(lang) {
       document.getElementById('site-title').textContent = translations[lang].title;
       document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
       document.documentElement.lang = lang;
       const isMobile = window.innerWidth <= 768;
-      const isDarkMode = document.body.classList.contains('dark-mode');
+      const isDarkMode = body.classList.contains('dark-mode');
       document.querySelectorAll('.lang-switcher button').forEach(button => { button.classList.toggle('active', button.dataset.lang === lang); });
       const tableContainer = document.getElementById('table-container');
       if (fullData.length === 0) return;
@@ -449,9 +682,6 @@
         document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
       }
     }
-
-    // --- ここが修正点です ---
-    document.addEventListener('DOMContentLoaded', fetchAndRender);
   </script>
 
 </body>
