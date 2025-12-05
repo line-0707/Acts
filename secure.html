@@ -241,12 +241,9 @@
         // --- 翻訳データの定義 ---
         const translations = {
             ru: {
-                // Header Info
                 title: 'ИНФОРМАЦИОННАЯ САЙТА',
                 subtitle: 'Сводка опубликованных документов и ресурсов',
                 site_last_updated: 'Последнее обновление сайта:',
-
-                // Auth Form Info
                 formTitle: 'Аутентификация',
                 formSubtitle: 'Введите ID контента и пароль для просмотра защищённого контента',
                 labelId: 'ID контента',
@@ -287,12 +284,18 @@
         let siteLastModifiedDate = null;
         let currentLang = document.documentElement.lang || 'ru';
 
+        // 要素の取得（スコープを広げるため外に出しました）
+        const idInput = document.getElementById('content-id');
+        const passInput = document.getElementById('password');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const toggleBtn = document.getElementById('toggle-pass');
+
         // --- 描画関数 ---
         function renderPage(lang) {
             currentLang = lang;
             const t = translations[lang];
 
-            // 1. ヘッダー情報の更新
             const titleEl = document.getElementById('site-title');
             const subtitleEl = document.getElementById('site-subtitle');
             if (titleEl) titleEl.textContent = t.title;
@@ -300,12 +303,10 @@
 
             document.documentElement.lang = lang;
 
-            // 2. 言語切り替えボタンの状態更新
             document.querySelectorAll('.lang-switcher button').forEach(button => {
                 button.classList.toggle('active', button.dataset.lang === lang);
             });
 
-            // 3. 最終更新日の更新 (データがある場合のみ)
             const dateEl = document.getElementById('site-last-updated');
             if (siteLastModifiedDate && dateEl) {
                 const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
@@ -314,7 +315,6 @@
                 dateEl.textContent = `${t.site_last_updated} ${formattedDateTime}`;
             }
 
-            // 4. 認証フォームの翻訳適用
             const formTitle = document.getElementById('form-title');
             if (formTitle) formTitle.textContent = t.formTitle;
 
@@ -327,48 +327,47 @@
             const labelPass = document.getElementById('label-pass');
             if (labelPass) labelPass.textContent = t.labelPass;
 
-            const inputId = document.getElementById('content-id');
-            if (inputId) inputId.placeholder = t.placeholderId;
-
-            const inputPass = document.getElementById('password');
-            if (inputPass) inputPass.placeholder = t.placeholderPass;
-
-            const submitBtn = document.getElementById('submit-btn');
+            if (idInput) idInput.placeholder = t.placeholderId;
+            if (passInput) passInput.placeholder = t.placeholderPass;
             if (submitBtn) submitBtn.textContent = t.button;
-
-            const errorMsg = document.getElementById('error-msg');
             if (errorMsg) errorMsg.style.display = 'none';
         }
 
-        // 言語切り替えボタンのクリックイベント
         document.querySelectorAll('.lang-switcher button').forEach(button => {
             button.addEventListener('click', () => {
                 renderPage(button.dataset.lang);
             });
         });
 
-        // --- 実行順序の変更点 ---
+        // --- 初期化処理 ---
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. 通信を待たずに、まずは即座に描画する
+            // 1. 即座に描画
             renderPage(currentLang);
 
-            // 2. その後、裏で最終更新日時を取りに行く
+            // 2. URLパラメータからIDを自動入力 (ここが追加箇所)
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryId = urlParams.get('id'); // URLの ?id=〇〇 の部分を取得
+
+            if (queryId && idInput) {
+                idInput.value = queryId;
+                // IDが入っていたら、最初からパスワード欄にカーソルを合わせる
+                if (passInput) passInput.focus();
+            }
+
+            // 3. 最終更新日時取得
             fetch(window.location.href, { method: 'HEAD' })
                 .then(res => {
                     if (res.ok && res.headers.has('Last-Modified')) {
                         siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
-                        // 日付が取れたら、日付部分だけ反映させるために再描画
                         renderPage(currentLang);
                     }
                 })
-                .catch(e => console.error(e)); // エラーでも表示自体は消えない
+                .catch(e => console.error(e));
         });
 
-        /* --- 以下、認証ロジック --- */
+        /* --- 認証・機能ロジック --- */
 
         // パスワード表示切り替え
-        const toggleBtn = document.getElementById('toggle-pass');
-        const passInput = document.getElementById('password');
         if (toggleBtn && passInput) {
             toggleBtn.addEventListener('click', () => {
                 const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -377,17 +376,13 @@
             });
         }
 
-        // ハッシュ化とログイン処理
+        // SHA-256 ハッシュ化
         async function sha256(message) {
             const msgBuffer = new TextEncoder().encode(message);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
             const hashArray = Array.from(new Uint8Array(hashBuffer));
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
-
-        const idInput = document.getElementById('content-id');
-        const submitBtn = document.getElementById('submit-btn');
-        const errorMsg = document.getElementById('error-msg');
 
         async function attemptLogin() {
             const idVal = idInput.value.trim();
@@ -402,7 +397,7 @@
             try {
                 const combinedString = idVal + passVal;
                 const hash = await sha256(combinedString);
-                const targetUrl = 'secure/' + hash + '.html';
+                const targetUrl = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=.https%3A%2F%2Fline-0707.github.io%2FActs%2Fsecure%2F' + hash + '.pdf';
 
                 const response = await fetch(targetUrl, { method: 'HEAD' });
                 if (response.ok) {
