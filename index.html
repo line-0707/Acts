@@ -12,10 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-  <!-- --- ここが修正点です --- -->
   <link rel="stylesheet" href="common.css">
   <style>
-    /* index.html 専用のスタイルのみここに残す */
+    /* index.html 専用のスタイル */
     #table-container {
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -184,11 +183,9 @@
     </footer>
   </div>
 
-  <!-- --- ここが修正点です --- -->
   <script src="common.js"></script>
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
-    // ...(translationsオブジェクト, fullData, etc. の定義はそのまま)
 
     const translations = {
       ru: {
@@ -221,8 +218,6 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
     let siteLastModifiedDate = null;
-
-    // --- ここから下は、index.html に固有のロジック ---
 
     function parseCSV(csvText) {
       const lines = csvText.replace(/\r\n/g, '\n').split('\n');
@@ -455,7 +450,7 @@
       }
     }
 
-    // ページ読み込み時に実行
+    // --- ここが修正点です ---
     document.addEventListener('DOMContentLoaded', fetchAndRender);
   </script>
 
