@@ -398,7 +398,7 @@
             try {
                 const combinedString = idVal + passVal;
                 const hash = await sha256(combinedString);
-                const targetUrl = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=.https%3A%2F%2Fline-0707.github.io%2FActs%2Fsecure%2F' + hash + '.pdf';
+                const targetUrl = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=https%3A%2F%2Fline-0707.github.io%2FActs%2Fsecure%2F' + hash + '.pdf';
 
                 const response = await fetch(targetUrl, { method: 'HEAD' });
                 if (response.ok) {
