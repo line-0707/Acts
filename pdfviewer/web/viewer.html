@@ -876,53 +876,6 @@ See https://github.com/adobe-type-tools/cmap-resources
 
   </div> <!-- outerContainer -->
   <div id="printContainer"></div>
-
-  <!-- ▼▼▼ ここから追加したスクリプト ▼▼▼ -->
-  <script>
-    // 1. ハッシュ値とファイル/タイトルの対応マップ
-    const dataMap = {
-      // 例: ID="test" Pass="password" -> "testpassword" のSHA-256ハッシュ
-      "9f735e0df9a1ddc702bf0a1a7b83033f9f7153a00c29de82cedadc9957289b05": {
-        file: "secure/9f735e0df9a1ddc702bf0a1a7b83033f9f7153a00c29de82cedadc9957289b05.pdf",
-        title: "Test"
-      },
-      // 必要なだけ追加してください
-    };
-
-    // 2. PDF.jsの初期化イベントを待ってから実行
-    // webviewerloaded イベントはPDF.jsが準備完了した時に発火します
-    document.addEventListener('webviewerloaded', function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const hash = urlParams.get('id');
-      const data = dataMap[hash];
-
-      if (data) {
-        // ファイルを開く
-        // PDFViewerApplication.open はPDF.jsが提供するAPIです
-        PDFViewerApplication.open(data.file);
-
-        // タイトルを設定
-        document.title = data.title;
-
-        // PDF.jsがメタデータ読み込み後にタイトルを上書きするのを防止する
-        const titleElement = document.querySelector('title');
-        if (titleElement) {
-          const observer = new MutationObserver(function () {
-            if (document.title !== data.title) {
-              document.title = data.title;
-            }
-          });
-          observer.observe(titleElement, { childList: true });
-        }
-      } else {
-        // ハッシュが一致しない、または指定がない場合の処理
-        console.error('Document not found or invalid ID.');
-        // 必要であればアラートを出したり、404ページへ飛ばしたりする処理をここに記述
-      }
-    });
-  </script>
-  <!-- ▲▲▲ ここまで追加したスクリプト ▲▲▲ -->
-
 </body>
 
 </html>
