@@ -6,209 +6,353 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="darkreader-lock">
     <title>Аутентификация</title>
-    <link rel="icon" href="acts.ico" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Acts/favicon.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="common.css">
     <style>
-        /* 共通CSSの上書きと、このページ固有のスタイル */
+        /* このページ固有のスタイル */
         body {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        .top-controls {
-            /* common.cssのスタイルを上書き */
+        .auth-container {
+            background-color: var(--card-bg-color);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        #back-button {
             position: absolute;
             top: 20px;
-            right: 20px;
-            z-index: 100;
+            left: 20px;
+            color: var(--text-color-subtle);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #back-button:hover {
+            background-color: var(--hover-bg-color);
         }
 
-        #russiaBanner {
-            width: 100%;
-            height: 80px;
-            position: relative;
+        .form-header {
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            align-items: center;
+            margin-bottom: 25px; /* 仕切り線とのマージン */
         }
-        .flagStripe { flex: 1; }
-        .white { background-color: #fff; }
-        .blue { background-color: #0039a6; }
-        .red { background-color: #d52b1e; }
-        
-        #bannerText {
-            position: absolute;
-            top: 50%;
-            left: 7.5%;
-            transform: translateY(-50%);
-            font-weight: bold;
+        .form-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 15px;
         }
-        #bannerText a { text-decoration: none; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.7); }
-        #bannerText a:hover { text-decoration: underline; }
-
-        #bannerImage {
-            position: absolute;
-            top: 50%;
-            left: 95%;
-            transform: translate(-50%, -50%);
+        .form-header h1 {
+            font-size: 1.2em;
+            margin: 0 0 5px 0;
+            color: var(--text-color);
         }
-        #bannerImage a img { width: 45px; height: 45px; }
-
-        #langSelector {
-            position: absolute;
-            top: 50%;
-            left: 85%;
-            transform: translate(-50%, -50%);
-            padding: 5px 10px;
-            font-size: 1em;
-            border-radius: 5px;
+        .form-header h2 {
+            font-size: 0.9em;
+            margin: 0;
+            font-weight: normal;
+            color: var(--text-color-subtle);
         }
 
-        .form-container {
-            max-width: 400px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: var(--card-bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: left;
+        /* --- ここからが修正点です --- */
+        .separator {
+            border: none;
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 0 0 25px 0; /* 上下のマージン */
         }
-        .form-container h1 {
-            text-align: center;
+        /* --- ここまで --- */
+
+        .auth-container h2#form-title {
             margin-top: 0;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
         }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
-        .form-group input {
+
+        .auth-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-color-subtle);
+            margin-bottom: 35px;
+            line-height: 1.6;
+        }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: bold; color: var(--text-color); opacity: 0.9; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        .input-icon-left { position: absolute; left: 15px; color: var(--text-color-subtle); pointer-events: none; }
+        .input-icon-right { position: absolute; right: 15px; color: var(--text-color-subtle); cursor: pointer; user-select: none; }
+
+        input[type="text"],
+        input[type="password"] {
             width: 100%;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 14px 14px 14px 50px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
             background-color: var(--bg-color);
             color: var(--text-color);
+            font-size: 1rem;
             box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .form-group button {
+        
+        input#password { padding-right: 50px; }
+        input:focus { outline: none; border-color: var(--link-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        button.submit-btn {
             width: 100%;
-            padding: 12px;
-            border-radius: 5px;
-            border: none;
-            background-color: var(--header-bg-color);
+            padding: 14px;
+            background: var(--header-bg-color);
             color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
             font-weight: bold;
-            font-size: 1em;
             cursor: pointer;
-            transition: background-color 0.2s;
+            margin-top: 15px;
+            transition: opacity 0.2s;
         }
-        .form-group button:hover { opacity: 0.9; }
+        button.submit-btn:hover { opacity: 0.9; }
+
+        .error-msg { color: #ef4444; font-size: 0.9rem; margin-top: 20px; min-height: 1.2em; display: none; font-weight: 500; }
+        .header, footer { display: none; }
     </style>
 </head>
 
 <body>
+
     <div class="top-controls">
         <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
-    </div>
-    
-    <div id="russiaBanner">
-        <div class="flagStripe white"></div>
-        <div class="flagStripe blue"></div>
-        <div class="flagStripe red"></div>
-
-        <div id="bannerText">
-            <a id="back-link" href="index.html"></a>
-        </div>
-
-        <div id="bannerImage">
-            <a href="https://www.youtube.com/@intervidenie/">
-                <img src="source/intervision_logo.png" alt="Logo">
-            </a>
-        </div>
-
-        <select id="langSelector">
-            <option value="ru">Русский</option>
-            <option value="en">English</option>
-            <option value="ja">日本語</option>
-        </select>
-    </div>
-
-    <div class="content-wrapper">
-        <div class="form-container">
-            <h1 id="pageTitle"></h1>
-            <form onsubmit="return false;">
-                <div class="form-group">
-                    <label for="password" id="passwordLabel"></label>
-                    <input type="password" id="password" name="password">
-                </div>
-                <div class="form-group">
-                    <button type="submit" id="submitButton"></button>
-                </div>
-            </form>
+        <div class="lang-switcher">
+          <button data-lang="ru" class="control-button active">RU</button>
+          <button data-lang="en" class="control-button">EN</button>
+          <button data-lang="ja" class="control-button">JP</button>
         </div>
     </div>
-    
+
+    <div class="auth-container">
+        <button id="back-button" title="Back">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+
+        <div class="form-header">
+            <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
+            <h1 id="site-title"></h1>
+            <h2 id="site-subtitle"></h2>
+        </div>
+
+        <hr class="separator">
+
+        <h2 id="form-title"></h2>
+        <p id="form-subtitle" class="auth-subtitle"></p>
+
+        <div class="input-group">
+            <label for="content-id" id="label-id"></label>
+            <div class="input-wrapper">
+                <span class="material-symbols-outlined input-icon-left">id_card</span>
+                <input type="text" id="content-id" autocomplete="off">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="password" id="label-pass"></label>
+            <div class="input-wrapper">
+                <span class="material-symbols-outlined input-icon-left">password</span>
+                <input type="password" id="password">
+                <span class="material-symbols-outlined input-icon-right" id="toggle-pass">visibility</span>
+            </div>
+        </div>
+
+        <button id="submit-btn" class="submit-btn"></button>
+        <div id="error-msg" class="error-msg"></div>
+    </div>
+
     <script src="common.js"></script>
     <script>
         const translations = {
             ru: {
                 tabTitle: "Аутентификация",
-                pageTitle: "Аутентификация",
-                passwordLabel: "Пароль",
-                submitButton: "Войти",
-                backLink: "Вернуться на информационный сайт"
+                site_title: 'ИНФОРМАЦИОННАЯ САЙТА',
+                site_subtitle: 'Сводка опубликованных документов и ресурсов',
+                formTitle: 'Аутентификация',
+                formSubtitle: 'Введите ID контента и пароль для просмотра защищённого контента',
+                labelId: 'ID контента',
+                labelPass: 'Пароль',
+                placeholderId: 'ID контента',
+                placeholderPass: 'Пароль',
+                button: 'Вход',
+                error: 'Контент не найден. Неверный ID или пароль.'
             },
             en: {
                 tabTitle: "Authentication",
-                pageTitle: "Authentication",
-                passwordLabel: "Password",
-                submitButton: "Enter",
-                backLink: "Back to information site"
+                site_title: 'INFORMATION SITE',
+                site_subtitle: 'Summary of published documents and resources',
+                formTitle: 'Authentication',
+                formSubtitle: 'Enter Content ID and Password to view protected content',
+                labelId: 'Content ID',
+                labelPass: 'Password',
+                placeholderId: 'Content ID',
+                placeholderPass: 'Password',
+                button: 'Enter',
+                error: 'Content not found. ID or Password might be incorrect.'
             },
             ja: {
                 tabTitle: "認証",
-                pageTitle: "認証",
-                passwordLabel: "パスワード",
-                submitButton: "入力",
-                backLink: "情報サイトに戻る"
+                site_title: '情報サイト',
+                site_subtitle: '公開されたドキュメントとリソースの概要',
+                formTitle: '認証',
+                formSubtitle: '保護されたコンテンツを閲覧するには、コンテンツIDとパスワードを入力してください',
+                labelId: 'コンテンツID',
+                labelPass: 'パスワード',
+                placeholderId: 'コンテンツID',
+                placeholderPass: 'パスワード',
+                button: '送信',
+                error: 'コンテンツが見つかりません。IDまたはパスワードが間違っています。'
             }
         };
 
-        const langSelector = document.getElementById('langSelector');
+        let currentLang = 'ru';
+
+        const idInput = document.getElementById('content-id');
+        const passInput = document.getElementById('password');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-msg');
+        const toggleBtn = document.getElementById('toggle-pass');
 
         function renderPage(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+
             document.documentElement.lang = lang;
+            document.title = t.tabTitle;
             
-            document.title = translations[lang].tabTitle;
-            document.getElementById("pageTitle").textContent = translations[lang].pageTitle;
-            document.getElementById("passwordLabel").textContent = translations[lang].passwordLabel;
-            document.getElementById("submitButton").textContent = translations[lang].submitButton;
-            document.getElementById("back-link").textContent = translations[lang].backLink;
+            document.getElementById('site-title').textContent = t.site_title;
+            document.getElementById('site-subtitle').textContent = t.site_subtitle;
+            document.getElementById('form-title').textContent = t.formTitle;
+            document.getElementById('form-subtitle').textContent = t.formSubtitle;
+            document.getElementById('label-id').textContent = t.labelId;
+            document.getElementById('label-pass').textContent = t.labelPass;
+            idInput.placeholder = t.placeholderId;
+            passInput.placeholder = t.placeholderPass;
+            submitBtn.textContent = t.button;
+            errorMsg.style.display = 'none';
             
-            // <select> の値を更新
-            langSelector.value = lang;
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.classList.toggle('active', button.dataset.lang === lang);
+            });
         }
         
-        // --- ここからが修正点です ---
         document.addEventListener('DOMContentLoaded', () => {
-            // ページ読み込み時に、保存された言語を取得して適用
             const savedLang = localStorage.getItem('lang') || 'ru';
             renderPage(savedLang);
 
-            // 言語セレクターが変更された時のイベントを設定
-            langSelector.addEventListener('change', () => {
-                const newLang = langSelector.value;
-                // 言語設定をブラウザに保存
-                localStorage.setItem('lang', newLang);
-                // ページを再描画
-                renderPage(newLang);
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const newLang = button.dataset.lang;
+                    localStorage.setItem('lang', newLang);
+                    renderPage(newLang);
+                });
             });
+            
+            // --- ここからが修正点です ---
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', () => {
+                    window.history.back();
+                });
+            }
+            // --- ここまで ---
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryId = urlParams.get('id');
+            if (queryId && idInput) {
+                idInput.value = queryId;
+                if (passInput) passInput.focus();
+            }
         });
-        // --- ここまで ---
-    </script>
 
+        if (toggleBtn && passInput) {
+            toggleBtn.addEventListener('click', () => {
+                const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passInput.setAttribute('type', type);
+                toggleBtn.textContent = type === 'password' ? 'visibility' : 'visibility_off';
+            });
+        }
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function attemptLogin() {
+            const idVal = idInput.value.trim();
+            const passVal = passInput.value;
+            if (!idVal || !passVal) return;
+
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.textContent = '...';
+            submitBtn.disabled = true;
+            errorMsg.style.display = 'none';
+
+            try {
+                const combinedString = idVal + passVal;
+                const hash = await sha256(combinedString);
+                const targetUrl = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=https%3A%2F%2Fline-0707.github.io%2FActs%2Fsecure%2F' + hash + '.pdf';
+
+                const response = await fetch(targetUrl, { method: 'HEAD' });
+                if (response.ok) {
+                    window.location.href = targetUrl;
+                } else {
+                    throw new Error('Not found');
+                }
+            } catch (e) {
+                errorMsg.textContent = translations[currentLang].error;
+                errorMsg.style.display = 'block';
+                submitBtn.textContent = originalBtnText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        if (submitBtn) {
+            submitBtn.addEventListener('click', attemptLogin);
+        }
+
+        [idInput, passInput].forEach(input => {
+            if (input) {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        attemptLogin();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
+
 </html>
