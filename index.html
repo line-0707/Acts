@@ -40,7 +40,7 @@
     tbody tr:nth-child(even) { background-color: var(--even-row-bg-color); }
     tbody tr:hover { background-color: var(--hover-bg-color); }
     
-    .category-row { display: table-row; }
+    .gory-row { display: table-row; }
     .category-row td {
       background-color: var(--category-bg-color);
       color: white; font-weight: bold;
@@ -69,13 +69,15 @@
             border: none;
             margin-bottom: 15px;
         }
+        /* --- 修正箇所1: カテゴリー表示の修正 --- */
         .category-cell {
             background-color: var(--category-bg-color);
             color: white;
             font-weight: bold;
             padding: 8px 15px;
             border-radius: 8px;
-            width: 100%;
+            width: 100% !important; /* width: autoを上書きして全幅にする */
+            display: block;         /* ブロック表示を強制 */
             box-sizing: border-box;
             text-align: center;
         }
@@ -85,6 +87,13 @@
             flex: none !important;
         }
         .td-files { font-weight: bold; font-size: 1.1em; margin-bottom: 10px; padding-right: 90px; }
+        
+        /* --- 修正箇所2: モバイル版ロシア語の折り返し位置修正 --- */
+        /* ロシア語の場合のみ右パディングを増やして、長いステータスとの重なりを防ぐ（折り返し位置を左へ） */
+        html[lang="ru"] .td-files {
+            padding-right: 130px;
+        }
+
         .td-date, .td-description, .td-status { display: none !important; }
         
         .mobile-meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 10px; }
@@ -99,6 +108,7 @@
             font-weight: bold;
             padding: 3px 8px;
             border-radius: 12px;
+            white-space: nowrap; /* ステータス内での折り返しを防止 */
         }
     }
   </style>
@@ -318,11 +328,9 @@
                 
                 const lastUpdateTd = document.createElement('td');
                 lastUpdateTd.className = 'td-last_update';
-                // --- ここからが修正点です ---
                 if (lastUpdateText) {
                     lastUpdateTd.textContent = `${translations[lang].last_update_label} ${lastUpdateText}`;
                 }
-                // --- ここまで ---
                 metaRow.appendChild(lastUpdateTd);
 
                 const orgTd = document.createElement('td');
@@ -332,8 +340,7 @@
                     orgLink.href = orgUrl;
                     orgLink.target = '_blank';
                     orgLink.rel = 'noopener noreferrer';
-                    // --- ここからが修正点です ---
-                    orgLink.title = translations[lang].org_tooltip; // ツールチップを追加
+                    orgLink.title = translations[lang].org_tooltip;
                     const icon = document.createElement('span');
                     icon.className = 'material-symbols-outlined';
                     icon.textContent = 'file_open';
