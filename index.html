@@ -21,7 +21,7 @@
       background-color: var(--card-bg-color);
     }
     table { width: 100%; border-collapse: collapse; display: table; }
-    thead, tbody { display: table-header-group; } /* 修正: a11yのためにも適切な値に */
+    thead, tbody { display: table-header-group; }
     tr { display: flex; align-items: stretch; }
     th, td {
       padding: 12px 15px; text-align: left;
@@ -40,7 +40,6 @@
     tbody tr:nth-child(even) { background-color: var(--even-row-bg-color); }
     tbody tr:hover { background-color: var(--hover-bg-color); }
     
-    .category-row { display: table-row; } /* Flexboxからテーブル行に戻す */
     .category-row td {
       background-color: var(--category-bg-color);
       color: white; font-weight: bold;
@@ -55,13 +54,33 @@
         table, thead, tbody, tr, td { display: block; }
         thead { display: none; }
         tbody { border: none; }
-        tr {
+        
+        /* データ行をカードとして表示 */
+        tr.data-row {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             margin-bottom: 15px;
             padding: 15px;
         }
         tbody tr:nth-child(even) { background-color: transparent; }
+        
+        /* カテゴリー行をセクション見出しとして表示 */
+        tr.category-row {
+            padding: 0;
+            border: none;
+            margin-bottom: 15px;
+        }
+        .category-cell {
+            background-color: var(--category-bg-color);
+            color: white;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
         td {
             border: none; padding: 5px 0; width: auto !important;
             flex: none !important;
@@ -231,23 +250,24 @@
         if (lang === 'en') { fileCellText = (rowData[columnIndices['en']] || ruFileText).trim();
         } else if (lang === 'ja') { fileCellText = (rowData[columnIndices['jp']] || ruFileText).trim();
         } else { fileCellText = ruFileText; }
+        
+        const tr = document.createElement('tr');
         if (fileCellText.startsWith('cat[')) {
+          tr.className = 'category-row';
           const match = fileCellText.match(/\[(.*?)\]/);
           if (match) {
-            const tr = document.createElement('tr');
-            tr.className = 'category-row';
             const td = document.createElement('td');
-            td.colSpan = visibleHeadersInfo.length; td.textContent = match[1];
-            tr.appendChild(td); tbody.appendChild(tr);
+            td.className = 'category-cell';
+            td.textContent = match[1];
+            tr.appendChild(td);
           }
         } else {
-          const tr = document.createElement('tr');
+          tr.className = 'data-row';
           const linkUrl = (rowData[columnIndices['link']] || '').trim();
           const statusCode = (rowData[columnIndices['status']] || '').trim().toLowerCase();
           const statusConfig = getStatusConfig(statusCode, lang, isDarkMode);
           
           if(isMobile) {
-            // モバイル用のカード表示ロジック
             const filesTd = document.createElement('td');
             filesTd.className = 'td-files';
             const contentWrapper = document.createDocumentFragment();
@@ -261,43 +281,44 @@
             const a = document.createElement('a');
             a.textContent = fileCellText;
             if (linkUrl) {
-                if (linkUrl.toLowerCase().endsWith('.pdf')) {
-                    a.href = `pdfviewer/web/viewer.html?file=${encodeURIComponent(linkUrl)}`;
-                } else { a.href = linkUrl; }
+                if (linkUrl.toLowerCase().endsWith('.pdf')) { a.href = `pdfviewer/web/viewer.html?file=${encodeURIComponent(linkUrl)}`; } 
+                else { a.href = linkUrl; }
             }
             contentWrapper.appendChild(a);
             filesTd.appendChild(contentWrapper);
             tr.appendChild(filesTd);
 
-            const metaRow = document.createElement('div');
-            metaRow.className = 'mobile-meta-row';
-            
-            const lastUpdateTd = document.createElement('td');
-            lastUpdateTd.className = 'td-last_update';
-            lastUpdateTd.textContent = formatDate((rowData[columnIndices['last_update']] || '').trim(), lang, true);
-            metaRow.appendChild(lastUpdateTd);
-
-            const orgTd = document.createElement('td');
-            orgTd.className = 'td-org';
+            const lastUpdateText = formatDate((rowData[columnIndices['last_update']] || '').trim(), lang, true);
             const orgUrl = (rowData[columnIndices['org']] || '').trim();
-            if (orgUrl) {
-                const orgLink = document.createElement('a');
-                orgLink.href = orgUrl;
-                orgLink.target = '_blank';
-                orgLink.rel = 'noopener noreferrer';
-                const icon = document.createElement('span');
-                icon.className = 'material-symbols-outlined';
-                icon.textContent = 'file_open';
-                orgLink.appendChild(icon);
-                orgTd.appendChild(orgLink);
-            } else {
-                orgTd.textContent = '—';
+
+            if (lastUpdateText || orgUrl) {
+                const metaRow = document.createElement('div');
+                metaRow.className = 'mobile-meta-row';
+                
+                const lastUpdateTd = document.createElement('td');
+                lastUpdateTd.className = 'td-last_update';
+                lastUpdateTd.textContent = lastUpdateText;
+                metaRow.appendChild(lastUpdateTd);
+
+                const orgTd = document.createElement('td');
+                orgTd.className = 'td-org';
+                if (orgUrl) {
+                    const orgLink = document.createElement('a');
+                    orgLink.href = orgUrl;
+                    orgLink.target = '_blank';
+                    orgLink.rel = 'noopener noreferrer';
+                    const icon = document.createElement('span');
+                    icon.className = 'material-symbols-outlined';
+                    icon.textContent = 'file_open';
+                    orgLink.appendChild(icon);
+                    orgTd.appendChild(orgLink);
+                } else {
+                    orgTd.textContent = '—';
+                }
+                metaRow.appendChild(orgTd);
+                tr.appendChild(metaRow);
             }
-            metaRow.appendChild(orgTd);
-            tr.appendChild(metaRow);
-            
           } else {
-            // デスクトップ用の通常表示ロジック
             visibleHeadersInfo.forEach(({ header, index }) => {
                 const td = document.createElement('td');
                 let cellText;
@@ -320,54 +341,37 @@
                 } else if (normalizedHeader === 'org') {
                     const url = (rowData[index] || '').trim();
                     if (url) {
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.target = '_blank';
-                        a.rel = 'noopener noreferrer';
-                        const icon = document.createElement('span');
-                        icon.className = 'material-symbols-outlined';
-                        icon.textContent = 'file_open';
-                        a.appendChild(icon);
-                        td.appendChild(a);
-                    } else {
-                        td.textContent = '—';
-                    }
+                        const a = document.createElement('a'); a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                        const icon = document.createElement('span'); icon.className = 'material-symbols-outlined'; icon.textContent = 'file_open';
+                        a.appendChild(icon); td.appendChild(a);
+                    } else { td.textContent = '—'; }
                     tr.appendChild(td); return;
                 } else if (normalizedHeader === 'last_update') {
                     cellText = formatDate((rowData[index] || '').trim(), lang, true);
                 } else {
                   cellText = formatDate((rowData[index] || '').trim(), lang, false);
                 }
-                
                 if (normalizedHeader === 'files') {
                     const contentWrapper = document.createDocumentFragment();
                     if (statusConfig) {
-                        const bulletSpan = document.createElement('span');
-                        bulletSpan.className = 'status-bullet-mobile';
-                        bulletSpan.textContent = '● ';
-                        bulletSpan.style.color = statusConfig.bulletColor;
+                        const bulletSpan = document.createElement('span'); bulletSpan.className = 'status-bullet-mobile'; bulletSpan.textContent = '● '; bulletSpan.style.color = statusConfig.bulletColor;
                         contentWrapper.appendChild(bulletSpan);
                     }
                     const a = document.createElement('a');
                     a.textContent = cellText;
                     if (linkUrl) {
                         if (linkUrl.toLowerCase().endsWith('.pdf')) {
-                            const viewerUrl = 'pdfviewer/web/viewer.html';
-                            a.href = `${viewerUrl}?file=${encodeURIComponent(linkUrl)}`;
-                        } else {
-                            a.href = linkUrl;
-                        }
+                            a.href = `pdfviewer/web/viewer.html?file=${encodeURIComponent(linkUrl)}`;
+                        } else { a.href = linkUrl; }
                     }
                     contentWrapper.appendChild(a);
                     td.appendChild(contentWrapper);
-                } else { 
-                    td.textContent = cellText; 
-                }
+                } else { td.textContent = cellText; }
                 tr.appendChild(td);
             });
           }
-          tbody.appendChild(tr);
         }
+        tbody.appendChild(tr);
       }
       table.appendChild(thead); table.appendChild(tbody);
       tableContainer.appendChild(table);
