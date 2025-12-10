@@ -342,28 +342,53 @@
 
         // --- 初期化処理 ---
         document.addEventListener('DOMContentLoaded', () => {
-            // 1. 即座に描画
-            renderPage(currentLang);
-
-            // 2. URLパラメータからIDを自動入力 (ここが追加箇所)
-            const urlParams = new URLSearchParams(window.location.search);
-            const queryId = urlParams.get('id'); // URLの ?id=〇〇 の部分を取得
-
-            if (queryId && idInput) {
-                idInput.value = queryId;
-                // IDが入っていたら、最初からパスワード欄にカーソルを合わせる
-                if (passInput) passInput.focus();
-            }
-
-            // 3. 最終更新日時取得
             fetch(window.location.href, { method: 'HEAD' })
                 .then(res => {
                     if (res.ok && res.headers.has('Last-Modified')) {
                         siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
-                        renderPage(currentLang);
+                    }
+                    const savedLang = localStorage.getItem('lang') || 'ru';
+                    renderPage(savedLang);
+                });
+            
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const newLang = button.dataset.lang;
+                    localStorage.setItem('lang', newLang);
+                    renderPage(newLang);
+                });
+            });
+        });```
+
+**↓ 以下のコードに完全に置き換えてください ↓**
+
+**修正後のコード:**
+```javascript
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. まず言語ボタンのクリックイベントを設定する
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const newLang = button.dataset.lang;
+                    // 2. 言語設定をブラウザに保存する
+                    localStorage.setItem('lang', newLang);
+                    // 3. ページを再描画する
+                    renderPage(newLang);
+                });
+            });
+
+            // 4. サイトの最終更新日時を取得する
+            fetch(window.location.href, { method: 'HEAD' })
+                .then(res => {
+                    if (res.ok && res.headers.has('Last-Modified')) {
+                        siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
                     }
                 })
-                .catch(e => console.error(e));
+                .finally(() => {
+                    // 5. 保存された言語を読み込む（なければ 'ru' を使う）
+                    const savedLang = localStorage.getItem('lang') || 'ru';
+                    // 6. 読み込んだ言語でページの初回表示を行う
+                    renderPage(savedLang);
+                });
         });
 
         /* --- 認証・機能ロジック --- */
