@@ -4,353 +4,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentication</title>
-
-    <!-- 手順1: 共通リソースの読み込み -->
+    <meta name="darkreader-lock">
+    <title>Аутентификация</title>
+    <link rel="icon" href="acts.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Acts/favicon.ico">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="common.css">
-
     <style>
-        /* 
-           common.css で定義されていない、このページ固有のスタイルのみ記述しています。
-           配色や基本フォントは common.css に依存します。
-        */
-
-        /* コンテンツを中央寄せするための調整 (common.cssの実装によるが念のため) */
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        /* 認証フォームコンテナ */
-        .auth-container {
-            /* 背景色や枠線は common.css の変数(--container-bgなど)があればそれを使う想定ですが、
-               ここではフォールバックとして前回のスタイルを維持しつつ、変数を利用します */
-            background-color: var(--container-bg, #f9f9f9);
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: var(--shadow, 0 4px 6px rgba(0, 0, 0, 0.1));
-            width: 90%;
+        /* このページ固有のスタイル */
+        .form-container {
             max-width: 400px;
-            text-align: center;
-            border: 1px solid var(--border-color, #e0e0e0);
-            margin-top: 50px;
-            /* ヘッダーとの間隔 */
-            margin-bottom: auto;
-            /* フッターを下に押しやる */
-        }
-
-        /* ダークモード時のスタイル (common.cssのクラスと連動) */
-        body.dark-mode .auth-container {
-            background-color: var(--container-bg, #2d2e30);
-            border-color: var(--border-color, #3c4043);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
-        }
-
-        /* フォーム内の見出し */
-        .auth-container h2 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-color, inherit);
-        }
-
-        .auth-subtitle {
-            font-size: 0.9rem;
-            opacity: 0.7;
-            margin-bottom: 35px;
-            line-height: 1.6;
-            color: var(--text-color, inherit);
-        }
-
-        /* 入力エリア */
-        .input-group {
-            margin-bottom: 20px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: left;
         }
-
-        .input-group label {
+        .form-container h1 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-size: 0.85rem;
             font-weight: bold;
-            opacity: 0.8;
-            letter-spacing: 0.05em;
-            color: var(--text-color, inherit);
         }
-
-        .input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        /* アイコン類 */
-        .input-icon-left {
-            position: absolute;
-            left: 12px;
-            color: var(--icon-color, #757575);
-            pointer-events: none;
-        }
-
-        .input-icon-right {
-            position: absolute;
-            right: 12px;
-            color: var(--icon-color, #757575);
-            cursor: pointer;
-            opacity: 0.7;
-        }
-
-        .input-icon-right:hover {
-            opacity: 1;
-            color: var(--primary-color, #3b82f6);
-        }
-
-        /* 入力フィールド */
-        input[type="text"],
-        input[type="password"] {
+        .form-group input {
             width: 100%;
-            padding: 14px;
-            padding-left: 45px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color, #e0e0e0);
-            background-color: var(--input-bg, #ffffff);
-            color: var(--text-color, #333333);
-            font-size: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
             box-sizing: border-box;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
-
-        body.dark-mode input[type="text"],
-        body.dark-mode input[type="password"] {
-            background-color: var(--input-bg, #202124);
-            border-color: var(--border-color, #3c4043);
-            color: var(--text-color, #e8eaed);
-        }
-
-        input#password {
-            padding-right: 45px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary-color, #3b82f6);
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-        }
-
-        /* 送信ボタン */
-        button.submit-btn {
+        .form-group button {
             width: 100%;
-            padding: 14px;
-            background-color: var(--primary-color, #3b82f6);
-            color: #ffffff;
+            padding: 12px;
+            border-radius: 5px;
             border: none;
-            border-radius: 6px;
-            font-size: 1rem;
+            background-color: var(--header-bg-color);
+            color: white;
             font-weight: bold;
+            font-size: 1em;
             cursor: pointer;
-            margin-top: 15px;
+            transition: background-color 0.2s;
         }
-
-        button.submit-btn:hover {
+        .form-group button:hover {
             opacity: 0.9;
         }
-
-        .error-msg {
-            color: #ef4444;
-            font-size: 0.85rem;
+        .back-link-container {
+            text-align: center;
             margin-top: 20px;
-            min-height: 1.2em;
-            display: none;
+        }
+        .back-link-container a {
+            color: var(--link-color);
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .back-link-container a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 
 <body>
-
-    <!-- 手順2: 共通ヘッダー・コントロールの挿入 -->
+    <div class="top-controls">
+        <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
+        <div class="lang-switcher">
+          <button data-lang="ru" class="control-button active">RU</button>
+          <button data-lang="en" class="control-button">EN</button>
+          <button data-lang="ja" class="control-button">JP</button>
+        </div>
+    </div>
+    
     <div class="content-wrapper">
-
-        <div class="top-controls">
-            <button id="theme-toggle" class="control-button" title="Toggle theme">
-                <!-- アイコンはCSSまたはJSで制御される想定ですが、念のためMaterial Symbolsを入れておきます -->
-                <span class="material-symbols-outlined">dark_mode</span>
-            </button>
-            <div class="lang-switcher">
-                <button data-lang="ru" class="control-button active">RU</button>
-                <button data-lang="en" class="control-button">EN</button>
-                <button data-lang="ja" class="control-button">JP</button>
-            </div>
-        </div>
-
-        <div class="header">
-            <a href="https://line-0707.github.io/Acts/index.html">
-                <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
-            </a>
-            <div>
-                <h1><a href="https://line-0707.github.io/Acts/index.html" id="site-title"></a></h1>
-                <h2 id="site-subtitle"></h2>
-            </div>
-        </div>
-
-        <!-- 認証フォーム (メインコンテンツ) -->
-        <div class="auth-container">
-            <h2 id="form-title">Аутентификация</h2>
-            <p id="form-subtitle" class="auth-subtitle">Введите ID контента и пароль для просмотра защищённого контента
-            </p>
-
-            <!-- コンテンツID -->
-            <div class="input-group">
-                <label for="content-id" id="label-id">ID контента</label>
-                <div class="input-wrapper">
-                    <span class="material-symbols-outlined input-icon-left">id_card</span>
-                    <input type="text" id="content-id" autocomplete="off" placeholder="ID контента">
+        <div class="form-container">
+            <h1 id="pageTitle"></h1>
+            <form onsubmit="return false;">
+                <div class="form-group">
+                    <label for="password" id="passwordLabel"></label>
+                    <input type="password" id="password" name="password">
                 </div>
-            </div>
-
-            <!-- パスワード -->
-            <div class="input-group">
-                <label for="password" id="label-pass">Пароль</label>
-                <div class="input-wrapper">
-                    <span class="material-symbols-outlined input-icon-left">password</span>
-                    <input type="password" id="password" placeholder="Пароль">
-                    <span class="material-symbols-outlined input-icon-right" id="toggle-pass">visibility</span>
+                <div class="form-group">
+                    <button type="submit" id="submitButton"></button>
                 </div>
+            </form>
+            <div class="back-link-container">
+                <a id="back-link" href="index.html"></a>
             </div>
-
-            <button id="submit-btn" class="submit-btn">Вход</button>
-            <div id="error-msg" class="error-msg"></div>
         </div>
-
-        <!-- 手順3: フッターとスクリプトの挿入 -->
-        <footer>
-            <p id="site-last-updated"></p>
-        </footer>
-
-    </div> <!-- content-wrapper closing tag -->
+    </div>
+    
+    <footer style="background: var(--bg-color);"> <!-- このページはフッター背景を通常にする -->
+        <p id="site-last-updated"></p>
+    </footer>
 
     <script src="common.js"></script>
     <script>
-        // --- 翻訳データの定義 ---
         const translations = {
             ru: {
-                title: 'ИНФОРМАЦИОННАЯ САЙТА',
-                subtitle: 'Сводка опубликованных документов и ресурсов',
-                site_last_updated: 'Последнее обновление сайта:',
-                formTitle: 'Аутентификация',
-                formSubtitle: 'Введите ID контента и пароль для просмотра защищённого контента',
-                labelId: 'ID контента',
-                labelPass: 'Пароль',
-                placeholderId: 'ID контента',
-                placeholderPass: 'Пароль',
-                button: 'Вход',
-                error: 'Контент не найден. Неверный ID или пароль.'
+                tabTitle: "Аутентификация",
+                pageTitle: "Аутентификация",
+                passwordLabel: "Пароль",
+                submitButton: "Войти",
+                backLink: "← Вернуться на информационный сайт",
+                site_last_updated: 'Последнее обновление сайта:'
             },
             en: {
-                title: 'INFORMATION SITE',
-                subtitle: 'Summary of published documents and resources',
-                site_last_updated: 'Site last updated:',
-                formTitle: 'Authentication',
-                formSubtitle: 'Enter Content ID and Password to view protected content',
-                labelId: 'Content ID',
-                labelPass: 'Password',
-                placeholderId: 'Content ID',
-                placeholderPass: 'Password',
-                button: 'Enter',
-                error: 'Content not found. ID or Password might be incorrect.'
+                tabTitle: "Authentication",
+                pageTitle: "Authentication",
+                passwordLabel: "Password",
+                submitButton: "Enter",
+                backLink: "← Back to information site",
+                site_last_updated: 'Site last updated:'
             },
             ja: {
-                title: '情報サイト',
-                subtitle: '公開されたドキュメントとリソースの概要',
-                site_last_updated: 'サイト最終更新日時:',
-                formTitle: '認証',
-                formSubtitle: '保護されたコンテンツを閲覧するには、コンテンツIDとパスワードを入力してください',
-                labelId: 'コンテンツID',
-                labelPass: 'パスワード',
-                placeholderId: 'コンテンツID',
-                placeholderPass: 'パスワード',
-                button: '送信',
-                error: 'コンテンツが見つかりません。IDまたはパスワードが間違っています。'
+                tabTitle: "認証",
+                pageTitle: "認証",
+                passwordLabel: "パスワード",
+                submitButton: "入力",
+                backLink: "← 情報サイトに戻る",
+                site_last_updated: 'サイト最終更新日時:'
             }
         };
-
         let siteLastModifiedDate = null;
-        let currentLang = document.documentElement.lang || 'ru';
 
-        // 要素の取得（スコープを広げるため外に出しました）
-        const idInput = document.getElementById('content-id');
-        const passInput = document.getElementById('password');
-        const submitBtn = document.getElementById('submit-btn');
-        const errorMsg = document.getElementById('error-msg');
-        const toggleBtn = document.getElementById('toggle-pass');
-
-        // --- 描画関数 ---
         function renderPage(lang) {
-            currentLang = lang;
-            const t = translations[lang];
-
-            const titleEl = document.getElementById('site-title');
-            const subtitleEl = document.getElementById('site-subtitle');
-            if (titleEl) titleEl.textContent = t.title;
-            if (subtitleEl) subtitleEl.textContent = t.subtitle;
-
             document.documentElement.lang = lang;
+            
+            document.title = translations[lang].tabTitle;
+            document.getElementById("pageTitle").textContent = translations[lang].pageTitle;
+            document.getElementById("passwordLabel").textContent = translations[lang].passwordLabel;
+            document.getElementById("submitButton").textContent = translations[lang].submitButton;
+            document.getElementById("back-link").textContent = translations[lang].backLink;
 
             document.querySelectorAll('.lang-switcher button').forEach(button => {
                 button.classList.toggle('active', button.dataset.lang === lang);
             });
 
-            const dateEl = document.getElementById('site-last-updated');
-            if (siteLastModifiedDate && dateEl) {
+            if (siteLastModifiedDate) {
                 const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
                 const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
                 const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(siteLastModifiedDate);
-                dateEl.textContent = `${t.site_last_updated} ${formattedDateTime}`;
+                document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
             }
-
-            const formTitle = document.getElementById('form-title');
-            if (formTitle) formTitle.textContent = t.formTitle;
-
-            const formSubtitle = document.getElementById('form-subtitle');
-            if (formSubtitle) formSubtitle.textContent = t.formSubtitle;
-
-            const labelId = document.getElementById('label-id');
-            if (labelId) labelId.textContent = t.labelId;
-
-            const labelPass = document.getElementById('label-pass');
-            if (labelPass) labelPass.textContent = t.labelPass;
-
-            if (idInput) idInput.placeholder = t.placeholderId;
-            if (passInput) passInput.placeholder = t.placeholderPass;
-            if (submitBtn) submitBtn.textContent = t.button;
-            if (errorMsg) errorMsg.style.display = 'none';
         }
-
-        document.querySelectorAll('.lang-switcher button').forEach(button => {
-            button.addEventListener('click', () => {
-                renderPage(button.dataset.lang);
-            });
-        });
-
-        // --- 初期化処理 ---
+        
         document.addEventListener('DOMContentLoaded', () => {
-            fetch(window.location.href, { method: 'HEAD' })
-                .then(res => {
-                    if (res.ok && res.headers.has('Last-Modified')) {
-                        siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
-                    }
-                    const savedLang = localStorage.getItem('lang') || 'ru';
-                    renderPage(savedLang);
-                });
-            
             document.querySelectorAll('.lang-switcher button').forEach(button => {
                 button.addEventListener('click', () => {
                     const newLang = button.dataset.lang;
@@ -358,25 +167,7 @@
                     renderPage(newLang);
                 });
             });
-        });```
 
-**↓ 以下のコードに完全に置き換えてください ↓**
-
-**修正後のコード:**
-```javascript
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. まず言語ボタンのクリックイベントを設定する
-            document.querySelectorAll('.lang-switcher button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const newLang = button.dataset.lang;
-                    // 2. 言語設定をブラウザに保存する
-                    localStorage.setItem('lang', newLang);
-                    // 3. ページを再描画する
-                    renderPage(newLang);
-                });
-            });
-
-            // 4. サイトの最終更新日時を取得する
             fetch(window.location.href, { method: 'HEAD' })
                 .then(res => {
                     if (res.ok && res.headers.has('Last-Modified')) {
@@ -384,75 +175,11 @@
                     }
                 })
                 .finally(() => {
-                    // 5. 保存された言語を読み込む（なければ 'ru' を使う）
                     const savedLang = localStorage.getItem('lang') || 'ru';
-                    // 6. 読み込んだ言語でページの初回表示を行う
                     renderPage(savedLang);
                 });
         });
-
-        /* --- 認証・機能ロジック --- */
-
-        // パスワード表示切り替え
-        if (toggleBtn && passInput) {
-            toggleBtn.addEventListener('click', () => {
-                const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passInput.setAttribute('type', type);
-                toggleBtn.textContent = type === 'password' ? 'visibility' : 'visibility_off';
-            });
-        }
-
-        // SHA-256 ハッシュ化
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function attemptLogin() {
-            const idVal = idInput.value.trim();
-            const passVal = passInput.value;
-            if (!idVal || !passVal) return;
-
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.textContent = '...';
-            submitBtn.disabled = true;
-            if (errorMsg) errorMsg.style.display = 'none';
-
-            try {
-                const combinedString = idVal + passVal;
-                const hash = await sha256(combinedString);
-                const targetUrl = 'https://line-0707.github.io/Acts/pdfviewer/web/viewer.html?file=https%3A%2F%2Fline-0707.github.io%2FActs%2Fsecure%2F' + hash + '.pdf';
-
-                const response = await fetch(targetUrl, { method: 'HEAD' });
-                if (response.ok) {
-                    window.location.href = targetUrl;
-                } else {
-                    throw new Error('Not found');
-                }
-            } catch (e) {
-                if (errorMsg) {
-                    errorMsg.textContent = translations[currentLang].error;
-                    errorMsg.style.display = 'block';
-                }
-                submitBtn.textContent = originalBtnText;
-                submitBtn.disabled = false;
-            }
-        }
-
-        if (submitBtn) {
-            submitBtn.addEventListener('click', attemptLogin);
-        }
-
-        [idInput, passInput].forEach(input => {
-            if (input) {
-                input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') attemptLogin();
-                });
-            }
-        });
     </script>
-</body>
 
+</body>
 </html>
