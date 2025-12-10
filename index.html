@@ -1068,4 +1068,260 @@
     </script>
 
 </body>
+</html><!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="darkreader-lock">
+    <title>Intervision チャンネルコンテンツ</title>
+    <link rel="icon" href="acts.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="common.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content-wrapper {
+            flex: 1;
+            padding-top: 80px;
+        }
+        .top-controls { z-index: 100; }
+
+        /* --- ここからが修正点です --- */
+        .header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        .header-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .header-right {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .header-left a, .header-right a {
+            color: var(--link-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .header-left a:hover, .header-right a:hover { text-decoration: underline; }
+        .header-left .material-symbols-outlined { font-size: 28px; }
+        .header-right img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .header h1 { font-size: 1.5em; }
+        .header h2 { font-size: 0.9em; }
+        /* --- ここまで --- */
+
+        .playlist { margin: 0 auto 50px auto; max-width: 800px; text-align: center; }
+        .playlist h2 { margin-bottom: 15px; font-size: 1.5em; }
+        .video-container {
+            position: relative; width: 100%; padding-top: 56.25%;
+            height: 0; overflow: hidden; border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .dark-mode .playlist h2 { color: var(--text-color); }
+
+        footer {
+            margin-top: 60px; padding: 0; color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; position: relative;
+            height: 60px; justify-content: center;
+        }
+        footer .flagStripe { position: absolute; left: 0; width: 100%; height: 33.33%; }
+        footer .white { background-color: #fff; top: 0; }
+        footer .blue { background-color: #0039a6; top: 33.33%; }
+        footer .red { background-color: #d52b1e; top: 66.66%; }
+        footer p { margin: 0; z-index: 1; }
+
+        @media (max-width: 768px) {
+            .content-wrapper { padding-top: 20px; }
+            .header h1 { font-size: 1.2em; }
+            .header h2 { font-size: 0.8em; }
+        }
+        @media (max-width: 600px) {
+            .playlist h2 { font-size: 1.2em; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-controls">
+        <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
+        <div class="lang-switcher">
+          <button data-lang="ru" class="control-button active">RU</button>
+          <button data-lang="en" class="control-button">EN</button>
+          <button data-lang="ja" class="control-button">JP</button>
+        </div>
+    </div>
+    
+    <div class="content-wrapper">
+        <div class="header">
+            <div class="header-left">
+                <a id="back-link" href="index.html">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+            </div>
+            <div class="header-center">
+                <h1 id="site-title"></h1>
+                <h2 id="site-subtitle"></h2>
+            </div>
+            <div class="header-right">
+                <a href="https://www.youtube.com/@intervidenie/">
+                    <img src="source/intervision_logo.png" alt="Logo">
+                </a>
+            </div>
+        </div>
+        
+        <div id="content-area">
+            <!-- JavaScriptでコンテンツがここに追加されます -->
+        </div>
+    </div>
+    
+    <footer>
+        <div class="flagStripe white"></div>
+        <div class="flagStripe blue"></div>
+        <div class="flagStripe red"></div>
+        <p id="site-last-updated"></p>
+    </footer>
+
+    <script src="common.js"></script>
+    <script>
+        const contentData = [
+            { type: 'category', key: 'parade' },
+            { type: 'playlist', id: 'PLMaOtQxqinZYDO5c-CYPszqjqVEr3x3kI', status: 'g' },
+            { type: 'category', key: 'explanation' },
+            { type: 'playlist', id: 'PLMaOtQxqinZYwBVb9kSG-I8-gCg-a2cQ5', status: 'e' },
+            { type: 'category', key: 'marches' },
+            { type: 'playlist', id: 'PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0', status: 'b' }
+        ];
+
+        const translations = {
+            ru: {
+                tabTitle: "Intervision Контент",
+                title: "Интервидение",
+                subtitle: "Официальный канал",
+                categories: { parade: "Парад", explanation: "Объяснение", marches: "Марши" },
+                status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
+                site_last_updated: 'Последнее обновление сайта:'
+            },
+            en: {
+                tabTitle: "Intervision Contents",
+                title: "Intervision",
+                subtitle: "Official Channel",
+                categories: { parade: "Parade", explanation: "Explanation", marches: "Marches" },
+                status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
+                site_last_updated: 'Site last updated:'
+            },
+            ja: {
+                tabTitle: "Intervision コンテンツ",
+                title: "インタービジョン",
+                subtitle: "公式チャンネル",
+                categories: { parade: "パレード", explanation: "解説", marches: "行進曲" },
+                status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '非公開' },
+                site_last_updated: 'サイト最終更新日時:'
+            }
+        };
+        let siteLastModifiedDate = null;
+
+        function getStatusConfig(statusCode, lang, isDarkMode) {
+            let colors = null;
+            switch (statusCode) {
+                case 'g': colors = { light: '#d1fae5', dark: '#065f46', bullet: '#16a34a' }; break;
+                case 'ex': colors = { light: '#fecaca', dark: '#991b1b', bullet: '#dc2626' }; break;
+                case 'e': colors = { light: '#fef9c3', dark: '#92400e', bullet: '#f59e0b' }; break;
+                case 'b': colors = { light: '#e5e7eb', dark: '#374151', bullet: '#6b7280' }; break;
+                default: return null;
+            }
+            return {
+                text: translations[lang].status_text[statusCode],
+                bgColor: isDarkMode ? colors.dark : colors.light,
+                color: isDarkMode ? colors.light : colors.dark,
+                bulletColor: colors.bullet
+            };
+        }
+
+        function renderPage(lang) {
+            document.documentElement.lang = lang;
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = '';
+            
+            document.title = translations[lang].tabTitle;
+            document.getElementById("site-title").textContent = translations[lang].title;
+            document.getElementById("site-subtitle").textContent = translations[lang].subtitle;
+
+            contentData.forEach(item => {
+                if (item.type === 'category') {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category-header';
+                    categoryDiv.textContent = translations[lang].categories[item.key];
+                    contentArea.appendChild(categoryDiv);
+                } else if (item.type === 'playlist') {
+                    const playlistDiv = document.createElement('div');
+                    playlistDiv.className = 'playlist';
+                    const itemWrapper = document.createElement('div');
+                    itemWrapper.className = 'playlist-item';
+                    const videoContainer = document.createElement('div');
+                    videoContainer.className = 'video-container';
+                    const iframe = document.createElement('iframe');
+                    const hl = lang === 'ja' ? 'en' : lang;
+                    iframe.src = `https://www.youtube.com/embed/videoseries?list=${item.id}&hl=${hl}`;
+                    iframe.allowFullscreen = true;
+                    videoContainer.appendChild(iframe);
+                    itemWrapper.appendChild(videoContainer);
+                    playlistDiv.appendChild(itemWrapper);
+                    contentArea.appendChild(playlistDiv);
+                }
+            });
+
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.classList.toggle('active', button.dataset.lang === lang);
+            });
+
+            if (siteLastModifiedDate) {
+                const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
+                const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(siteLastModifiedDate);
+                document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch(window.location.href, { method: 'HEAD' })
+                .then(res => {
+                    if (res.ok && res.headers.has('Last-Modified')) {
+                        siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
+                    }
+                    const savedLang = localStorage.getItem('lang') || 'ru';
+                    renderPage(savedLang);
+                });
+            
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const newLang = button.dataset.lang;
+                    localStorage.setItem('lang', newLang);
+                    renderPage(newLang);
+                });
+            });
+        });
+    </script>
+
+</body>
 </html>
