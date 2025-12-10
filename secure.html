@@ -56,7 +56,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 25px; /* 仕切り線とのマージン */
+            margin-bottom: 25px;
         }
         .form-header img {
             width: 50px;
@@ -76,14 +76,12 @@
             color: var(--text-color-subtle);
         }
 
-        /* --- ここからが修正点です --- */
         .separator {
             border: none;
             height: 1px;
             background-color: var(--border-color);
-            margin: 0 0 25px 0; /* 上下のマージン */
+            margin: 0 0 25px 0;
         }
-        /* --- ここまで --- */
 
         .auth-container h2#form-title {
             margin-top: 0;
@@ -139,11 +137,19 @@
 
         .error-msg { color: #ef4444; font-size: 0.9rem; margin-top: 20px; min-height: 1.2em; display: none; font-weight: 500; }
         .header, footer { display: none; }
+        
+        /* --- ここからが修正点です --- */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin-top: 60px; /* 上部コントロールとのスペースを確保 */
+            }
+        }
+        /* --- ここまで --- */
     </style>
 </head>
 
 <body>
-
+    <!-- --- ここが修正点です --- -->
     <div class="top-controls">
         <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
         <div class="lang-switcher">
@@ -153,43 +159,45 @@
         </div>
     </div>
 
-    <div class="auth-container">
-        <button id="back-button" title="Back">
-            <span class="material-symbols-outlined">arrow_back</span>
-        </button>
+    <div class="content-wrapper">
+        <div class="auth-container">
+            <button id="back-button" title="Back">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
 
-        <div class="form-header">
-            <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
-            <h1 id="site-title"></h1>
-            <h2 id="site-subtitle"></h2>
-        </div>
-
-        <hr class="separator">
-
-        <h2 id="form-title"></h2>
-        <p id="form-subtitle" class="auth-subtitle"></p>
-
-        <div class="input-group">
-            <label for="content-id" id="label-id"></label>
-            <div class="input-wrapper">
-                <span class="material-symbols-outlined input-icon-left">id_card</span>
-                <input type="text" id="content-id" autocomplete="off">
+            <div class="form-header">
+                <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
+                <h1 id="site-title"></h1>
+                <h2 id="site-subtitle"></h2>
             </div>
-        </div>
 
-        <div class="input-group">
-            <label for="password" id="label-pass"></label>
-            <div class="input-wrapper">
-                <span class="material-symbols-outlined input-icon-left">password</span>
-                <input type="password" id="password">
-                <span class="material-symbols-outlined input-icon-right" id="toggle-pass">visibility</span>
+            <hr class="separator">
+
+            <h2 id="form-title"></h2>
+            <p id="form-subtitle" class="auth-subtitle"></p>
+
+            <div class="input-group">
+                <label for="content-id" id="label-id"></label>
+                <div class="input-wrapper">
+                    <span class="material-symbols-outlined input-icon-left">id_card</span>
+                    <input type="text" id="content-id" autocomplete="off">
+                </div>
             </div>
-        </div>
 
-        <button id="submit-btn" class="submit-btn"></button>
-        <div id="error-msg" class="error-msg"></div>
+            <div class="input-group">
+                <label for="password" id="label-pass"></label>
+                <div class="input-wrapper">
+                    <span class="material-symbols-outlined input-icon-left">password</span>
+                    <input type="password" id="password">
+                    <span class="material-symbols-outlined input-icon-right" id="toggle-pass">visibility</span>
+                </div>
+            </div>
+
+            <button id="submit-btn" class="submit-btn"></button>
+            <div id="error-msg" class="error-msg"></div>
+        </div>
     </div>
-
+    
     <script src="common.js"></script>
     <script>
         const translations = {
@@ -268,23 +276,13 @@
         document.addEventListener('DOMContentLoaded', () => {
             const savedLang = localStorage.getItem('lang') || 'ru';
             renderPage(savedLang);
-
-            document.querySelectorAll('.lang-switcher button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const newLang = button.dataset.lang;
-                    localStorage.setItem('lang', newLang);
-                    renderPage(newLang);
-                });
-            });
             
-            // --- ここからが修正点です ---
             const backButton = document.getElementById('back-button');
             if (backButton) {
                 backButton.addEventListener('click', () => {
                     window.history.back();
                 });
             }
-            // --- ここまで ---
             
             const urlParams = new URLSearchParams(window.location.search);
             const queryId = urlParams.get('id');
