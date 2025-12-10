@@ -35,9 +35,18 @@
     .th-date, .td-date { flex: 0 0 16%; }
     .th-status, .td-status { flex: 0 0 18%; }
     .th-last_update, .td-last_update { flex: 0 0 20%; order: 99; }
+    /* --- ここからが修正点です --- */
+    .th-org, .td-org {
+        flex: 0 0 12%; 
+        order: 100; /* last_update の右に配置 */
+        justify-content: center; /* アイコンを中央揃え */
+    }
+    /* --- ここまで --- */
+
     thead th { background-color: var(--header-bg-color); color: white; font-weight: bold; border-bottom: 1px solid var(--header-bg-color); }
     tbody tr:nth-child(even) { background-color: var(--even-row-bg-color); }
     tbody tr:hover { background-color: var(--hover-bg-color); }
+    
     .category-row { display: block; }
     .category-row td {
       background-color: var(--category-bg-color);
@@ -56,6 +65,13 @@
         .th-date, .td-date { flex: 0 0 25%; }
         .th-description, .td-description { flex: 0 0 15%; }
         .th-last_update, .td-last_update { flex: 0 0 30%; order: 99; }
+        /* --- ここからが修正点です --- */
+        .th-org, .td-org { 
+            flex: 0 0 18%; 
+            order: 100;
+            justify-content: center;
+        }
+        /* --- ここまで --- */
     }
   </style>
 </head>
@@ -96,9 +112,8 @@
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
-        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
+        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'Оригинальный файл' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
-        // --- ここが修正点です ---
         months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
         site_last_updated: 'Последнее обновление сайта:'
@@ -106,9 +121,8 @@
       en: {
         title: 'INFORMATION SITE',
         subtitle: 'Summary of published documents and resources',
-        headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update'},
+        headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update', org: 'Original File'},
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
-        // --- ここが修正点です ---
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         site_last_updated: 'Site last updated:'
@@ -116,7 +130,7 @@
       ja: {
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
-        headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新'},
+        headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: 'オリジナルファイル'},
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '非公開' },
         site_last_updated: 'サイト最終更新日時:'
       }
@@ -127,7 +141,7 @@
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
     let siteLastModifiedDate = null;
-
+    
     function parseCSV(csvText) {
         const lines = csvText.replace(/\r\n/g, '\n').split('\n');
         return lines.map(line => {
@@ -324,8 +338,26 @@
                   td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
               } else { td.textContent = (rowData[index] || '').trim(); }
               tr.appendChild(td); return;
+            // --- ここからが修正点です ---
+            } else if (normalizedHeader === 'org') {
+                const url = (rowData[index] || '').trim();
+                if (url) {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    const icon = document.createElement('span');
+                    icon.className = 'material-symbols-outlined';
+                    icon.textContent = 'file_open';
+                    a.appendChild(icon);
+                    td.appendChild(a);
+                } else {
+                    td.textContent = '—';
+                }
+                tr.appendChild(td); return; // この列は特別なのでここで終了
+            // --- ここまで ---
             } else if (normalizedHeader === 'last_update') {
-                cellText = formatDate((rowData[index] || '').trim(), lang, isMobile);
+                cellText = formatDate((rowData[index] || '').trim(), lang, true);
             } else {
               cellText = formatDate((rowData[index] || '').trim(), lang, false);
             }
@@ -344,7 +376,6 @@
                     } else {
                         a.href = linkUrl;
                     }
-                    a.rel = 'noopener noreferrer';
                 }
                 contentWrapper.appendChild(a);
                 td.appendChild(contentWrapper);
