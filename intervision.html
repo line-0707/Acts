@@ -3,96 +3,52 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="darkreader-lock">
     <title>Intervision チャンネルコンテンツ</title>
     <link rel="icon" href="acts.ico" type="image/x-icon">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="common.css">
     <style>
+        /* このページ固有のスタイル */
         body {
-            font-family: 'Noto Sans JP', sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            line-height: 1.6;
             text-align: center;
-            color: #333;
-        }
-
-        /* バナー */
-        #russiaBanner {
-            width: 100%;
-            height: 80px;
-            position: relative;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
 
-        .flagStripe {
+        .content-wrapper {
             flex: 1;
+            padding-top: 80px;
         }
 
-        .white {
-            background-color: #fff;
+        .top-controls {
+            z-index: 100; 
         }
 
-        .blue {
-            background-color: #0039a6;
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            padding: 0 10px;
+            box-sizing: border-box;
         }
-
-        .red {
-            background-color: #d52b1e;
-        }
-
-        /* バナー左文字リンク */
-        #bannerText {
-            position: absolute;
-            top: 50%;
-            left: 7.5%;
-            transform: translateY(-50%);
-            font-weight: bold;
-            color: #fff;
-        }
-
-        #bannerText a {
-            text-decoration: none;
-            color: #fff;
-        }
-
-        #bannerText a:hover {
-            text-decoration: underline;
-        }
-
-        /* バナー右画像 */
-        #bannerImage {
-            position: absolute;
-            top: 50%;
-            left: 95%;
-            transform: translate(-50%, -50%);
-        }
-
-        #bannerImage a img {
-            width: 45px;
-            height: 45px;
-        }
-
-        /* 言語セレクター */
-        #langSelector {
-            position: absolute;
-            top: 50%;
-            left: 85%;
-            transform: translate(-50%, -50%);
-            padding: 5px 10px;
-            font-size: 1em;
-        }
-
-        /* 最終更新日 */
-        #lastUpdate {
-            margin-top: 85px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-        h1 {
+        .page-header a { color: var(--link-color); text-decoration: none; font-size: 0.9em; }
+        .page-header a:hover { text-decoration: underline; }
+        .page-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        
+        #pageTitle {
             margin-top: 20px;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .playlist {
@@ -106,159 +62,190 @@
         .playlist h2 {
             margin-bottom: 15px;
             font-size: 1.5em;
-            color: #333;
         }
 
-        iframe {
+        /* --- ここからが修正点です --- */
+        .video-container {
+            position: relative;
             width: 100%;
-            height: 450px;
-            border: none;
-            display: block;
+            padding-top: 56.25%; /* 16:9 アスペクト比 */
+            height: 0;
+            overflow: hidden;
             border-radius: 8px;
+            border: 1px solid var(--border-color);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none; /* コンテナに枠線があるのでiframe自身の枠線は不要 */
+        }
+        /* --- ここまで --- */
+        
+        .dark-mode .playlist h2 { color: var(--text-color); }
+
+        footer {
+            margin-top: 60px;
+            padding: 0;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            height: 60px;
+            justify-content: center;
+        }
+        footer .flagStripe {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 33.33%;
+        }
+        footer .white { background-color: #fff; top: 0; }
+        footer .blue { background-color: #0039a6; top: 33.33%; }
+        footer .red { background-color: #d52b1e; top: 66.66%; }
+        footer p {
+            margin: 0;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding-top: 20px;
+            }
         }
 
         @media (max-width: 600px) {
-            iframe {
-                height: 250px;
-            }
-
-            .playlist h2 {
-                font-size: 1.2em;
-            }
-        }
-
-        /* ダークモード（本文部分のみ） */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #121212;
-                color: #eee;
-            }
-
-            h1,
-            .playlist h2 {
-                color: #fff;
-            }
-
-            #lastUpdate {
-                color: #ccc;
-            }
+            .playlist h2 { font-size: 1.2em; }
         }
     </style>
 </head>
 
 <body>
-    <!-- バナー -->
-    <div id="russiaBanner">
-        <div class="flagStripe white"></div>
-        <div class="flagStripe blue"></div>
-        <div class="flagStripe red"></div>
-
-        <!-- 左7.5%に文字リンク -->
-        <div id="bannerText">
-            <a id="backLink" href="https://line-0707.github.io/Acts/index.html">Вернуться на информационный сайт</a>
+    <div class="top-controls">
+        <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
+        <div class="lang-switcher">
+          <button data-lang="ru" class="control-button active">RU</button>
+          <button data-lang="en" class="control-button">EN</button>
+          <button data-lang="ja" class="control-button">JP</button>
         </div>
-
-        <!-- 右92.5%に画像リンク -->
-        <div id="bannerImage">
+    </div>
+    
+    <div class="content-wrapper">
+        <div class="page-header">
+            <a id="back-link" href="https://line-0707.github.io/Acts/index.html"></a>
             <a href="https://www.youtube.com/@intervidenie/">
                 <img src="source/intervision_logo.png" alt="Logo">
             </a>
         </div>
+        
+        <h1 id="pageTitle"></h1>
+        
+        <!-- --- ここからが修正点です --- -->
+        <div class="playlist">
+            <h2 class="playlistTitle"></h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYDO5c-CYPszqjqVEr3x3kI" allowfullscreen></iframe>
+            </div>
+        </div>
 
-        <!-- 左85%に言語セレクター -->
-        <select id="langSelector" onchange="changeLanguage(this.value)">
-            <option value="ru">Русский</option>
-            <option value="en">English</option>
-            <option value="ja">日本語</option>
-        </select>
+        <div class="playlist">
+            <h2 class="playlistTitle"></h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYwBVb9kSG-I8-gCg-a2cQ5" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <div class="playlist">
+            <h2 class="playlistTitle"></h2>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0" allowfullscreen></iframe>
+            </div>
+        </div>
+        <!-- --- ここまで --- -->
     </div>
+    
+    <footer>
+        <div class="flagStripe white"></div>
+        <div class="flagStripe blue"></div>
+        <div class="flagStripe red"></div>
+        <p id="site-last-updated"></p>
+    </footer>
 
-    <!-- 最終更新日 -->
-    <div id="lastUpdate"></div>
-
-    <h1 id="pageTitle">Intervision チャンネルコンテンツ</h1>
-
-    <div class="playlist">
-        <h2 class="playlistTitle">Парад</h2>
-        <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYDO5c-CYPszqjqVEr3x3kI&hl=ru"
-            allowfullscreen></iframe>
-    </div>
-
-    <div class="playlist">
-        <h2 class="playlistTitle">Объяснение</h2>
-        <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYwBVb9kSG-I8-gCg-a2cQ5&hl=ru"
-            allowfullscreen></iframe>
-    </div>
-
-    <div class="playlist">
-        <h2 class="playlistTitle">Марши</h2>
-        <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0&hl=ru"
-            allowfullscreen></iframe>
-    </div>
-
+    <script src="common.js"></script>
     <script>
-        const texts = {
+        const translations = {
             ru: {
                 pageTitle: "Канал «Интервидение» Публикация видео",
                 playlists: ["Парад", "Объяснение", "Марши"],
-                backLink: "Вернуться на информационный сайт",
-                lastUpdateLabel: "Последнее обновление："
+                backLink: "← Вернуться на информационный сайт",
+                site_last_updated: 'Последнее обновление сайта:'
             },
             en: {
                 pageTitle: "Intervision channel Video contents",
                 playlists: ["Parade", "Explanation", "Marches"],
-                backLink: "Return to information site",
-                lastUpdateLabel: "Last update: "
+                backLink: "← Back to information site",
+                site_last_updated: 'Site last updated:'
             },
             ja: {
                 pageTitle: "Intervisionチャンネルコンテンツ",
                 playlists: ["パレード", "解説", "行進曲"],
-                backLink: "情報サイトに戻る",
-                lastUpdateLabel: "最終更新日："
+                backLink: "← 情報サイトに戻る",
+                site_last_updated: 'サイト最終更新日時:'
             }
         };
+        let siteLastModifiedDate = null;
 
-        function formatDate(date, lang) {
-            return date.toLocaleDateString(lang, { year: 'numeric', month: '2-digit', day: '2-digit' });
-        }
+        function renderPage(lang) {
+            document.documentElement.lang = lang;
+            
+            document.getElementById("pageTitle").textContent = translations[lang].pageTitle;
+            document.querySelectorAll(".playlistTitle").forEach((el, idx) => { el.textContent = translations[lang].playlists[idx]; });
+            document.getElementById("back-link").textContent = translations[lang].backLink;
 
-        function updateLastUpdate(lang) {
-            const today = new Date();
-            document.getElementById("lastUpdate").textContent = texts[lang].lastUpdateLabel + formatDate(today, lang);
-        }
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.classList.toggle('active', button.dataset.lang === lang);
+            });
 
-        function changeLanguage(lang) {
-            // ページタイトル
-            document.getElementById("pageTitle").textContent = texts[lang].pageTitle;
-            // プレイリストタイトル
-            const titles = document.querySelectorAll(".playlistTitle");
-            titles.forEach((el, idx) => { el.textContent = texts[lang].playlists[idx]; });
-            // バナー左文字列（リンク先は固定）
-            document.getElementById("backLink").textContent = texts[lang].backLink;
-            // 最終更新日
-            updateLastUpdate(lang);
-            let titleText;
-            switch (lang) {
-                case 'ru':
-                    titleText = 'Интервидение';
-                    break;
-                case 'en':
-                    titleText = 'Intervison';
-                    break;
-                case 'ja': ;
-                    titleText = 'インタービジョン';
-                    break;
-                default:
-                    titleText = 'Интервидение';
+            if (siteLastModifiedDate) {
+                const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
+                const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(siteLastModifiedDate);
+                document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
             }
+            
+            const hl = lang === 'ja' ? 'en' : lang;
+            document.querySelectorAll('iframe').forEach(iframe => {
+                try {
+                    const src = new URL(iframe.src);
+                    src.searchParams.set('hl', hl);
+                    iframe.src = src.toString();
+                } catch(e) { console.error("Invalid iframe URL:", iframe.src); }
+            });
         }
-
-        // 初期表示：ロシア語
-        window.onload = () => { changeLanguage('ru'); };
-
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch(window.location.href, { method: 'HEAD' })
+                .then(res => {
+                    if (res.ok && res.headers.has('Last-Modified')) {
+                        siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
+                    }
+                    const savedLang = localStorage.getItem('lang') || 'ru';
+                    renderPage(savedLang);
+                });
+            
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const newLang = button.dataset.lang;
+                    localStorage.setItem('lang', newLang);
+                    renderPage(newLang);
+                });
+            });
+        });
     </script>
 
 </body>
-
 </html>
