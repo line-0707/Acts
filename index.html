@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   <link rel="stylesheet" href="common.css">
   <style>
-    /* index.html 専用のスタイル */
     #table-container {
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -22,7 +21,7 @@
       background-color: var(--card-bg-color);
     }
     table { width: 100%; border-collapse: collapse; display: table; }
-    thead, tbody { display: block; }
+    thead, tbody { display: table-header-group; } /* 修正: a11yのためにも適切な値に */
     tr { display: flex; align-items: stretch; }
     th, td {
       padding: 12px 15px; text-align: left;
@@ -35,19 +34,13 @@
     .th-date, .td-date { flex: 0 0 16%; }
     .th-status, .td-status { flex: 0 0 18%; }
     .th-last_update, .td-last_update { flex: 0 0 20%; order: 99; }
-    /* --- ここからが修正点です --- */
-    .th-org, .td-org {
-        flex: 0 0 12%; 
-        order: 100; /* last_update の右に配置 */
-        justify-content: center; /* アイコンを中央揃え */
-    }
-    /* --- ここまで --- */
+    .th-org, .td-org { flex: 0 0 12%; order: 100; justify-content: center; }
 
     thead th { background-color: var(--header-bg-color); color: white; font-weight: bold; border-bottom: 1px solid var(--header-bg-color); }
     tbody tr:nth-child(even) { background-color: var(--even-row-bg-color); }
     tbody tr:hover { background-color: var(--hover-bg-color); }
     
-    .category-row { display: block; }
+    .category-row { display: table-row; } /* Flexboxからテーブル行に戻す */
     .category-row td {
       background-color: var(--category-bg-color);
       color: white; font-weight: bold;
@@ -59,25 +52,31 @@
     .status-bullet-mobile { display: none; }
     
     @media (max-width: 768px) {
-        .status-text, .th-status, .td-status { display: none; }
-        .status-bullet-mobile { display: inline; font-weight: bold; }
-        .th-files, .td-files { flex: 1 1 auto; }
-        .th-date, .td-date { flex: 0 0 25%; }
-        .th-description, .td-description { flex: 0 0 15%; }
-        .th-last_update, .td-last_update { flex: 0 0 30%; order: 99; }
-        /* --- ここからが修正点です --- */
-        .th-org, .td-org { 
-            flex: 0 0 18%; 
-            order: 100;
-            justify-content: center;
+        table, thead, tbody, tr, td { display: block; }
+        thead { display: none; }
+        tbody { border: none; }
+        tr {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
         }
-        /* --- ここまで --- */
+        tbody tr:nth-child(even) { background-color: transparent; }
+        td {
+            border: none; padding: 5px 0; width: auto !important;
+            flex: none !important;
+        }
+        .td-files { font-weight: bold; font-size: 1.1em; margin-bottom: 10px; }
+        .td-date, .td-description, .td-status { display: none !important; }
+        .mobile-meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .td-last_update { color: var(--text-color-subtle); font-size: 0.9em; }
+        .td-org { justify-content: flex-end; }
+        .status-bullet-mobile { display: inline; font-weight: bold; }
     }
   </style>
 </head>
 
 <body>
-
   <div class="content-wrapper">
     <div class="top-controls">
         <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
@@ -107,12 +106,11 @@
   <script src="common.js"></script>
   <script>
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
-
     const translations = {
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
-        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'Оригиналы' },
+        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'Оригинальный файл' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
         months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
@@ -130,94 +128,22 @@
       ja: {
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
-        headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル'},
+        headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: 'オリジナルファイル'},
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '非公開' },
         site_last_updated: 'サイト最終更新日時:'
       }
     };
-
     let fullData = [];
     let columnIndices = {};
     let visibleHeadersInfo = [];
     const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
     let siteLastModifiedDate = null;
     
-    function parseCSV(csvText) {
-        const lines = csvText.replace(/\r\n/g, '\n').split('\n');
-        return lines.map(line => {
-            const row = [];
-            let cell = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                if (char === '"' && inQuotes) {
-                    if (i + 1 < line.length && line[i + 1] === '"') { cell += '"'; i++; } else { inQuotes = false; }
-                } else if (char === '"' && !inQuotes) { inQuotes = true;
-                } else if (char === ',' && !inQuotes) { row.push(cell); cell = '';
-                } else { cell += char; }
-            }
-            row.push(cell);
-            return row;
-        });
-    }
-
-    function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); }
+    function parseCSV(csvText) { const lines=csvText.replace(/\r\n/g,'\n').split('\n'); return lines.map(line=>{const r=[];let c='',i=!1;for(let t=0;t<line.length;t++){const e=line[t];if('"'===e&&i){t+1<line.length&&'"'===line[t+1]?(c+='"',t++):i=!1}else'"'===e&&!i?i=!0:','===e&&!i?(r.push(c),c=''):c+=e}return r.push(c),r}) };
+    function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); };
+    function formatDate(dateString, lang, useShort = false) { if (!dateString || typeof dateString !== 'string') return dateString; let date; if (/^\d{8}$/.test(dateString)) { const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8); date = new Date(year, month - 1, day); } else if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(dateString)) { const parts = dateString.split('.'); date = new Date(parts[2], parts[1] - 1, parts[0]); } else { date = new Date(dateString); } if (isNaN(date.getTime())) { return dateString; } if (lang === 'ja') { const isMobile = window.innerWidth <= 768; const options = { era: isMobile ? 'narrow' : 'long', year: 'numeric', month: 'long', day: 'numeric' }; return new Intl.DateTimeFormat('ja-JP-u-ca-japanese', options).format(date); } const year = date.getFullYear(), monthIndex = date.getMonth(), day = date.getDate(); const monthArray = useShort ? translations[lang].months_short : (translations[lang].months || translations.en.months); switch (lang) { case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`; case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`; default: return date.toLocaleDateString(); } };
+    function getStatusConfig(statusCode, lang, isDarkMode) { let colors = null; switch (statusCode) { case 'g': colors = { light: '#d1fae5', dark: '#065f46', bullet: '#16a34a' }; break; case 'ex': colors = { light: '#fecaca', dark: '#991b1b', bullet: '#dc2626' }; break; case 'e': colors = { light: '#fef9c3', dark: '#92400e', bullet: '#f59e0b' }; break; case 'b': colors = { light: '#e5e7eb', dark: '#374151', bullet: '#6b7280' }; break; default: return null; } return { text: translations[lang].status_text[statusCode], bgColor: isDarkMode ? colors.dark : colors.light, color: isDarkMode ? colors.light : colors.dark, bulletColor: colors.bullet }; };
     
-    function formatDate(dateString, lang, useShort = false) {
-        if (!dateString || typeof dateString !== 'string') return dateString;
-        let date;
-        if (/^\d{8}$/.test(dateString)) {
-            const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
-            date = new Date(year, month - 1, day);
-        } else if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(dateString)) {
-            const parts = dateString.split('.');
-            date = new Date(parts[2], parts[1] - 1, parts[0]);
-        } else {
-            date = new Date(dateString);
-        }
-        if (isNaN(date.getTime())) { return dateString; }
-
-        if (lang === 'ja') {
-            const isMobile = window.innerWidth <= 768;
-            const options = { era: isMobile ? 'narrow' : 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            return new Intl.DateTimeFormat('ja-JP-u-ca-japanese', options).format(date);
-        }
-        
-        const year = date.getFullYear(), monthIndex = date.getMonth(), day = date.getDate();
-        const monthArray = useShort ? translations[lang].months_short : (translations[lang].months || translations.en.months);
-
-        switch (lang) {
-            case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`;
-            case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`;
-            default: return date.toLocaleDateString();
-        }
-    }
-    
-    function getStatusConfig(statusCode, lang, isDarkMode) {
-        let colors = null;
-        switch (statusCode) {
-            case 'g': 
-                colors = { light: '#d1fae5', dark: '#065f46', bullet: '#16a34a' };
-                break;
-            case 'ex': 
-                colors = { light: '#fecaca', dark: '#991b1b', bullet: '#dc2626' };
-                break;
-            case 'e': 
-                colors = { light: '#fef9c3', dark: '#92400e', bullet: '#f59e0b' };
-                break;
-            case 'b':
-                colors = { light: '#e5e7eb', dark: '#374151', bullet: '#6b7280' };
-                break;
-            default: return null;
-        }
-        return {
-            text: translations[lang].status_text[statusCode],
-            bgColor: isDarkMode ? colors.dark : colors.light,
-            color: isDarkMode ? colors.light : colors.dark,
-            bulletColor: colors.bullet
-        };
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
         button.addEventListener('click', () => {
@@ -319,81 +245,138 @@
           const linkUrl = (rowData[columnIndices['link']] || '').trim();
           const statusCode = (rowData[columnIndices['status']] || '').trim().toLowerCase();
           const statusConfig = getStatusConfig(statusCode, lang, isDarkMode);
-          visibleHeadersInfo.forEach(({ header, index }) => {
-            const td = document.createElement('td');
-            let cellText;
-            const normalizedHeader = normalizeHeader(header);
-            td.className = 'td-' + normalizedHeader;
-            if (normalizedHeader === 'files') { cellText = fileCellText;
-            } else if (normalizedHeader === 'description') {
-              const ruDescText = (rowData[columnIndices['description']] || '').trim();
-              if (lang === 'en') cellText = (rowData[columnIndices['desc_en']] || ruDescText).trim();
-              else if (lang === 'ja') cellText = (rowData[columnIndices['desc_ja']] || ruDescText).trim();
-              else cellText = ruDescText;
-            } else if (normalizedHeader === 'status') {
-              if (statusConfig) {
-                  const bulletSpan = document.createElement('span'); bulletSpan.textContent = '● '; bulletSpan.style.color = statusConfig.bulletColor;
-                  const textSpan = document.createElement('span'); textSpan.className = 'status-text'; textSpan.textContent = statusConfig.text; textSpan.style.fontWeight = 'bold';
-                  td.appendChild(bulletSpan); td.appendChild(textSpan);
-                  td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
-              } else { td.textContent = (rowData[index] || '').trim(); }
-              tr.appendChild(td); return;
-            // --- ここからが修正点です ---
-            } else if (normalizedHeader === 'org') {
-                const url = (rowData[index] || '').trim();
-                if (url) {
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    const icon = document.createElement('span');
-                    icon.className = 'material-symbols-outlined';
-                    icon.textContent = 'file_open';
-                    a.appendChild(icon);
-                    td.appendChild(a);
-                } else {
-                    td.textContent = '—';
-                }
-                tr.appendChild(td); return; // この列は特別なのでここで終了
-            // --- ここまで ---
-            } else if (normalizedHeader === 'last_update') {
-                cellText = formatDate((rowData[index] || '').trim(), lang, true);
-            } else {
-              cellText = formatDate((rowData[index] || '').trim(), lang, false);
+          
+          if(isMobile) {
+            // モバイル用のカード表示ロジック
+            const filesTd = document.createElement('td');
+            filesTd.className = 'td-files';
+            const contentWrapper = document.createDocumentFragment();
+            if (statusConfig) {
+                const bulletSpan = document.createElement('span');
+                bulletSpan.className = 'status-bullet-mobile';
+                bulletSpan.textContent = '● ';
+                bulletSpan.style.color = statusConfig.bulletColor;
+                contentWrapper.appendChild(bulletSpan);
             }
-            if (normalizedHeader === 'files') {
-                const contentWrapper = document.createDocumentFragment();
-                if (statusConfig) {
-                    const bulletSpan = document.createElement('span'); bulletSpan.className = 'status-bullet-mobile'; bulletSpan.textContent = '● '; bulletSpan.style.color = statusConfig.bulletColor;
-                    contentWrapper.appendChild(bulletSpan);
-                }
-                const a = document.createElement('a');
-                a.textContent = cellText;
-                if (linkUrl) {
-                    if (linkUrl.toLowerCase().endsWith('.pdf')) {
-                        const viewerUrl = 'pdfviewer/web/viewer.html';
-                        a.href = `${viewerUrl}?file=${encodeURIComponent(linkUrl)}`;
-                    } else {
-                        a.href = linkUrl;
-                    }
-                }
-                contentWrapper.appendChild(a);
-                td.appendChild(contentWrapper);
+            const a = document.createElement('a');
+            a.textContent = fileCellText;
+            if (linkUrl) {
+                if (linkUrl.toLowerCase().endsWith('.pdf')) {
+                    a.href = `pdfviewer/web/viewer.html?file=${encodeURIComponent(linkUrl)}`;
+                } else { a.href = linkUrl; }
+            }
+            contentWrapper.appendChild(a);
+            filesTd.appendChild(contentWrapper);
+            tr.appendChild(filesTd);
 
-            } else { td.textContent = cellText; }
-            tr.appendChild(td);
-          });
+            const metaRow = document.createElement('div');
+            metaRow.className = 'mobile-meta-row';
+            
+            const lastUpdateTd = document.createElement('td');
+            lastUpdateTd.className = 'td-last_update';
+            lastUpdateTd.textContent = formatDate((rowData[columnIndices['last_update']] || '').trim(), lang, true);
+            metaRow.appendChild(lastUpdateTd);
+
+            const orgTd = document.createElement('td');
+            orgTd.className = 'td-org';
+            const orgUrl = (rowData[columnIndices['org']] || '').trim();
+            if (orgUrl) {
+                const orgLink = document.createElement('a');
+                orgLink.href = orgUrl;
+                orgLink.target = '_blank';
+                orgLink.rel = 'noopener noreferrer';
+                const icon = document.createElement('span');
+                icon.className = 'material-symbols-outlined';
+                icon.textContent = 'file_open';
+                orgLink.appendChild(icon);
+                orgTd.appendChild(orgLink);
+            } else {
+                orgTd.textContent = '—';
+            }
+            metaRow.appendChild(orgTd);
+            tr.appendChild(metaRow);
+            
+          } else {
+            // デスクトップ用の通常表示ロジック
+            visibleHeadersInfo.forEach(({ header, index }) => {
+                const td = document.createElement('td');
+                let cellText;
+                const normalizedHeader = normalizeHeader(header);
+                td.className = 'td-' + normalizedHeader;
+                if (normalizedHeader === 'files') { cellText = fileCellText;
+                } else if (normalizedHeader === 'description') {
+                  const ruDescText = (rowData[columnIndices['description']] || '').trim();
+                  if (lang === 'en') cellText = (rowData[columnIndices['desc_en']] || ruDescText).trim();
+                  else if (lang === 'ja') cellText = (rowData[columnIndices['desc_ja']] || ruDescText).trim();
+                  else cellText = ruDescText;
+                } else if (normalizedHeader === 'status') {
+                  if (statusConfig) {
+                      const bulletSpan = document.createElement('span'); bulletSpan.textContent = '● '; bulletSpan.style.color = statusConfig.bulletColor;
+                      const textSpan = document.createElement('span'); textSpan.className = 'status-text'; textSpan.textContent = statusConfig.text; textSpan.style.fontWeight = 'bold';
+                      td.appendChild(bulletSpan); td.appendChild(textSpan);
+                      td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
+                  } else { td.textContent = (rowData[index] || '').trim(); }
+                  tr.appendChild(td); return;
+                } else if (normalizedHeader === 'org') {
+                    const url = (rowData[index] || '').trim();
+                    if (url) {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        const icon = document.createElement('span');
+                        icon.className = 'material-symbols-outlined';
+                        icon.textContent = 'file_open';
+                        a.appendChild(icon);
+                        td.appendChild(a);
+                    } else {
+                        td.textContent = '—';
+                    }
+                    tr.appendChild(td); return;
+                } else if (normalizedHeader === 'last_update') {
+                    cellText = formatDate((rowData[index] || '').trim(), lang, true);
+                } else {
+                  cellText = formatDate((rowData[index] || '').trim(), lang, false);
+                }
+                
+                if (normalizedHeader === 'files') {
+                    const contentWrapper = document.createDocumentFragment();
+                    if (statusConfig) {
+                        const bulletSpan = document.createElement('span');
+                        bulletSpan.className = 'status-bullet-mobile';
+                        bulletSpan.textContent = '● ';
+                        bulletSpan.style.color = statusConfig.bulletColor;
+                        contentWrapper.appendChild(bulletSpan);
+                    }
+                    const a = document.createElement('a');
+                    a.textContent = cellText;
+                    if (linkUrl) {
+                        if (linkUrl.toLowerCase().endsWith('.pdf')) {
+                            const viewerUrl = 'pdfviewer/web/viewer.html';
+                            a.href = `${viewerUrl}?file=${encodeURIComponent(linkUrl)}`;
+                        } else {
+                            a.href = linkUrl;
+                        }
+                    }
+                    contentWrapper.appendChild(a);
+                    td.appendChild(contentWrapper);
+                } else { 
+                    td.textContent = cellText; 
+                }
+                tr.appendChild(td);
+            });
+          }
           tbody.appendChild(tr);
         }
       }
       table.appendChild(thead); table.appendChild(tbody);
       tableContainer.appendChild(table);
-
+      
       if (siteLastModifiedDate) {
-        const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
-        const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-        const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(siteLastModifiedDate);
-        document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
+          const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
+          const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+          const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(siteLastModifiedDate);
+          document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
       }
     }
   </script>
