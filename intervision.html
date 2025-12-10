@@ -64,7 +64,6 @@
             font-size: 1.5em;
         }
 
-        /* --- ここからが修正点です --- */
         .video-container {
             position: relative;
             width: 100%;
@@ -81,9 +80,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: none; /* コンテナに枠線があるのでiframe自身の枠線は不要 */
+            border: none;
         }
-        /* --- ここまで --- */
         
         .dark-mode .playlist h2 { color: var(--text-color); }
 
@@ -144,7 +142,6 @@
         
         <h1 id="pageTitle"></h1>
         
-        <!-- --- ここからが修正点です --- -->
         <div class="playlist">
             <h2 class="playlistTitle"></h2>
             <div class="video-container">
@@ -165,7 +162,6 @@
                 <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0" allowfullscreen></iframe>
             </div>
         </div>
-        <!-- --- ここまで --- -->
     </div>
     
     <footer>
@@ -179,18 +175,21 @@
     <script>
         const translations = {
             ru: {
+                tabTitle: "Intervision Контент",
                 pageTitle: "Канал «Интервидение» Публикация видео",
                 playlists: ["Парад", "Объяснение", "Марши"],
                 backLink: "← Вернуться на информационный сайт",
                 site_last_updated: 'Последнее обновление сайта:'
             },
             en: {
+                tabTitle: "Intervision Contents",
                 pageTitle: "Intervision channel Video contents",
                 playlists: ["Parade", "Explanation", "Marches"],
                 backLink: "← Back to information site",
                 site_last_updated: 'Site last updated:'
             },
             ja: {
+                tabTitle: "Intervision コンテンツ",
                 pageTitle: "Intervisionチャンネルコンテンツ",
                 playlists: ["パレード", "解説", "行進曲"],
                 backLink: "← 情報サイトに戻る",
@@ -202,7 +201,11 @@
         function renderPage(lang) {
             document.documentElement.lang = lang;
             
+            // --- ここからが修正点です ---
+            document.title = translations[lang].tabTitle;
             document.getElementById("pageTitle").textContent = translations[lang].pageTitle;
+            // --- ここまで ---
+
             document.querySelectorAll(".playlistTitle").forEach((el, idx) => { el.textContent = translations[lang].playlists[idx]; });
             document.getElementById("back-link").textContent = translations[lang].backLink;
 

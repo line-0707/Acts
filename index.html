@@ -98,6 +98,8 @@
         subtitle: 'Сводка опубликованных документов и ресурсов',
         headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
+        // --- ここが修正点です ---
+        months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
         site_last_updated: 'Последнее обновление сайта:'
       },
@@ -106,6 +108,8 @@
         subtitle: 'Summary of published documents and resources',
         headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update'},
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
+        // --- ここが修正点です ---
+        months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         site_last_updated: 'Site last updated:'
       },
@@ -200,12 +204,11 @@
         };
     }
 
-    // --- ここからが修正点です ---
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.lang-switcher button').forEach(button => {
         button.addEventListener('click', () => {
           const newLang = button.dataset.lang;
-          localStorage.setItem('lang', newLang); // 言語設定を保存
+          localStorage.setItem('lang', newLang);
           renderPage(newLang);
         });
       });
@@ -251,7 +254,7 @@
           headers.forEach((header, index) => { columnIndices[normalizeHeader(header)] = index; });
           visibleHeadersInfo = headers.map((header, index) => ({ header, index })).filter(h => !columnsToHide.has(normalizeHeader(h.header)));
           
-          const savedLang = localStorage.getItem('lang') || 'ru'; // 保存された言語を読み込む
+          const savedLang = localStorage.getItem('lang') || 'ru';
           renderPage(savedLang);
         })
         .catch(error => {
@@ -259,7 +262,6 @@
           document.getElementById('table-container').textContent = 'Error: Could not load data. Ensure the Google Sheet is "Published to the web" as a CSV.';
         });
     }
-    // --- ここまで ---
 
     function renderPage(lang) {
       document.getElementById('site-title').textContent = translations[lang].title;
@@ -342,8 +344,6 @@
                     } else {
                         a.href = linkUrl;
                     }
-                    // --- ここが修正点です ---
-                    // a.target = '_blank'; // この行を削除
                     a.rel = 'noopener noreferrer';
                 }
                 contentWrapper.appendChild(a);
