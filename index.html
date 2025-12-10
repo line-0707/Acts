@@ -148,7 +148,7 @@
       ru: {
         title: 'ИНФОРМАЦИОННАЯ САЙТА',
         subtitle: 'Сводка опубликованных документов и ресурсов',
-        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'Оригинальный файл' },
+        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'Оригиналы' },
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
         months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
         months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
@@ -159,7 +159,7 @@
       en: {
         title: 'INFORMATION SITE',
         subtitle: 'Summary of published documents and resources',
-        headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update', org: 'Original File'},
+        headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update', org: 'Originals'},
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
@@ -170,7 +170,7 @@
       ja: {
         title: '情報サイト',
         subtitle: '公開されたドキュメントとリソースの概要',
-        headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: 'オリジナルファイル'},
+        headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル'},
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '非公開' },
         site_last_updated: 'サイト最終更新日時:',
         last_update_label: '更新日:',
@@ -185,7 +185,31 @@
     
     function parseCSV(csvText) { const lines=csvText.replace(/\r\n/g,'\n').split('\n'); return lines.map(line=>{const r=[];let c='',i=!1;for(let t=0;t<line.length;t++){const e=line[t];if('"'===e&&i){t+1<line.length&&'"'===line[t+1]?(c+='"',t++):i=!1}else'"'===e&&!i?i=!0:','===e&&!i?(r.push(c),c=''):c+=e}return r.push(c),r}) };
     function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); };
-    function formatDate(dateString, lang, useShort = false) { if (!dateString || typeof dateString !== 'string') return dateString; let date; if (/^\d{8}$/.test(dateString)) { const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8); date = new Date(year, month - 1, day); } else if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(dateString)) { const parts = dateString.split('.'); date = new Date(parts[2], parts[1] - 1, parts[0]); } else { date = new Date(dateString); } if (isNaN(date.getTime())) { return dateString; } if (lang === 'ja') { const isMobile = window.innerWidth <= 768; const options = { era: isMobile ? 'narrow' : 'long', year: 'numeric', month: 'long', day: 'numeric' }; return new Intl.DateTimeFormat('ja-JP-u-ca-japanese', options).format(date); } const year = date.getFullYear(), monthIndex = date.getMonth(), day = date.getDate(); const monthArray = useShort ? translations[lang].months_short : (translations[lang].months || translations.en.months); switch (lang) { case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`; case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`; default: return date.toLocaleDateString(); } };
+    function formatDate(dateString, lang, useShort = false) {
+        if (!dateString || typeof dateString !== 'string') return dateString;
+        let date;
+        if (/^\d{8}$/.test(dateString)) {
+            const year = dateString.substring(0, 4), month = dateString.substring(4, 6), day = dateString.substring(6, 8);
+            date = new Date(year, month - 1, day);
+        } else if (/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.test(dateString)) {
+            const parts = dateString.split('.');
+            date = new Date(parts[2], parts[1] - 1, parts[0]);
+        } else {
+            date = new Date(dateString);
+        }
+        if (isNaN(date.getTime())) { return dateString; }
+
+        const year = date.getFullYear(), monthIndex = date.getMonth(), day = date.getDate();
+        const monthArray = useShort ? translations[lang].months_short : (translations[lang].months || translations.en.months);
+
+        switch (lang) {
+            case 'ru': return `${day} ${monthArray[monthIndex]} ${year}г.`;
+            case 'en': return `${monthArray[monthIndex]} ${day}, ${year}`;
+            // --- ここが修正点です ---
+            case 'ja': return `${year}年${monthIndex + 1}月${day}日`;
+            default: return date.toLocaleDateString();
+        }
+    }
     function getStatusConfig(statusCode, lang, isDarkMode) { let colors = null; switch (statusCode) { case 'g': colors = { light: '#d1fae5', dark: '#065f46', bullet: '#16a34a' }; break; case 'ex': colors = { light: '#fecaca', dark: '#991b1b', bullet: '#dc2626' }; break; case 'e': colors = { light: '#fef9c3', dark: '#92400e', bullet: '#f59e0b' }; break; case 'b': colors = { light: '#e5e7eb', dark: '#374151', bullet: '#6b7280' }; break; default: return null; } return { text: translations[lang].status_text[statusCode], bgColor: isDarkMode ? colors.dark : colors.light, color: isDarkMode ? colors.light : colors.dark, bulletColor: colors.bullet }; };
     
     document.addEventListener('DOMContentLoaded', () => {
