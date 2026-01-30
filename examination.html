@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成績一覧</title>
+
+    <!-- 共通リソース -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link rel="stylesheet" href="common.css">
+
+    <style>
+        /* メインコンテンツ */
+        .main-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 60vh;
+        }
+
+        /* タブナビゲーション */
+        .grade-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .grade-tab-btn {
+            background: none;
+            border: 1px solid transparent;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-family: 'Noto Sans JP', sans-serif;
+            color: var(--text-main, #333);
+        }
+
+        .grade-tab-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .grade-tab-btn.active {
+            background-color: var(--accent-color, #007bff);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* データ表示エリア */
+        #tables-output {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            /* テーブル間の間隔 */
+            width: 100%;
+        }
+
+        /* テーブルコンテナ */
+        .score-table-container {
+            overflow-x: auto;
+            /* 必要に応じて横スクロール */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background: var(--bg-card, #fff);
+            animation: fadeIn 0.3s ease-in;
+            width: 100%;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        table.score-table {
+            width: 100%;
+            border-collapse: separate;
+            /* stickyを効かせるためseparate推奨 */
+            border-spacing: 0;
+            font-size: 0.95rem;
+            min-width: 600px;
+            /* スマホで潰れすぎないように */
+        }
+
+        .score-table th,
+        .score-table td {
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* 左端と上端のボーダー調整 */
+        .score-table th:first-child,
+        .score-table td:first-child {
+            border-left: 1px solid #ddd;
+        }
+
+        .score-table thead tr:first-child th {
+            border-top: 1px solid #ddd;
+        }
+
+        /* --- ヘッダー・列固定のスタイル --- */
+
+        /* 1. 左上の角セル（固定） */
+        .score-table thead tr:first-child th:first-child {
+            position: sticky;
+            left: 0;
+            top: 0;
+            z-index: 4;
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        /* 2. 左端の列（科目名 - 固定） */
+        .score-table tbody th {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background-color: #fff;
+            text-align: left;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* ダークモード時の左端背景 */
+        @media (prefers-color-scheme: dark) {
+            .score-table tbody th {
+                background-color: #2a2a2a;
+                color: #eee;
+            }
+        }
+
+        /* 3. 1行目（試験名ヘッダー - 固定） */
+        /* 注: bodyスクロールではなくdiv内スクロールなのでtop:0で固定 */
+        .score-table thead tr:first-child th {
+            /* position: sticky; top: 0; z-index: 3; */
+            /* 必要ならコメントアウト解除 */
+            background-color: #f0f4f8;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* 4. 2行目（得点・平均サブヘッダー） */
+        .score-table thead tr:nth-child(2) th {
+            background-color: #fafafa;
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: normal;
+        }
+
+        /* ダークモード対応 */
+        @media (prefers-color-scheme: dark) {
+
+            .score-table th,
+            .score-table td {
+                border-color: #444;
+            }
+
+            .score-table-container {
+                background: #1a1a1a;
+            }
+
+            .score-table thead tr:first-child th {
+                background-color: #333;
+                color: #fff;
+            }
+
+            .score-table thead tr:nth-child(2) th {
+                background-color: #222;
+                color: #ccc;
+            }
+
+            .score-table thead tr:first-child th:first-child {
+                background-color: #333;
+            }
+
+            .grade-tab-btn {
+                color: #ccc;
+            }
+
+            .grade-tab-btn:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            .grade-tab-btn.active {
+                background-color: #4a90e2;
+                color: #fff;
+            }
+        }
+
+        /* 平均の列 */
+        .col-avg {
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        .loading-msg,
+        .error-msg {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2rem;
+            grid-column: 1 / -1;
+        }
+
+        .error-msg {
+            color: #d32f2f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="content-wrapper">
+        <div class="top-controls">
+            <button id="theme-toggle" class="control-button" title="Toggle theme">
+                <span class="material-symbols-outlined">contrast</span>
+            </button>
+            <div class="lang-switcher">
+                <button data-lang="ru" class="control-button">RU</button>
+                <button data-lang="en" class="control-button">EN</button>
+                <button data-lang="ja" class="control-button active">JP</button>
+            </div>
+        </div>
+
+        <div class="header">
+            <a href="https://line-0707.github.io/Acts/index.html">
+                <img src="https://line-0707.github.io/Acts/source/icon.webp" alt="Site Icon">
+            </a>
+            <div>
+                <h1><a href="https://line-0707.github.io/Acts/index.html" id="site-title">成績一覧</a></h1>
+                <h2 id="site-subtitle">定期考査の得点と推移</h2>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <nav id="grade-tabs" class="grade-tabs"></nav>
+            <div id="tables-output">
+                <p class="loading-msg">読み込み中...</p>
+            </div>
+        </main>
+
+        <footer>
+            <p id="site-last-updated"></p>
+        </footer>
+    </div>
+
+    <script src="common.js"></script>
+
+    <script>
+        const dataSources = [
+            { id: 'j2', name: '中2', url: 'https://docs.google.com/spreadsheets/d/1hncAI8x7vVy13PfbBipwfvkaB9nWlXMPebsDnz6cy8I/export?format=csv&gid=463244634' },
+            { id: 'j3', name: '中3', url: 'https://docs.google.com/spreadsheets/d/1YGmmZBbKIETe7xNKCJNwoHbwm4Nqe4d_B1CWNXjhmws/export?format=csv&gid=2060844939' },
+            { id: 'h1', name: '高1', url: 'https://docs.google.com/spreadsheets/d/1i0kNh1d0mkumLMM3b4aGIm4XK8HiKhQIsGdMPfwvhG0/export?format=csv&gid=1325998336' },
+            { id: 'h2', name: '高2', url: 'https://docs.google.com/spreadsheets/d/1qgo7JC16-H2zYS7Vaus_1_SCJpf8PKYMIwgRnF1zqWo/export?format=csv&gid=726966416' }
+        ];
+
+        const translations = {
+            ru: { title: 'Успеваемость', subtitle: 'Результаты регулярных экзаменов', site_last_updated: 'Последнее обновление сайта:', loading: 'Загрузка...', error: 'Не удалось загрузить данные.' },
+            en: { title: 'Academic Results', subtitle: 'Summary of regular exam scores', site_last_updated: 'Site last updated:', loading: 'Loading...', error: 'Failed to load data.' },
+            ja: { title: '成績一覧', subtitle: '定期考査の得点と推移', site_last_updated: 'サイト最終更新日時:', loading: '読み込み中...', error: 'データの読み込みに失敗しました。' }
+        };
+
+        let currentLang = document.documentElement.lang || 'ja';
+        let siteLastModifiedDate = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initLanguageAndFooter();
+            initTabs();
+            if (dataSources.length > 0) loadGradeData(dataSources[0]);
+        });
+
+        function initTabs() {
+            const tabContainer = document.getElementById('grade-tabs');
+            tabContainer.innerHTML = '';
+            dataSources.forEach((source, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'grade-tab-btn';
+                btn.textContent = source.name;
+                btn.dataset.id = source.id;
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.grade-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    loadGradeData(source);
+                });
+                if (index === 0) btn.classList.add('active');
+                tabContainer.appendChild(btn);
+            });
+        }
+
+        async function loadGradeData(source) {
+            const outputDiv = document.getElementById('tables-output');
+            outputDiv.innerHTML = `<p class="loading-msg">${translations[currentLang].loading}</p>`;
+            try {
+                const response = await fetch(source.url);
+                if (!response.ok) throw new Error('Network response');
+                const csvText = await response.text();
+                renderTransposedCSV(csvText, outputDiv);
+            } catch (error) {
+                console.error(error);
+                outputDiv.innerHTML = `<p class="error-msg">${translations[currentLang].error} (${source.name})</p>`;
+            }
+        }
+
+        function renderTransposedCSV(csvText, container) {
+            container.innerHTML = '';
+            const lines = csvText.split(/\r\n|\n/).map(line => line.split(','));
+
+            // ヘッダー情報の取得（1行目:科目、2行目:項目ラベル）
+            const globalSubjectRow = lines.length > 0 ? lines[0] : [];
+            const globalLabelRow = lines.length > 1 ? lines[1] : [];
+
+            // ブロック分割（空行区切り）
+            let tableStartIndex = 2; // データは3行目から
+
+            for (let i = 2; i <= lines.length; i++) {
+                // 行が存在しない(EOF) または 全セル空の場合にブロック終了とみなす
+                const row = lines[i];
+                const isEmpty = !row || row.every(c => c.trim() === '');
+
+                if (isEmpty) {
+                    if (i > tableStartIndex) {
+                        const tableRows = lines.slice(tableStartIndex, i);
+                        // データがある場合のみ描画
+                        if (tableRows.length > 0) {
+                            const tableHtml = createTransposedTable(tableRows, globalSubjectRow, globalLabelRow);
+                            if (tableHtml) container.appendChild(tableHtml);
+                        }
+                    }
+                    tableStartIndex = i + 1;
+                }
+            }
+        }
+
+        function createTransposedTable(dataRows, subjectRow, labelRow) {
+            // dataRows: 各行の0列目が試験名
+            // subjectRow: 0列目が「毎回」などのタイトル、1列目以降が科目名
+            // labelRow: 1列目以降が「得点」「平均」などのラベル
+
+            if (!dataRows || dataRows.length === 0) return null;
+
+            // 1. 試験名リストの取得
+            const exams = [];
+            dataRows.forEach((row, index) => {
+                if (row[0] && row[0].trim() !== '') {
+                    exams.push({ name: row[0], rowIndex: index });
+                }
+            });
+            if (exams.length === 0) return null;
+
+            // 2. 科目リストの取得
+            const subjects = [];
+            // CSV構造上、科目は3列ごと（得点,平均,順位）あるいは4列ごとなどの可能性がある
+            // 空白でないセルを科目名の開始として拾う
+            for (let c = 1; c < subjectRow.length; c++) {
+                const subjName = subjectRow[c];
+                if (subjName && subjName.trim() !== '') {
+                    subjects.push({ name: subjName, colIndex: c });
+                }
+            }
+            if (subjects.length === 0) return null;
+
+            // 3. テーブル構築
+            const wrapper = document.createElement('div');
+            wrapper.className = 'score-table-container';
+            const table = document.createElement('table');
+            table.className = 'score-table';
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+
+            // --- ヘッダー行1: [左上タイトル] + [試験名...] ---
+            const trHead1 = document.createElement('tr');
+
+            // 左上角セル (A1の内容、例: "毎回")
+            const thCorner = document.createElement('th');
+            thCorner.textContent = subjectRow[0] || '';
+            thCorner.rowSpan = 2; // 下の行と結合
+            trHead1.appendChild(thCorner);
+
+            // 試験名 (横に並ぶ)
+            exams.forEach(exam => {
+                const th = document.createElement('th');
+                th.textContent = exam.name;
+                th.colSpan = 2; // 得点と平均の2列分
+                trHead1.appendChild(th);
+            });
+            thead.appendChild(trHead1);
+
+            // --- ヘッダー行2: [得点][平均] のラベル ---
+            const trHead2 = document.createElement('tr');
+            exams.forEach(() => {
+                // 科目の列インデックスに関わらず、ラベルは「得点」「平均」と仮定するか、
+                // あるいは最初の科目のラベル(labelRow)を参照して表示する
+                // ここでは1つ目の科目のラベル位置（得点=subjects[0].colIndex）を参照して動的に取得
+                const baseCol = subjects[0].colIndex;
+                const label1 = labelRow[baseCol] || '得点';
+                const label2 = labelRow[baseCol + 1] || '平均';
+
+                const th1 = document.createElement('th');
+                th1.textContent = label1;
+                const th2 = document.createElement('th');
+                th2.textContent = label2;
+                th2.className = 'col-avg';
+
+                trHead2.appendChild(th1);
+                trHead2.appendChild(th2);
+            });
+            thead.appendChild(trHead2);
+
+            // --- データ行: 各科目ごとに1行 ---
+            subjects.forEach(subj => {
+                const tr = document.createElement('tr');
+
+                // 行見出し（科目名）
+                const thSubj = document.createElement('th');
+                thSubj.textContent = subj.name;
+                tr.appendChild(thSubj);
+
+                // 各試験のデータ
+                exams.forEach(exam => {
+                    // dataRowsはブロックの配列。rowIndexで該当行を取得
+                    const row = dataRows[exam.rowIndex];
+
+                    // データ取得
+                    const score = row[subj.colIndex] || '';
+                    const avg = row[subj.colIndex + 1] || '';
+
+                    const tdScore = document.createElement('td');
+                    tdScore.textContent = score;
+                    const tdAvg = document.createElement('td');
+                    tdAvg.textContent = avg;
+                    tdAvg.className = 'col-avg';
+
+                    tr.appendChild(tdScore);
+                    tr.appendChild(tdAvg);
+                });
+                tbody.appendChild(tr);
+            });
+
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            wrapper.appendChild(table);
+            return wrapper;
+        }
+
+        function initLanguageAndFooter() {
+            fetch(window.location.href, { method: 'HEAD' })
+                .then(res => {
+                    if (res.ok && res.headers.has('Last-Modified')) {
+                        siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
+                    }
+                    updatePageContent(document.documentElement.lang || 'ja');
+                });
+
+            document.querySelectorAll('.lang-switcher button').forEach(button => {
+                button.addEventListener('click', (e) => updatePageContent(e.target.dataset.lang));
+            });
+        }
+
+        function updatePageContent(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.getElementById('site-title').textContent = translations[lang].title;
+            document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
+            document.querySelectorAll('.lang-switcher button').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+
+            if (siteLastModifiedDate) {
+                const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
+                const opts = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                const dateStr = new Intl.DateTimeFormat(locale, opts).format(siteLastModifiedDate);
+                document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${dateStr}`;
+            }
+        }
+    </script>
+</body>
+
+</html>
