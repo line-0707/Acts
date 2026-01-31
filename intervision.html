@@ -99,7 +99,7 @@
         .th-thumbnail,
         .td-thumbnail {
             flex: 0 0 180px;
-            justify-content: center !important;
+            justify-content: left !important;
             /* フレックスボックスで中央寄せ */
             text-align: center;
             /* 文字列自体の配置も中央に */
@@ -538,7 +538,22 @@
                             const norm = normalizeHeader(header);
                             td.className = 'td-' + norm;
                             if (isVirtual && norm === 'thumbnail') {
-                                td.innerHTML = ytId ? `<div class="thumb-wrapper"><img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" class="thumb-img"></div>` : '—';
+                                if (ytId) {
+                                    // サムネイルをリンクで囲む
+                                    const a = document.createElement('a');
+                                    a.href = linkUrl;
+                                    a.target = "_blank";          // PC版は新しいタブで開く
+                                    a.rel = "noopener noreferrer"; // セキュリティ対策
+
+                                    const wrapper = document.createElement('div');
+                                    wrapper.className = 'thumb-wrapper';
+                                    wrapper.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" class="thumb-img">`;
+
+                                    a.appendChild(wrapper);
+                                    td.appendChild(a);
+                                } else {
+                                    td.textContent = '—';
+                                }
                             } else if (norm === 'files') {
                                 const a = document.createElement('a');
                                 a.textContent = fileCellText;
