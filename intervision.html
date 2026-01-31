@@ -98,19 +98,29 @@
         /* デスクトップ版サムネイル：大きく表示 */
         .th-thumbnail,
         .td-thumbnail {
-            flex: 0 0 120px;
-            /* 120pxから180pxに拡大 */
-            justify-content: center;
+            flex: 0 0 180px;
+            justify-content: center !important;
+            /* フレックスボックスで中央寄せ */
+            text-align: center;
+            /* 文字列自体の配置も中央に */
+            padding-left: 0 !important;
+            /* 左右のパディングをリセットして */
+            padding-right: 0 !important;
+            /* 数学的な中央を出す */
         }
 
+
         .thumb-wrapper {
-            width: 240px;
-            /* 中身も拡大 */
-            height: 135px;
+            width: 160px;
+            height: 90px;
             overflow: hidden;
             border-radius: 6px;
             background: #000;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            /* 影を少し強調して浮かす */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .thumb-img {
