@@ -178,10 +178,25 @@
       }
 
       .td-files {
+        display: block;
+        /* 回り込みを有効にするため */
+        padding-right: 0;
+        /* 全体への一律パディングを解除 */
+      }
+
+      .mobile-status {
+        position: static;
+        /* 絶対配置を解除 */
+        float: right;
+        /* 右に浮かせてテキストを回り込ませる */
+        margin-left: 10px;
+        /* テキストとの間に隙間を作る */
+        margin-bottom: 2px;
+        border-radius: 12px;
+        font-size: 0.8em;
         font-weight: bold;
-        font-size: 1.1em;
-        margin-bottom: 10px;
-        padding-right: 90px;
+        padding: 3px 8px;
+        /* 他のスタイル（padding, border-radius等）はそのまま */
       }
 
       html[lang="ru"] .td-files {
@@ -211,16 +226,7 @@
         justify-content: flex-end;
       }
 
-      .mobile-status {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        font-size: 0.8em;
-        font-weight: bold;
-        padding: 3px 8px;
-        border-radius: 12px;
-        white-space: nowrap;
-      }
+
     }
   </style>
 </head>

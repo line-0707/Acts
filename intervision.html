@@ -5,241 +5,529 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="darkreader-lock">
-    <title>Ютьюб Канал «Интервидение»</title>
-    <link rel="icon" href="source/fav2.ico" type="image/x-icon">
+    <title>ИНФОРМАЦИОННАЯ САЙТА</title>
+    <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Acts/source/fav1.ico">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <link rel="stylesheet" href="common.css">
     <style>
-        /* このページ固有のスタイル */
-        body {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        .content-wrapper {
-            flex: 1;
-            padding-top: 80px;
-        }
-
-        .top-controls {
-            z-index: 100; 
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 800px;
-            margin: 0 auto 20px auto;
-            padding: 0 10px;
-            box-sizing: border-box;
-        }
-        .page-header a { color: var(--link-color); text-decoration: none; font-size: 0.9em; }
-        .page-header a:hover { text-decoration: underline; }
-        .page-header img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        
-        #pageTitle {
-            margin-top: 20px;
-            margin-bottom: 40px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .playlist {
-            margin-bottom: 50px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
-        }
-
-        .playlist h2 {
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%; /* 16:9 アスペクト比 */
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
+        #table-container {
             border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+            background-color: var(--card-bg-color);
         }
-        .video-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        
-        .dark-mode .playlist h2 { color: var(--text-color); }
 
-        footer {
-            margin-top: 60px;
-            padding: 0;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            display: table;
+        }
+
+        thead,
+        tbody {
+            display: table-header-group;
+        }
+
+        tr {
             display: flex;
-            flex-direction: column;
-            position: relative;
-            height: 60px;
+            align-items: stretch;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            white-space: normal;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+        }
+
+        /* --- デスクトップ版：列幅の定義 --- */
+        .th-files,
+        .td-files {
+            flex: 1 1 auto;
+        }
+
+        .th-description,
+        .td-description {
+            flex: 0 1 25%;
+        }
+
+        .th-date,
+        .td-date {
+            flex: 0 0 15%;
+        }
+
+        .th-status,
+        .td-status {
+            flex: 0 0 16%;
+        }
+
+        .th-last_update,
+        .td-last_update {
+            flex: 0 0 18%;
+            order: 99;
+        }
+
+        .th-org,
+        .td-org {
+            flex: 0 0 10%;
+            order: 100;
             justify-content: center;
         }
-        footer .flagStripe {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 33.33%;
+
+        /* YouTubeがある場合の幅調整 */
+        .has-yt .th-description {
+            flex: 0 1 18%;
         }
-        footer .white { background-color: #fff; top: 0; }
-        footer .blue { background-color: #0039a6; top: 33.33%; }
-        footer .red { background-color: #d52b1e; top: 66.66%; }
-        footer p {
-            margin: 0;
-            z-index: 1;
+
+        .has-yt .th-date {
+            flex: 0 0 12%;
+        }
+
+        /* デスクトップ版サムネイル：大きく表示 */
+        .th-thumbnail,
+        .td-thumbnail {
+            flex: 0 0 120px;
+            /* 120pxから180pxに拡大 */
+            justify-content: center;
+        }
+
+        .thumb-wrapper {
+            width: 240px;
+            /* 中身も拡大 */
+            height: 135px;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        thead th {
+            background-color: var(--header-bg-color);
+            color: white;
+            font-weight: bold;
+            border-bottom: 1px solid var(--header-bg-color);
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: var(--even-row-bg-color);
+        }
+
+        tbody tr:hover {
+            background-color: var(--hover-bg-color);
+        }
+
+        .category-row td {
+            background-color: var(--category-bg-color);
+            color: white;
+            font-weight: bold;
+            width: 100%;
+            box-sizing: border-box;
+            justify-content: left;
+        }
+
+        tr.category-row:hover td {
+            background-color: var(--category-hover-bg-color);
+        }
+
+        .loader {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2em;
         }
 
         @media (max-width: 768px) {
-            .content-wrapper {
-                padding-top: 20px;
-            }
-        }
 
-        @media (max-width: 600px) {
-            .playlist h2 { font-size: 1.2em; }
+            table,
+            thead,
+            tbody,
+            tr,
+            td {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody {
+                border: none;
+            }
+
+            tr.data-row {
+                position: relative;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                margin-bottom: 15px;
+                padding: 15px;
+            }
+
+            /* モバイル版サムネイル：小さく中央に */
+            .mobile-thumb {
+                width: 300px;
+                /* 小さめに設定 */
+                margin: 0 auto 12px auto;
+                aspect-ratio: 16 / 9;
+                overflow: hidden;
+                border-radius: 6px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                border: 1px solid var(--border-color);
+            }
+
+            .mobile-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            /* モバイル版ファイル名：バッジを避けて早めに改行 */
+            .td-files {
+                font-weight: bold;
+                font-size: 1.1em;
+                margin-bottom: 10px;
+                padding-right: 150px;
+                /* 改行位置を早めるためにパディングを増加 */
+            }
+
+            .td-date,
+            .td-description,
+            .td-status,
+            .td-thumbnail {
+                display: none !important;
+            }
+
+            .mobile-meta-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 10px;
+                gap: 10px;
+            }
+
+            /* モバイル版日付：改行を禁止 */
+            .td-last_update {
+                color: var(--text-color-subtle);
+                font-size: 0.85em;
+                white-space: nowrap;
+                /* 改行禁止 */
+            }
+
+            .mobile-status {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                font-size: 0.8em;
+                font-weight: bold;
+                padding: 4px 8px;
+                border-radius: 12px;
+                white-space: nowrap;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="top-controls">
-        <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
-        <div class="lang-switcher">
-          <button data-lang="ru" class="control-button active">RU</button>
-          <button data-lang="en" class="control-button">EN</button>
-          <button data-lang="ja" class="control-button">JP</button>
-        </div>
-    </div>
-    
     <div class="content-wrapper">
-        <div class="page-header">
-            <a id="back-link" href="https://line-0707.github.io/Acts/index.html"></a>
-            <a href="https://www.youtube.com/@intervidenie/">
-                <img src="source/intervision_logo.png" alt="Logo">
+        <div class="top-controls">
+            <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
+            <div class="lang-switcher">
+                <button data-lang="ru" class="control-button active">RU</button>
+                <button data-lang="en" class="control-button">EN</button>
+                <button data-lang="ja" class="control-button">JP</button>
+            </div>
+        </div>
+        <div class="header">
+            <a href="https://line-0707.github.io/Acts/index.html">
+                <img src="https://line-0707.github.io/Acts/source/sov.webp" alt="Site Icon">
             </a>
-        </div>
-        
-        <h1 id="pageTitle"></h1>
-        
-        <div class="playlist">
-            <h2 class="playlistTitle"></h2>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYDO5c-CYPszqjqVEr3x3kI" allowfullscreen></iframe>
+            <div>
+                <h1><a href="https://line-0707.github.io/Acts/index.html" id="site-title"></a></h1>
+                <h2 id="site-subtitle"></h2>
             </div>
         </div>
-
-        <div class="playlist">
-            <h2 class="playlistTitle"></h2>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYwBVb9kSG-I8-gCg-a2cQ5" allowfullscreen></iframe>
-            </div>
-        </div>
-
-        <div class="playlist">
-            <h2 class="playlistTitle"></h2>
-            <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/videoseries?list=PLMaOtQxqinZYheFhDsD_UphtF-cehQKn0" allowfullscreen></iframe>
-            </div>
+        <div id="table-container">
+            <div class="loader">Loading data from Google Sheet...</div>
         </div>
     </div>
-    
-    <footer>
-        <div class="flagStripe white"></div>
-        <div class="flagStripe blue"></div>
-        <div class="flagStripe red"></div>
-        <p id="site-last-updated"></p>
-    </footer>
 
     <script src="common.js"></script>
     <script>
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
+
         const translations = {
             ru: {
-                tabTitle: "Intervision Контент",
-                pageTitle: "Канал «Интервидение» Публикация видео",
-                playlists: ["Парад", "Объяснение", "Марши"],
-                backLink: "← Вернуться на информационный сайт",
-                site_last_updated: 'Последнее обновление сайта:'
+                title: 'ИНФОРМАЦИОННАЯ САЙТА',
+                subtitle: 'Сводка опубликованных документов и ресурсов',
+                headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'Оригиналы', thumbnail: 'превью' },
+                status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
+                months: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
+                months_short: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+                last_update_label: 'Обновлено:',
+                org_tooltip: 'Открыть оригинальный файл'
             },
             en: {
-                tabTitle: "Intervision Contents",
-                pageTitle: "Intervision channel Video contents",
-                playlists: ["Parade", "Explanation", "Marches"],
-                backLink: "← Back to information site",
-                site_last_updated: 'Site last updated:'
+                title: 'INFORMATION SITE',
+                subtitle: 'Summary of published documents and resources',
+                headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update', org: 'Originals', thumbnail: 'preview' },
+                status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
+                months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                last_update_label: 'Updated:',
+                org_tooltip: 'Open original file'
             },
             ja: {
-                tabTitle: "Intervision コンテンツ",
-                pageTitle: "Intervisionチャンネルコンテンツ",
-                playlists: ["パレード", "解説", "行進曲"],
-                backLink: "← 情報サイトに戻る",
-                site_last_updated: 'サイト最終更新日時:'
+                title: '情報サイト',
+                subtitle: '公開されたドキュメントとリソースの概要',
+                headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル', thumbnail: 'プレビュー' },
+                status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '非公開' },
+                last_update_label: '更新日:',
+                org_tooltip: 'オリジナルファイルを開く'
             }
         };
-        let siteLastModifiedDate = null;
 
-        function renderPage(lang) {
-            document.documentElement.lang = lang;
-            
-            // --- ここからが修正点です ---
-            document.title = translations[lang].tabTitle;
-            document.getElementById("pageTitle").textContent = translations[lang].pageTitle;
-            // --- ここまで ---
+        let fullData = [];
+        let columnIndices = {};
+        let visibleHeadersInfo = [];
+        let hasAnyYouTube = false;
+        const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
 
-            document.querySelectorAll(".playlistTitle").forEach((el, idx) => { el.textContent = translations[lang].playlists[idx]; });
-            document.getElementById("back-link").textContent = translations[lang].backLink;
+        function parseCSV(csvText) { const lines = csvText.replace(/\r\n/g, '\n').split('\n'); return lines.map(line => { const r = []; let c = '', i = !1; for (let t = 0; t < line.length; t++) { const e = line[t]; if ('"' === e && i) { t + 1 < line.length && '"' === line[t + 1] ? (c += '"', t++) : i = !1 } else '"' === e && !i ? i = !0 : ',' === e && !i ? (r.push(c), c = '') : c += e } return r.push(c), r }) };
+        function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); };
 
-            document.querySelectorAll('.lang-switcher button').forEach(button => {
-                button.classList.toggle('active', button.dataset.lang === lang);
-            });
-
-            if (siteLastModifiedDate) {
-                const locale = lang === 'ja' ? 'ja-JP-u-ca-japanese' : `${lang}-${lang.toUpperCase()}`;
-                const dateTimeOptions = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-                const formattedDateTime = new Intl.DateTimeFormat(locale, dateTimeOptions).format(siteLastModifiedDate);
-                document.getElementById('site-last-updated').textContent = `${translations[lang].site_last_updated} ${formattedDateTime}`;
-            }
-            
-            const hl = lang === 'ja' ? 'en' : lang;
-            document.querySelectorAll('iframe').forEach(iframe => {
-                try {
-                    const src = new URL(iframe.src);
-                    src.searchParams.set('hl', hl);
-                    iframe.src = src.toString();
-                } catch(e) { console.error("Invalid iframe URL:", iframe.src); }
-            });
+        function getYouTubeId(url) {
+            if (!url) return null;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
         }
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            fetch(window.location.href, { method: 'HEAD' })
-                .then(res => {
-                    if (res.ok && res.headers.has('Last-Modified')) {
-                        siteLastModifiedDate = new Date(res.headers.get('Last-Modified'));
+
+        function formatDate(dateString, lang, useShort = false) {
+            if (!dateString || typeof dateString !== 'string') return dateString;
+            const matchYMD = dateString.match(/^(\d{4})(\d{2})(\d{2})(\d{2})?(\d{2})?(\d{2})?/);
+            if (matchYMD) {
+                const year = matchYMD[1], month = matchYMD[2], day = matchYMD[3], hour = matchYMD[4], min = matchYMD[5], sec = matchYMD[6];
+                const hasFullTime = hour && min && sec;
+                const monthIndex = parseInt(month) - 1;
+                const monthArray = useShort ? translations[lang].months_short : (translations[lang].months || translations.en.months);
+                switch (lang) {
+                    case 'ru': return `${parseInt(day)} ${monthArray[monthIndex]} ${year}г.${hasFullTime ? ` ${hour}:${min}:${sec}` : ''}`;
+                    case 'en': return `${monthArray[monthIndex]} ${parseInt(day)}, ${year}${hasFullTime ? ` ${hour}:${min}:${sec}` : ''}`;
+                    case 'ja': return `${year}年${parseInt(month)}月${parseInt(day)}日${hasFullTime ? ` ${hour}時${min}分${sec}秒` : ''}`;
+                    default: return `${year}/${month}/${day}${hasFullTime ? ` ${hour}:${min}:${sec}` : ''}`;
+                }
+            }
+            return dateString;
+        }
+
+        function getStatusConfig(statusCode, lang, isDarkMode) {
+            let colors = null;
+            switch (statusCode) {
+                case 'g': colors = { light: '#d1fae5', dark: '#065f46', bullet: '#16a34a' }; break;
+                case 'ex': colors = { light: '#fecaca', dark: '#991b1b', bullet: '#dc2626' }; break;
+                case 'e': colors = { light: '#fef9c3', dark: '#92400e', bullet: '#f59e0b' }; break;
+                case 'b': colors = { light: '#e5e7eb', dark: '#374151', bullet: '#6b7280' }; break;
+                default: return null;
+            }
+            return { text: translations[lang].status_text[statusCode], bgColor: isDarkMode ? colors.dark : colors.light, color: isDarkMode ? colors.light : colors.dark, bulletColor: colors.bullet };
+        };
+
+        function fetchAndRender() {
+            fetch(sheetUrl)
+                .then(res => res.ok ? res.text() : Promise.reject('Data fetch failed'))
+                .then(csvText => {
+                    fullData = parseCSV(csvText);
+                    if (fullData.length < 1) throw new Error('No data found');
+
+                    const firstRowRaw = fullData[0];
+                    if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
+                        const correctedHeaders = [], correctedFirstDataRow = [];
+                        firstRowRaw.forEach(cellContent => {
+                            const catIndex = cellContent.indexOf('cat[');
+                            if (catIndex !== -1) {
+                                correctedHeaders.push(cellContent.substring(0, catIndex).trim());
+                                correctedFirstDataRow.push(cellContent.substring(catIndex).trim());
+                            } else {
+                                const spaceIndex = cellContent.indexOf(' ');
+                                if (spaceIndex !== -1) {
+                                    correctedHeaders.push(cellContent.substring(0, spaceIndex).trim());
+                                    correctedFirstDataRow.push(cellContent.substring(spaceIndex + 1).trim());
+                                } else {
+                                    correctedHeaders.push(cellContent.trim()); correctedFirstDataRow.push('');
+                                }
+                            }
+                        });
+                        fullData.shift(); fullData.unshift(correctedFirstDataRow); fullData.unshift(correctedHeaders);
                     }
+
+                    const headers = fullData[0];
+                    headers.forEach((header, index) => { columnIndices[normalizeHeader(header)] = index; });
+
+                    hasAnyYouTube = fullData.some((row, i) => i > 0 && getYouTubeId(row[columnIndices['link']]));
+
+                    visibleHeadersInfo = [];
+                    headers.forEach((header, index) => {
+                        const norm = normalizeHeader(header);
+                        if (norm === 'status' && hasAnyYouTube) {
+                            visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+                        }
+                        if (!columnsToHide.has(norm)) {
+                            visibleHeadersInfo.push({ header, index, isVirtual: false });
+                        }
+                    });
+
                     const savedLang = localStorage.getItem('lang') || 'ru';
                     renderPage(savedLang);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('table-container').textContent = 'Error: Could not load data.';
                 });
-            
+        }
+
+        function renderPage(lang) {
+            document.getElementById('site-title').textContent = translations[lang].title;
+            document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
+            document.documentElement.lang = lang;
+            const isMobile = window.innerWidth <= 768;
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            document.querySelectorAll('.lang-switcher button').forEach(button => { button.classList.toggle('active', button.dataset.lang === lang); });
+
+            const tableContainer = document.getElementById('table-container');
+            if (fullData.length === 0) return;
+            tableContainer.innerHTML = '';
+
+            if (hasAnyYouTube) tableContainer.classList.add('has-yt');
+            else tableContainer.classList.remove('has-yt');
+
+            const table = document.createElement('table'), thead = document.createElement('thead'), tbody = document.createElement('tbody');
+            const headerRow = document.createElement('tr');
+            const translatedHeaders = translations[lang].headers;
+
+            visibleHeadersInfo.forEach(({ header }) => {
+                const th = document.createElement('th'), normalizedHeader = normalizeHeader(header);
+                th.className = 'th-' + normalizedHeader;
+                th.textContent = translatedHeaders[normalizedHeader] || header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            for (let i = 1; i < fullData.length; i++) {
+                const rowData = fullData[i];
+                if (rowData.length <= 1 && !(rowData[0] || '').trim()) continue;
+
+                let fileCellText = (rowData[columnIndices['files']] || '').trim();
+                let enText = (rowData[columnIndices['en']] || '').trim();
+                let jaText = (rowData[columnIndices['jp']] || '').trim();
+                if (lang === 'en' && enText) fileCellText = enText;
+                else if (lang === 'ja' && jaText) fileCellText = jaText;
+
+                const tr = document.createElement('tr');
+
+                if (fileCellText.includes('cat[')) {
+                    tr.className = 'category-row';
+                    const match = fileCellText.match(/\[(.*?)\]/);
+                    const td = document.createElement('td');
+                    td.textContent = match ? match[1] : fileCellText.replace(/cat\[|\]/g, '');
+                    tr.appendChild(td);
+                } else {
+                    tr.className = 'data-row';
+                    const linkUrl = (rowData[columnIndices['link']] || '').trim();
+                    const ytId = getYouTubeId(linkUrl);
+                    const statusCode = (rowData[columnIndices['status']] || '').trim().toLowerCase();
+                    const statusConfig = getStatusConfig(statusCode, lang, isDarkMode);
+
+                    if (isMobile) {
+                        if (ytId) {
+                            const mobileThumb = document.createElement('div');
+                            mobileThumb.className = 'mobile-thumb';
+                            mobileThumb.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg">`;
+                            tr.appendChild(mobileThumb);
+                        }
+                        if (statusConfig) {
+                            const statusDiv = document.createElement('div');
+                            statusDiv.className = 'mobile-status';
+                            statusDiv.innerHTML = `<span style="color:${statusConfig.bulletColor}">●</span> ${statusConfig.text}`;
+                            statusDiv.style.backgroundColor = statusConfig.bgColor;
+                            statusDiv.style.color = statusConfig.color;
+                            tr.appendChild(statusDiv);
+                        }
+                        const filesTd = document.createElement('td');
+                        filesTd.className = 'td-files';
+                        const a = document.createElement('a');
+                        a.textContent = fileCellText;
+                        a.href = linkUrl.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(linkUrl)}` : linkUrl;
+                        filesTd.appendChild(a);
+                        tr.appendChild(filesTd);
+
+                        const lastUpdateText = formatDate((rowData[columnIndices['last_update']] || '').trim(), lang, true);
+                        const orgUrl = (rowData[columnIndices['org']] || '').trim();
+                        if (lastUpdateText || orgUrl) {
+                            const metaRow = document.createElement('div');
+                            metaRow.className = 'mobile-meta-row';
+                            metaRow.innerHTML = `<div class="td-last_update">${lastUpdateText ? translations[lang].last_update_label + ' ' + lastUpdateText : ''}</div>`;
+                            const orgTd = document.createElement('td');
+                            orgTd.className = 'td-org';
+                            if (orgUrl) orgTd.innerHTML = `<a href="${orgUrl}" target="_blank" title="${translations[lang].org_tooltip}"><span class="material-symbols-outlined">file_open</span></a>`;
+                            metaRow.appendChild(orgTd);
+                            tr.appendChild(metaRow);
+                        }
+                    } else {
+                        visibleHeadersInfo.forEach(({ header, index, isVirtual }) => {
+                            const td = document.createElement('td');
+                            const norm = normalizeHeader(header);
+                            td.className = 'td-' + norm;
+                            if (isVirtual && norm === 'thumbnail') {
+                                td.innerHTML = ytId ? `<div class="thumb-wrapper"><img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" class="thumb-img"></div>` : '—';
+                            } else if (norm === 'files') {
+                                const a = document.createElement('a');
+                                a.textContent = fileCellText;
+                                a.href = linkUrl.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(linkUrl)}` : linkUrl;
+                                td.appendChild(a);
+                            } else if (norm === 'description') {
+                                let desc = (rowData[columnIndices['description']] || '').trim();
+                                let descEn = (rowData[columnIndices['desc_en']] || '').trim();
+                                let descJa = (rowData[columnIndices['desc_ja']] || '').trim();
+                                td.textContent = (lang === 'en' && descEn) ? descEn : (lang === 'ja' && descJa) ? descJa : desc;
+                            } else if (norm === 'status') {
+                                if (statusConfig) {
+                                    td.style.backgroundColor = statusConfig.bgColor; td.style.color = statusConfig.color;
+                                    td.innerHTML = `<span style="color:${statusConfig.bulletColor}">● </span><b>${statusConfig.text}</b>`;
+                                } else { td.textContent = (rowData[index] || '').trim(); }
+                            } else if (norm === 'org') {
+                                const url = (rowData[index] || '').trim();
+                                td.innerHTML = url ? `<a href="${url}" target="_blank"><span class="material-symbols-outlined">file_open</span></a>` : '—';
+                            } else {
+                                td.textContent = formatDate((rowData[index] || '').trim(), lang, false);
+                            }
+                            tr.appendChild(td);
+                        });
+                    }
+                }
+                tbody.appendChild(tr);
+            }
+            table.appendChild(thead); table.appendChild(tbody);
+            tableContainer.appendChild(table);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.lang-switcher button').forEach(button => {
                 button.addEventListener('click', () => {
                     const newLang = button.dataset.lang;
@@ -247,8 +535,10 @@
                     renderPage(newLang);
                 });
             });
+            fetchAndRender();
         });
+        window.addEventListener('resize', () => renderPage(localStorage.getItem('lang') || 'ru'));
     </script>
-
 </body>
+
 </html>
