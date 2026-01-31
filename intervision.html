@@ -356,6 +356,7 @@
                     fullData = parseCSV(csvText);
                     if (fullData.length < 1) throw new Error('No data found');
 
+                    // --- 1. 元のコードにある堅牢なヘッダー補正ロジック（cat[ の分離） ---
                     const firstRowRaw = fullData[0];
                     if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
                         const correctedHeaders = [], correctedFirstDataRow = [];
@@ -370,29 +371,61 @@
                                     correctedHeaders.push(cellContent.substring(0, spaceIndex).trim());
                                     correctedFirstDataRow.push(cellContent.substring(spaceIndex + 1).trim());
                                 } else {
-                                    correctedHeaders.push(cellContent.trim()); correctedFirstDataRow.push('');
+                                    correctedHeaders.push(cellContent.trim());
+                                    correctedFirstDataRow.push('');
                                 }
                             }
                         });
-                        fullData.shift(); fullData.unshift(correctedFirstDataRow); fullData.unshift(correctedHeaders);
+                        fullData.shift();
+                        fullData.unshift(correctedFirstDataRow);
+                        fullData.unshift(correctedHeaders);
                     }
 
+                    // --- 2. 全列のインデックス作成 ---
                     const headers = fullData[0];
-                    headers.forEach((header, index) => { columnIndices[normalizeHeader(header)] = index; });
+                    columnIndices = {};
+                    headers.forEach((header, index) => {
+                        columnIndices[normalizeHeader(header)] = index;
+                    });
 
-                    hasAnyYouTube = fullData.some((row, i) => i > 0 && getYouTubeId(row[columnIndices['link']]));
+                    // --- 3. YouTubeリンクの存在確認（hasAnyYouTubeの更新） ---
+                    hasAnyYouTube = fullData.some((row, i) => {
+                        if (i === 0) return false; // ヘッダーはスキップ
+                        const link = row[columnIndices['link']];
+                        return getYouTubeId(link) !== null;
+                    });
 
+                    // --- 4. 可視ヘッダー構成（status列がなくてもサムネイルを挿入） ---
                     visibleHeadersInfo = [];
+                    let thumbInserted = false;
+
                     headers.forEach((header, index) => {
                         const norm = normalizeHeader(header);
-                        if (norm === 'status' && hasAnyYouTube) {
+
+                        // A. 'status' 列を見つけたら、その直前にサムネイル列を予約挿入
+                        if (norm === 'status' && hasAnyYouTube && !thumbInserted) {
                             visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+                            thumbInserted = true;
                         }
+
+                        // 表示対象外（en, jp, linkなど）でなければ追加
                         if (!columnsToHide.has(norm)) {
                             visibleHeadersInfo.push({ header, index, isVirtual: false });
                         }
+
+                        // B. 'description' 列の直後まで来ても未挿入なら挿入（status列がない場合用）
+                        if (norm === 'description' && hasAnyYouTube && !thumbInserted) {
+                            visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+                            thumbInserted = true;
+                        }
                     });
 
+                    // C. どちらも見つからなかった場合のフォールバック（最後尾に追加）
+                    if (hasAnyYouTube && !thumbInserted) {
+                        visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+                    }
+
+                    // --- 5. ページの描画実行 ---
                     const savedLang = localStorage.getItem('lang') || 'ru';
                     renderPage(savedLang);
                 })
