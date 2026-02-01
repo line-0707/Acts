@@ -29,19 +29,17 @@
       padding: 0;
     }
 
+    /* PC版：表全体のコンテナ設定（ここで角丸と枠線を定義） */
     #table-container {
-      background-color: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-
-      /* --- ここを追加：島が端まで広がらないように左右に余白を作る --- */
-      padding-left: 12px !important;
-      padding-right: 12px !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background-color: var(--card-bg-color);
+      overflow: hidden;
+      /* 角丸からはみ出す中身をカット */
+      width: 100%;
     }
 
-    /* display: block にすることで flex との親和性を高め、幅の突き抜けを防止 */
     table,
     thead,
     tbody {
@@ -73,7 +71,6 @@
       flex: 1 1 0%;
     }
 
-    /* 余った幅をすべて使う */
     .th-description,
     .td-description {
       flex: 0 0 22%;
@@ -152,17 +149,13 @@
       width: 100% !important;
       flex: 1 0 100%;
       justify-content: flex-start;
-      /* 左寄せ */
       padding-left: 15px;
-      /* 左側に少しインデント */
     }
 
     /* PC版のヘッダー画像設定 */
     .header img {
       width: 48px;
-      /* icoファイルに適したサイズ */
       height: 48px;
-      /* autoではなく数値を指定して消失を防ぐ */
       object-fit: contain;
       margin-right: 15px;
       flex-shrink: 0;
@@ -170,10 +163,16 @@
 
     /* --- モバイル版レイアウト (768px以下) --- */
     @media (max-width: 768px) {
+
+      /* モバイルではコンテナの枠線を消し、背景を透明にして「島」を目立たせる */
       #table-container {
         background-color: transparent !important;
         border: none !important;
         box-shadow: none !important;
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        overflow: visible !important;
+        /* カードの影が見えるようにする */
       }
 
       table,
@@ -205,10 +204,8 @@
         border-radius: 8px;
         text-align: center;
         justify-content: center;
-        /* モバイルでは中央 */
         display: block;
         width: 100% !important;
-        padding-left: 15px;
       }
 
       /* データカード */
