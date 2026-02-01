@@ -311,6 +311,17 @@
         padding: 20px 10px;
       }
 
+      /* PC版のヘッダー画像設定 */
+      .header img {
+        width: 48px;
+        /* icoファイルに適したサイズ */
+        height: 48px;
+        /* autoではなく数値を指定して消失を防ぐ */
+        object-fit: contain;
+        margin-right: 15px;
+        flex-shrink: 0;
+      }
+
       /* --- 画像の引き延ばしを防止する設定 --- */
       .header a {
         display: flex;

@@ -154,6 +154,17 @@
             /* 左側に少しインデント */
         }
 
+        /* PC版のヘッダー画像設定 */
+        .header img {
+            width: 48px;
+            /* icoファイルに適したサイズ */
+            height: 48px;
+            /* autoではなく数値を指定して消失を防ぐ */
+            object-fit: contain;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
         /* --- モバイル版レイアウト (768px以下) --- */
         @media (max-width: 768px) {
             #table-container {
