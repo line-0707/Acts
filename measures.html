@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="darkreader-lock">
-  <title>Камоинформбюро | Меры</title>
-  <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Acts/source/fav3.ico">
+  <title>Меры | Камоинформбюро</title>
+  <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Acts/source/fav2.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -152,6 +152,17 @@
       /* 左寄せ */
       padding-left: 15px;
       /* 左側に少しインデント */
+    }
+
+    /* PC版のヘッダー画像設定 */
+    .header img {
+      width: 48px;
+      /* icoファイルに適したサイズ */
+      height: 48px;
+      /* autoではなく数値を指定して消失を防ぐ */
+      object-fit: contain;
+      margin-right: 15px;
+      flex-shrink: 0;
     }
 
     /* --- モバイル版レイアウト (768px以下) --- */
@@ -301,63 +312,6 @@
       .td-thumbnail {
         display: none !important;
       }
-
-      .header {
-        flex-direction: column !important;
-        align-items: center !important;
-        /* 中央に寄せる */
-        text-align: center !important;
-        gap: 15px;
-        padding: 20px 10px;
-      }
-
-      /* PC版のヘッダー画像設定 */
-      .header img {
-        width: 48px;
-        /* icoファイルに適したサイズ */
-        height: 48px;
-        /* autoではなく数値を指定して消失を防ぐ */
-        object-fit: contain;
-        margin-right: 15px;
-        flex-shrink: 0;
-      }
-
-      /* --- 画像の引き延ばしを防止する設定 --- */
-      .header a {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-      }
-
-      .header a img {
-        margin-right: 0 !important;
-        width: 70px !important;
-        /* 幅を固定 */
-        height: auto !important;
-        /* 縦幅を自動計算にして比率を維持 */
-        aspect-ratio: 1 / 1;
-        /* 正方形の画像ならこれを入れるとより確実です */
-        object-fit: contain !important;
-        /* 枠内で比率を維持して収める */
-        flex-shrink: 0;
-        /* 圧縮を防止 */
-      }
-
-      .header h1 {
-        font-size: 1.4em !important;
-        line-height: 1.3;
-        margin: 5px 0;
-        width: 100%;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        /* 長いタイトルを改行させる */
-      }
-
-      .header h2 {
-        font-size: 0.9em !important;
-        line-height: 1.4;
-        padding: 0 15px;
-      }
     }
   </style>
 </head>
@@ -374,7 +328,7 @@
     </div>
     <div class="header">
       <a href="https://line-0707.github.io/Acts/measures.html">
-        <img src="https://line-0707.github.io/Acts/source/rus.ico" alt="Site Icon">
+        <img src="https://line-0707.github.io/Acts/source/fav3.ico" alt="Site Icon">
       </a>
       <div>
         <h1><a href="https://line-0707.github.io/Acts/measures.html" id="site-title"></a></h1>
@@ -382,7 +336,7 @@
       </div>
     </div>
     <div id="table-container">
-      <div class="loader">Загрузка данных из Google Таблиц...</div>
+      <div class="loader">Loading data from Google Sheet...</div>
     </div>
   </div>
 
@@ -391,28 +345,28 @@
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/1egsFu716o4qmAWyDIsHs4OJ3ODUXevzCCJ6CozgfD9Y/gviz/tq?tqx=out:csv&sheet=Лист1';
     const translations = {
       ru: {
-        title: 'Камоинформбюро Меры',
-        subtitle: 'Сводка опубликованных документов и ресурсов',
-        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'Оригиналы', thumbnail: 'プレビュー' },
-        status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Скрытый' },
+        title: 'Меры @Камоинформбюро',
+        subtitle: 'Публикация обзора серьезных инцидентов и аварий, которые произошли, и мер реагирования на них.',
+        headers: { date: 'дата', files: 'файлы', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'оригиналы', thumbnail: 'превью' },
+        status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Недоступно' },
         months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
         months_short: ['Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
         last_update_label: 'Обновлено:', org_tooltip: 'Открыть оригинал'
       },
       en: {
-        title: 'Kamoinformburo Measures',
-        subtitle: 'Summary of published documents and resources',
-        headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update', org: 'Originals', thumbnail: 'preview' },
-        status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Private' },
+        title: 'Measures @Kamoinformburo',
+        subtitle: 'Publication of an outline of serious incidents and accidents that have occurred and responses to them',
+        headers: { date: 'date', files: 'files', description: 'description', status: 'status', last_update: 'last update', org: 'originals', thumbnail: 'preview' },
+        status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Unavailable' },
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         last_update_label: 'Updated:', org_tooltip: 'Open original'
       },
       ja: {
-        title: 'Камоинформбюро 措置',
-        subtitle: '発生した重大インシデント及びアクシデントの概要及び適応した措置の公表',
+        title: '措置 @Камоинформбюро',
+        subtitle: '発生した重大インシデント及びアクシデントの概要並びにそれらへの対応の公表',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル', thumbnail: 'プレビュー' },
-        status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '非公開' },
+        status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '利用不可' },
         last_update_label: '更新日:', org_tooltip: 'オリジナルファイルを開く'
       }
     };
