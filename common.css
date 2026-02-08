@@ -1,7 +1,7 @@
 /* --- ライト/ダークモード用の変数定義 --- */
 :root {
   color-scheme: light dark;
-  --bg-color: #f4f4f9;
+  --bg-color: #f2f2f9;
   --text-color: #333;
   --text-color-subtle: #888;
   --card-bg-color: #fff;
