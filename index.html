@@ -14,6 +14,7 @@
     rel="stylesheet">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="common.css">
   <style>
     /* --- 全体設計と横スクロール防止 --- */
@@ -161,6 +162,109 @@
       flex-shrink: 0;
     }
 
+
+    :root {
+      --ticker-height: 35px;
+      --ticker-bg: #000000;
+    }
+
+    .ticker-wrapper {
+      width: 100%;
+      background-color: var(--ticker-bg) !important;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+
+    .ticker {
+      display: flex;
+      overflow: hidden;
+      height: var(--ticker-height);
+      line-height: var(--ticker-height);
+    }
+
+    .ticker__inner {
+      display: flex;
+      width: max-content;
+      /* 中身のサイズに合わせる */
+    }
+
+    .ticker__inner.is-scrolling .ticker__group {
+      animation: scroll-ticker var(--speed, 18s) linear infinite;
+    }
+
+
+
+    .ticker__group {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      padding-left: 100vw;
+      /* 通常（PC）の速度 */
+      animation: scroll-ticker var(--speed, 18s) linear infinite;
+    }
+
+    .ticker__inner span {
+      padding: 0 4rem;
+      font-weight: 700;
+      /* DotGothic16は通常400で綺麗に見えます */
+      font-family: 'DotGothic16', sans-serif;
+      /* ここを修正 */
+      font-size: 20px;
+      /* ドットをはっきりさせるため少し大きくするのもアリです */
+      letter-spacing: 0.05em;
+      /* わずかに広げると読みやすくなります */
+      white-space: nowrap;
+    }
+
+    /* マークダウンの太字（strong）もドットフォントで維持 */
+    .ticker__inner span strong {
+      font-weight: 900;
+      color: inherit;
+      /* 親のspanの色を引き継ぐ */
+    }
+
+    /* アニメーション：グループ1つ分（コンテンツ+100vwの余白）だけ左に動かす */
+    @keyframes scroll-ticker {
+      0% {
+        transform: translateX(0);
+      }
+
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    /* お知らせがない時の点滅アニメーション (3秒周期：2秒点灯 + 1秒消灯) */
+    @keyframes blink-ticker {
+
+      0%,
+      66.5% {
+        opacity: 1;
+      }
+
+      66.6%,
+      100% {
+        opacity: 0;
+      }
+    }
+
+    .ticker__inner.is-blinking {
+      justify-content: center;
+      width: 100%;
+      /* linearを指定することで、中間での補完（フェード）を防ぎます */
+      animation: blink-ticker 3s steps(1, end) infinite;
+    }
+
+    .ticker__inner.is-blinking .ticker__group {
+      padding-left: 0;
+      animation: none;
+    }
+
+    /* お知らせがある時のスクロール制御 */
+    .ticker__inner.is-scrolling .ticker__group {
+      animation: scroll-ticker var(--speed, 18s) linear infinite;
+    }
+
     /* --- モバイル版レイアウト (768px以下) --- */
     @media (max-width: 768px) {
 
@@ -306,6 +410,19 @@
       .td-thumbnail {
         display: none !important;
       }
+
+      .ticker-wrapper {
+        position: sticky;
+        top: 0;
+        z-index: 10000;
+        margin: 0;
+      }
+
+      .ticker__group {
+        /* PCの秒数に 0.4 を掛けて、移動時間を短く（＝速く）する */
+        animation-duration: calc(var(--speed, 18s) * 0.5);
+      }
+
     }
   </style>
 </head>
@@ -329,6 +446,13 @@
         <h2 id="site-subtitle"></h2>
       </div>
     </div>
+    <div id="led-ticker-container" class="ticker-wrapper">
+      <div class="ticker" role="marquee">
+        <div id="ticker-inner" class="ticker__inner">
+          <span>Loading...</span>
+        </div>
+      </div>
+    </div>
     <div id="table-container">
       <div class="loader">Loading data from Google Sheet...</div>
     </div>
@@ -336,7 +460,7 @@
 
   <script src="common.js"></script>
   <script>
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=Лист1';
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=index';
     const translations = {
       ru: {
         title: 'Информация @Камоинформбюро',
@@ -497,12 +621,96 @@
         tbody.appendChild(tr);
       }
       table.appendChild(thead); table.appendChild(tbody); container.appendChild(table);
+      updateLEDTicker(lang);
     }
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.lang-switcher button').forEach(b => b.addEventListener('click', () => { localStorage.setItem('lang', b.dataset.lang); renderPage(b.dataset.lang); }));
       fetchAndRender();
     });
     window.addEventListener('resize', () => renderPage(localStorage.getItem('lang') || 'ru'));
+
+    async function updateLEDTicker(langCode) {
+      const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/gviz/tq?tqx=out:csv&sheet=notice";
+      const tickerInner = document.getElementById('ticker-inner');
+      if (!tickerInner) return;
+
+      try {
+        const response = await fetch(sheetUrl);
+        const csvText = await response.text();
+        const rows = parseCSV(csvText); // index.html内の既存の関数を使用
+
+        if (!rows || rows.length === 0) {
+          tickerInner.innerHTML = ''; // データがない場合は何も出さない
+          return;
+        }
+
+        let speed = "18s";
+        const colorMapTable = { "default": "#bd5d3a" };
+
+        // --- 1. 設定スキャン（スピードとカラーリスト） ---
+        for (const row of rows) {
+          for (const cell of row) {
+            const val = (cell || "").trim();
+            const sMatch = val.match(/speed\[(\d+)\]/);
+            if (sMatch) speed = sMatch[1] + "s";
+            if (val.includes('=') && !val.includes(' ')) {
+              const [code, name] = val.split('=').map(s => s.trim());
+              if (code.match(/^[0-9a-fA-F]{6}$/) || code.startsWith('#')) {
+                colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
+              }
+            }
+          }
+        }
+        tickerInner.style.setProperty('--speed', speed);
+
+        // --- 2. メッセージ構築 ---
+        const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
+        const colMap = { ru: 0, en: 1, jp: 2, color: 3 };
+        const colIdx = colMap[targetLang];
+
+        const parseMarkdown = (txt) => {
+          return txt
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // **太字**
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')           // *斜体*
+            .replace(/__(.*?)__/g, '<u>$1</u>');            // __下線__
+        };
+
+        let items = [];
+        for (let i = 1; i < rows.length; i++) {
+          let text = (rows[i][colIdx] || "").trim();
+          if (!text) continue;
+
+          text = parseMarkdown(text);
+          const colorInput = (rows[i][colMap.color] || "").trim();
+          let finalColor = colorMapTable[colorInput] ||
+            (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
+
+          items.push(`<span style="color:${finalColor}">${text}</span>`);
+        }
+
+        // --- 3. 反映（スクロール vs 点滅 の切り替え） ---
+        if (items.length === 0) {
+          // お知らせがない場合：中央配置 ＋ 点滅（2秒表示1秒消え）
+          const emptyMsg = { ru: "Нет уведомлений.", en: "No notices.", jp: "お知らせはありません。" };
+          const content = `<span style="color:#bd5d3a">${emptyMsg[targetLang]}</span>`;
+
+          tickerInner.classList.remove('is-scrolling');
+          tickerInner.classList.add('is-blinking');
+          tickerInner.innerHTML = `<div class="ticker__group">${content}</div>`;
+        } else {
+          // お知らせがある場合：スクロール
+          const content = items.join('');
+
+          tickerInner.classList.remove('is-blinking');
+          tickerInner.classList.add('is-scrolling');
+          tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+        }
+
+      } catch (err) {
+        console.error("Ticker Error:", err);
+        tickerInner.innerHTML = ''; // エラー時も何も表示しない
+      }
+    }
   </script>
 </body>
 
