@@ -522,32 +522,46 @@
     };
 
     function fetchAndRender() {
-      fetch(sheetUrl).then(res => res.text()).then(csvText => {
-        fullData = parseCSV(csvText);
-        const firstRowRaw = fullData[0];
-        if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
-          const correctedHeaders = [], correctedFirstDataRow = [];
-          firstRowRaw.forEach(cellContent => {
-            const catIndex = cellContent.indexOf('cat[');
-            if (catIndex !== -1) { correctedHeaders.push(cellContent.substring(0, catIndex).trim()); correctedFirstDataRow.push(cellContent.substring(catIndex).trim()); }
-            else { const spaceIndex = cellContent.indexOf(' '); if (spaceIndex !== -1) { correctedHeaders.push(cellContent.substring(0, spaceIndex).trim()); correctedFirstDataRow.push(cellContent.substring(spaceIndex + 1).trim()); } else { correctedHeaders.push(cellContent.trim()); correctedFirstDataRow.push(''); } }
+        fetch(sheetUrl)
+          .then(res => res.text())
+          .then(csvText => {
+            fullData = parseCSV(csvText);
+            if (fullData.length === 0) return;
+
+            // ヘッダー行の取得とインデックス作成
+            const headers = fullData[0];
+            columnIndices = {};
+            headers.forEach((h, i) => {
+              columnIndices[normalizeHeader(h)] = i;
+            });
+
+            // YouTubeが含まれるかチェック
+            hasAnyYouTube = fullData.slice(1).some(row =>
+              row[columnIndices['link']] && getYouTubeId(row[columnIndices['link']])
+            );
+
+            // 表示する列の構成
+            visibleHeadersInfo = [];
+            let thumbInserted = false;
+            headers.forEach((header, index) => {
+              const norm = normalizeHeader(header);
+              // 説明の後にサムネイルを挿入（YouTubeがある場合）
+              if (norm === 'status' && hasAnyYouTube && !thumbInserted) {
+                visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+                thumbInserted = true;
+              }
+              if (!columnsToHide.has(norm)) {
+                visibleHeadersInfo.push({ header, index, isVirtual: false });
+              }
+              if (norm === 'description' && hasAnyYouTube && !thumbInserted) {
+                visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+                thumbInserted = true;
+              }
+            });
+
+            renderPage(localStorage.getItem('lang') || 'ru');
           });
-          fullData.shift(); fullData.unshift(correctedFirstDataRow); fullData.unshift(correctedHeaders);
-        }
-        const headers = fullData[0];
-        headers.forEach((h, i) => { columnIndices[normalizeHeader(h)] = i; });
-        hasAnyYouTube = fullData.some((row, i) => i > 0 && getYouTubeId(row[columnIndices['link']]));
-        visibleHeadersInfo = [];
-        let thumbInserted = false;
-        headers.forEach((header, index) => {
-          const norm = normalizeHeader(header);
-          if (norm === 'status' && hasAnyYouTube && !thumbInserted) { visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true }); thumbInserted = true; }
-          if (!columnsToHide.has(norm)) visibleHeadersInfo.push({ header, index, isVirtual: false });
-          if (norm === 'description' && hasAnyYouTube && !thumbInserted) { visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true }); thumbInserted = true; }
-        });
-        renderPage(localStorage.getItem('lang') || 'ru');
-      });
-    }
+      }
 
     function renderPage(lang) {
       document.getElementById('site-title').textContent = translations[lang].title;
