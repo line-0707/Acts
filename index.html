@@ -199,8 +199,8 @@
       align-items: center;
       flex-shrink: 0;
       padding-left: 100vw;
-      /* 通常（PC）の速度 */
-      animation: scroll-ticker var(--speed, 18s) linear infinite;
+      /* --calculated-speed は JS で計算して付与します */
+      animation: scroll-ticker var(--calculated-speed, 18s) linear infinite;
     }
 
     .ticker__inner span {
@@ -419,8 +419,8 @@
       }
 
       .ticker__group {
-        /* PCの秒数に 0.4 を掛けて、移動時間を短く（＝速く）する */
-        animation-duration: calc(var(--speed, 18s) * 0.5);
+        /* スマホの場合は、計算された秒数にさらに0.4を掛けて速くする */
+        animation-duration: calc(var(--calculated-speed, 18s) * 0.4) !important;
       }
 
     }
@@ -634,25 +634,24 @@
       const tickerInner = document.getElementById('ticker-inner');
       if (!tickerInner) return;
 
+      tickerInner.innerHTML = '';
+
       try {
         const response = await fetch(sheetUrl);
         const csvText = await response.text();
-        const rows = parseCSV(csvText); // index.html内の既存の関数を使用
+        const rows = parseCSV(csvText);
+        if (!rows || rows.length === 0) return;
 
-        if (!rows || rows.length === 0) {
-          tickerInner.innerHTML = ''; // データがない場合は何も出さない
-          return;
-        }
-
-        let speed = "18s";
+        // --- 1. 設定スキャン ---
+        let baseSpeedValue = 100; // デフォルトの秒速 (100px/s)
         const colorMapTable = { "default": "#bd5d3a" };
 
-        // --- 1. 設定スキャン（スピードとカラーリスト） ---
         for (const row of rows) {
           for (const cell of row) {
             const val = (cell || "").trim();
             const sMatch = val.match(/speed\[(\d+)\]/);
-            if (sMatch) speed = sMatch[1] + "s";
+            if (sMatch) baseSpeedValue = parseInt(sMatch[1]); // speed[100] なら秒速100pxと解釈
+
             if (val.includes('=') && !val.includes(' ')) {
               const [code, name] = val.split('=').map(s => s.trim());
               if (code.match(/^[0-9a-fA-F]{6}$/) || code.startsWith('#')) {
@@ -661,7 +660,6 @@
             }
           }
         }
-        tickerInner.style.setProperty('--speed', speed);
 
         // --- 2. メッセージ構築 ---
         const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
@@ -669,46 +667,42 @@
         const colIdx = colMap[targetLang];
 
         const parseMarkdown = (txt) => {
-          return txt
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // **太字**
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')           // *斜体*
-            .replace(/__(.*?)__/g, '<u>$1</u>');            // __下線__
+          return txt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/__(.*?)__/g, '<u>$1</u>');
         };
 
         let items = [];
         for (let i = 1; i < rows.length; i++) {
           let text = (rows[i][colIdx] || "").trim();
           if (!text) continue;
-
           text = parseMarkdown(text);
           const colorInput = (rows[i][colMap.color] || "").trim();
-          let finalColor = colorMapTable[colorInput] ||
-            (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
-
+          let finalColor = colorMapTable[colorInput] || (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
           items.push(`<span style="color:${finalColor}">${text}</span>`);
         }
 
-        // --- 3. 反映（スクロール vs 点滅 の切り替え） ---
+        // --- 3. 反映と速度の絶対値計算 ---
         if (items.length === 0) {
-          // お知らせがない場合：中央配置 ＋ 点滅（2秒表示1秒消え）
           const emptyMsg = { ru: "Нет уведомлений.", en: "No notices.", jp: "お知らせはありません。" };
-          const content = `<span style="color:#bd5d3a">${emptyMsg[targetLang]}</span>`;
-
-          tickerInner.classList.remove('is-scrolling');
-          tickerInner.classList.add('is-blinking');
-          tickerInner.innerHTML = `<div class="ticker__group">${content}</div>`;
+          tickerInner.classList.replace('is-scrolling', 'is-blinking') || tickerInner.classList.add('is-blinking');
+          tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${emptyMsg[targetLang]}</span></div>`;
         } else {
-          // お知らせがある場合：スクロール
           const content = items.join('');
-
-          tickerInner.classList.remove('is-blinking');
-          tickerInner.classList.add('is-scrolling');
+          tickerInner.classList.replace('is-blinking', 'is-scrolling') || tickerInner.classList.add('is-scrolling');
           tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+
+          // ここで絶対値を計算
+          const group = tickerInner.querySelector('.ticker__group');
+          const totalDistance = group.offsetWidth; // 100vw + コンテンツの幅(px)
+
+          // 秒数 = 距離 / 速さ
+          const calculatedDuration = totalDistance / baseSpeedValue;
+          tickerInner.style.setProperty('--calculated-speed', `${calculatedDuration}s`);
         }
 
       } catch (err) {
         console.error("Ticker Error:", err);
-        tickerInner.innerHTML = ''; // エラー時も何も表示しない
       }
     }
   </script>
