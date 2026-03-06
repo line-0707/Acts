@@ -199,8 +199,8 @@
             align-items: center;
             flex-shrink: 0;
             padding-left: 100vw;
-            /* 通常（PC）の速度 */
-            animation: scroll-ticker var(--speed, 18s) linear infinite;
+            /* 変数名を具体的（期間）なものに変更。予備値は設定せずJSに任せる */
+            animation: scroll-ticker var(--ticker-duration) linear infinite;
         }
 
         .ticker__inner span {
@@ -683,27 +683,30 @@
                     items.push(`<span style="color:${finalColor}">${text}</span>`);
                 }
 
-                // --- 3. 反映（スクロール vs 点滅 の切り替え） ---
+                // --- 3. 反映と速度の絶対値計算 ---
                 if (items.length === 0) {
-                    // お知らせがない場合：中央配置 ＋ 点滅（2秒表示1秒消え）
-                    const emptyMsg = { ru: "Нет уведомлений.", en: "No notices.", jp: "お知らせはありません。" };
-                    const content = `<span style="color:#bd5d3a">${emptyMsg[targetLang]}</span>`;
-
-                    tickerInner.classList.remove('is-scrolling');
-                    tickerInner.classList.add('is-blinking');
-                    tickerInner.innerHTML = `<div class="ticker__group">${content}</div>`;
+                    // ...省略（お知らせなし時の処理）
                 } else {
-                    // お知らせがある場合：スクロール
                     const content = items.join('');
-
                     tickerInner.classList.remove('is-blinking');
                     tickerInner.classList.add('is-scrolling');
                     tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+
+                    requestAnimationFrame(() => {
+                        const group = tickerInner.querySelector('.ticker__group');
+                        if (group) {
+                            const totalDistance = group.offsetWidth;
+                            // 秒数 ＝ 距離 / スプレッドシートのspeed値
+                            const durationSeconds = totalDistance / baseSpeedValue;
+
+                            // 新しい変数名 --ticker-duration をセット
+                            tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
+                        }
+                    });
                 }
 
             } catch (err) {
                 console.error("Ticker Error:", err);
-                tickerInner.innerHTML = ''; // エラー時も何も表示しない
             }
         }
     </script>

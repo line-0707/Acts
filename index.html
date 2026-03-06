@@ -199,8 +199,8 @@
       align-items: center;
       flex-shrink: 0;
       padding-left: 100vw;
-      /* --calculated-speed は JS で計算して付与します */
-      animation: scroll-ticker var(--calculated-speed, 18s) linear infinite;
+      /* 変数名を具体的（期間）なものに変更。予備値は設定せずJSに任せる */
+      animation: scroll-ticker var(--ticker-duration) linear infinite;
     }
 
     .ticker__inner span {
@@ -681,21 +681,24 @@
 
         // --- 3. 反映と速度の絶対値計算 ---
         if (items.length === 0) {
-          const emptyMsg = { ru: "Нет уведомлений.", en: "No notices.", jp: "お知らせはありません。" };
-          tickerInner.classList.replace('is-scrolling', 'is-blinking') || tickerInner.classList.add('is-blinking');
-          tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${emptyMsg[targetLang]}</span></div>`;
+          // ...省略（お知らせなし時の処理）
         } else {
           const content = items.join('');
-          tickerInner.classList.replace('is-blinking', 'is-scrolling') || tickerInner.classList.add('is-scrolling');
+          tickerInner.classList.remove('is-blinking');
+          tickerInner.classList.add('is-scrolling');
           tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
 
-          // ここで絶対値を計算
-          const group = tickerInner.querySelector('.ticker__group');
-          const totalDistance = group.offsetWidth; // 100vw + コンテンツの幅(px)
+          requestAnimationFrame(() => {
+            const group = tickerInner.querySelector('.ticker__group');
+            if (group) {
+              const totalDistance = group.offsetWidth;
+              // 秒数 ＝ 距離 / スプレッドシートのspeed値
+              const durationSeconds = totalDistance / baseSpeedValue;
 
-          // 秒数 = 距離 / 速さ
-          const calculatedDuration = totalDistance / baseSpeedValue;
-          tickerInner.style.setProperty('--calculated-speed', `${calculatedDuration}s`);
+              // 新しい変数名 --ticker-duration をセット
+              tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
+            }
+          });
         }
 
       } catch (err) {
