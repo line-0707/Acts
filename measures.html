@@ -695,11 +695,15 @@
           requestAnimationFrame(() => {
             const group = tickerInner.querySelector('.ticker__group');
             if (group) {
-              const totalDistance = group.offsetWidth;
+              // 1. コンテンツ自体の幅を取得（padding-leftを除いた正味の幅）
+              const contentWidth = group.scrollWidth - window.innerWidth;
+              // 2. 実際に移動する総距離 ＝ 画面幅(100vw) ＋ コンテンツ幅
+              const totalDistance = window.innerWidth + contentWidth;
+
               // 秒数 ＝ 距離 / スプレッドシートのspeed値
+              // これにより、speed[100]なら「1秒間に100px進む」という直感的な設定になります
               const durationSeconds = totalDistance / baseSpeedValue;
 
-              // 新しい変数名 --ticker-duration をセット
               tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
             }
           });
