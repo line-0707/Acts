@@ -185,45 +185,52 @@
     .ticker__inner {
       display: flex;
       width: max-content;
-      /* 中身のサイズに合わせる */
     }
 
-    .ticker__inner.is-scrolling .ticker__group {
-      animation: scroll-ticker var(--speed, 18s) linear infinite;
-    }
-
-
-
+    /* --- グループの基本設定 (常に余白を含めておく) --- */
     .ticker__group {
       display: flex;
       align-items: center;
       flex-shrink: 0;
       padding-left: 100vw;
-      /* 変数名を具体的（期間）なものに変更。予備値は設定せずJSに任せる */
-      animation: scroll-ticker var(--ticker-duration) linear infinite;
+      /* ここを常に有効にする */
+      will-change: transform;
     }
 
+    /* --- スクロール制御 (アニメーションだけをONにする) --- */
+    .ticker__inner.is-scrolling .ticker__group {
+      animation: scroll-ticker var(--ticker-duration, 20s) linear infinite;
+    }
+
+    /* --- 点滅制御 (お知らせがない時) --- */
+    .ticker__inner.is-blinking {
+      justify-content: center;
+      width: 100%;
+      animation: blink-ticker 3s steps(1, end) infinite;
+    }
+
+    .ticker__inner.is-blinking .ticker__group {
+      padding-left: 0;
+      /* 点滅時は中央に寄せるため余白を消す */
+      animation: none;
+    }
+
+    /* --- テキスト装飾 --- */
     .ticker__inner span {
       padding: 0 4rem;
       font-weight: 700;
-      /* DotGothic16は通常400で綺麗に見えます */
       font-family: 'DotGothic16', sans-serif;
-      /* ここを修正 */
       font-size: 20px;
-      /* ドットをはっきりさせるため少し大きくするのもアリです */
       letter-spacing: 0.05em;
-      /* わずかに広げると読みやすくなります */
       white-space: nowrap;
     }
 
-    /* マークダウンの太字（strong）もドットフォントで維持 */
     .ticker__inner span strong {
       font-weight: 900;
       color: inherit;
-      /* 親のspanの色を引き継ぐ */
     }
 
-    /* アニメーション：グループ1つ分（コンテンツ+100vwの余白）だけ左に動かす */
+    /* --- アニメーション定義 --- */
     @keyframes scroll-ticker {
       0% {
         transform: translateX(0);
@@ -234,7 +241,6 @@
       }
     }
 
-    /* お知らせがない時の点滅アニメーション (3秒周期：2秒点灯 + 1秒消灯) */
     @keyframes blink-ticker {
 
       0%,
@@ -246,23 +252,6 @@
       100% {
         opacity: 0;
       }
-    }
-
-    .ticker__inner.is-blinking {
-      justify-content: center;
-      width: 100%;
-      /* linearを指定することで、中間での補完（フェード）を防ぎます */
-      animation: blink-ticker 3s steps(1, end) infinite;
-    }
-
-    .ticker__inner.is-blinking .ticker__group {
-      padding-left: 0;
-      animation: none;
-    }
-
-    /* お知らせがある時のスクロール制御 */
-    .ticker__inner.is-scrolling .ticker__group {
-      animation: scroll-ticker var(--speed, 18s) linear infinite;
     }
 
     /* --- モバイル版レイアウト (768px以下) --- */
@@ -631,80 +620,68 @@
       const tickerInner = document.getElementById('ticker-inner');
       if (!tickerInner) return;
 
+      // 完全にリセット
+      tickerInner.classList.remove('is-scrolling', 'is-blinking');
       tickerInner.innerHTML = '';
 
       try {
         const response = await fetch(sheetUrl);
         const csvText = await response.text();
         const rows = parseCSV(csvText);
-        if (!rows || rows.length === 0) return;
 
-        // --- 1. 設定スキャン ---
-        let baseSpeedValue = 100; // デフォルトの秒速 (100px/s)
+        let baseSpeed = 100;
         const colorMapTable = { "default": "#bd5d3a" };
 
         for (const row of rows) {
           for (const cell of row) {
             const val = (cell || "").trim();
             const sMatch = val.match(/speed\[(\d+)\]/);
-            if (sMatch) baseSpeedValue = parseInt(sMatch[1]); // speed[100] なら秒速100pxと解釈
-
+            if (sMatch) baseSpeed = parseInt(sMatch[1]);
             if (val.includes('=') && !val.includes(' ')) {
               const [code, name] = val.split('=').map(s => s.trim());
-              if (code.match(/^[0-9a-fA-F]{6}$/) || code.startsWith('#')) {
-                colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
-              }
+              colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
             }
           }
         }
 
-        // --- 2. メッセージ構築 ---
         const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
-        const colMap = { ru: 0, en: 1, jp: 2, color: 3 };
-        const colIdx = colMap[targetLang];
-
-        const parseMarkdown = (txt) => {
-          return txt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/__(.*?)__/g, '<u>$1</u>');
-        };
+        const colIdx = { ru: 0, en: 1, jp: 2 }[targetLang];
 
         let items = [];
         for (let i = 1; i < rows.length; i++) {
           let text = (rows[i][colIdx] || "").trim();
           if (!text) continue;
-          text = parseMarkdown(text);
-          const colorInput = (rows[i][colMap.color] || "").trim();
+          const colorInput = (rows[i][3] || "").trim();
           let finalColor = colorMapTable[colorInput] || (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
+          text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
           items.push(`<span style="color:${finalColor}">${text}</span>`);
         }
 
-        // --- 3. 反映と速度の絶対値計算 ---
         if (items.length === 0) {
-          // ...省略（お知らせなし時の処理）
+          tickerInner.innerHTML = `<div class="ticker__group"><span>СИСТЕМА ГОТОВА</span></div>`;
+          tickerInner.classList.add('is-blinking');
         } else {
           const content = items.join('');
-          tickerInner.classList.remove('is-blinking');
-          tickerInner.classList.add('is-scrolling');
           tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
 
+          // フォント読み込みを待つ
+          await document.fonts.ready;
+
+          // 描画が確定するのを待ってから計測
           requestAnimationFrame(() => {
             const group = tickerInner.querySelector('.ticker__group');
             if (group) {
-              // 1. コンテンツ自体の幅を取得（padding-leftを除いた正味の幅）
-              const contentWidth = group.scrollWidth - window.innerWidth;
-              // 2. 実際に移動する総距離 ＝ 画面幅(100vw) ＋ コンテンツ幅
-              const totalDistance = window.innerWidth + contentWidth;
+              // これで「100vw ＋ 文字幅」の合計距離が正確に取れる
+              const totalDistance = group.getBoundingClientRect().width;
 
-              // 秒数 ＝ 距離 / スプレッドシートのspeed値
-              // これにより、speed[100]なら「1秒間に100px進む」という直感的な設定になります
-              const durationSeconds = totalDistance / baseSpeedValue;
+              // 時間 ＝ 距離 ÷ 速度
+              const durationSeconds = totalDistance / Math.max(baseSpeed, 1);
 
               tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
+              tickerInner.classList.add('is-scrolling');
             }
           });
         }
-
       } catch (err) {
         console.error("Ticker Error:", err);
       }
