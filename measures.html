@@ -444,7 +444,7 @@
 
   <script src="common.js"></script>
   <script>
-    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&sheet=measures';
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1066748930';
     const translations = {
       ru: {
         title: 'Меры @Камоинформбюро',
@@ -614,7 +614,7 @@
     window.addEventListener('resize', () => renderPage(localStorage.getItem('lang') || 'ru'));
 
     async function updateLEDTicker(langCode) {
-      const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&sheet=notice";
+      const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1347522952";
       const tickerInner = document.getElementById('ticker-inner');
       if (!tickerInner) return;
 
