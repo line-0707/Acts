@@ -305,6 +305,7 @@
         background-color: var(--category-bg-color);
         color: white;
         font-weight: bold;
+        /* カテゴリーは太字を維持 */
         padding: 10px 15px;
         border-radius: 8px;
         text-align: center;
@@ -352,7 +353,8 @@
       /* ファイル名とバッジの衝突回避 (Floatロジック) */
       .td-files {
         display: block;
-        font-weight: bold;
+        font-weight: normal;
+        /* 太字を解除 */
         font-size: 1.1em;
         line-height: 1.6;
         padding: 0 !important;
