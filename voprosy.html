@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="darkreader-lock">
+    <title>ЧаВо | Камоинформбюро</title>
+    <link rel="icon" type="image/x-icon" href="https://line-0707.github.io/Kamoinformbyuro/source/fav1.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="common.css">
+    <style>
+        #led-ticker-container {
+            display: none;
+        }
+
+        /* --- 全体設計と横スクロール防止 --- */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* PC版：表全体のコンテナ設定（ここで角丸と枠線を定義） */
+        #table-container {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg-color);
+            overflow: hidden;
+            /* 角丸からはみ出す中身をカット */
+            width: 100%;
+        }
+
+        table,
+        thead,
+        tbody {
+            display: block;
+            width: 100%;
+        }
+
+        tr {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            word-break: break-word;
+            min-width: 0;
+        }
+
+        /* --- PC版：列幅の定義 --- */
+        .th-files,
+        .td-files {
+            flex: 1 1 0%;
+        }
+
+        .th-description,
+        .td-description {
+            flex: 0 0 22%;
+        }
+
+        .th-date,
+        .td-date {
+            flex: 0 0 13%;
+        }
+
+        .th-status,
+        .td-status {
+            flex: 0 0 12.5%;
+        }
+
+        .th-last_update,
+        .td-last_update {
+            flex: 0 0 20%;
+            order: 99;
+        }
+
+        .th-org,
+        .td-org {
+            flex: 0 0 10%;
+            order: 100;
+            justify-content: center;
+        }
+
+        /* PC版サムネイル設定 */
+        .th-thumbnail,
+        .td-thumbnail {
+            flex: 0 0 180px;
+            justify-content: center !important;
+            padding: 12px 0 !important;
+            text-align: center;
+        }
+
+        .thumb-wrapper {
+            width: 160px;
+            height: 90px;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thumb-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        thead th {
+            background-color: var(--header-bg-color);
+            color: white;
+            font-weight: bold;
+            border-bottom: none;
+        }
+
+        tbody tr:nth-child(even):not(.category-row) {
+            background-color: var(--even-row-bg-color);
+        }
+
+        tbody tr:hover:not(.category-row) {
+            background-color: var(--hover-bg-color);
+        }
+
+        /* PC版カテゴリー行：左寄せ */
+        .category-row td {
+            background-color: var(--category-bg-color);
+            color: white;
+            font-weight: bold;
+            width: 100% !important;
+            flex: 1 0 100%;
+            justify-content: flex-start;
+            padding-left: 15px;
+        }
+
+        /* PC版のヘッダー画像設定 */
+        .header img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+
+        :root {
+            --ticker-height: 35px;
+            --ticker-bg: #000000;
+        }
+
+        .ticker-wrapper {
+            width: 100%;
+            background-color: var(--ticker-bg) !important;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .ticker {
+            display: flex;
+            overflow: hidden;
+            height: var(--ticker-height);
+            line-height: var(--ticker-height);
+        }
+
+        .ticker__inner {
+            display: flex;
+            width: max-content;
+        }
+
+        /* --- グループの基本設定 (常に余白を含めておく) --- */
+        .ticker__group {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            padding-left: 100vw;
+            /* ここを常に有効にする */
+            will-change: transform;
+        }
+
+        /* --- スクロール制御 (アニメーションだけをONにする) --- */
+        .ticker__inner.is-scrolling .ticker__group {
+            animation: scroll-ticker var(--ticker-duration, 20s) linear infinite;
+        }
+
+        /* --- 点滅制御 (お知らせがない時) --- */
+        .ticker__inner.is-blinking {
+            justify-content: center;
+            width: 100%;
+            animation: blink-ticker 3s steps(1, end) infinite;
+        }
+
+        .ticker__inner.is-blinking .ticker__group {
+            padding-left: 0;
+            /* 点滅時は中央に寄せるため余白を消す */
+            animation: none;
+        }
+
+        /* --- テキスト装飾 --- */
+        .ticker__inner span {
+            padding: 0 4rem;
+            font-weight: 700;
+            font-family: 'DotGothic16', sans-serif;
+            font-size: 20px;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .ticker__inner span strong {
+            font-weight: 900;
+            color: inherit;
+        }
+
+        /* --- アニメーション定義 --- */
+        @keyframes scroll-ticker {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        @keyframes blink-ticker {
+
+            0%,
+            66.5% {
+                opacity: 1;
+            }
+
+            66.6%,
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* --- モバイル版レイアウト (768px以下) --- */
+        @media (max-width: 768px) {
+
+            /* モバイルではコンテナの枠線を消し、背景を透明にして「島」を目立たせる */
+            #table-container {
+                background-color: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+                overflow: visible !important;
+                /* カードの影が見えるようにする */
+            }
+
+            table,
+            thead,
+            tbody,
+            tr,
+            td {
+                display: block;
+                border: none !important;
+                width: 100% !important;
+            }
+
+            thead {
+                display: none;
+            }
+
+            /* AI Studio風 カテゴリー行 (アイランド形式) */
+            tr.category-row {
+                background-color: transparent !important;
+                margin: 15px 0 6px 0;
+                padding: 0;
+            }
+
+            tr.category-row td {
+                background-color: var(--category-bg-color);
+                color: white;
+                font-weight: bold;
+                padding: 10px 15px;
+                border-radius: 8px;
+                text-align: center;
+                justify-content: center;
+                display: block;
+                width: 100% !important;
+            }
+
+            /* データカード */
+            tr.data-row {
+                position: relative;
+                background-color: var(--card-bg-color);
+                border-radius: 12px;
+                margin-bottom: 10px;
+                padding: 15px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                overflow: hidden;
+            }
+
+            /* モバイルサムネイル：カード上部密着 */
+            .mobile-thumb {
+                width: calc(100% + 30px);
+                margin: -15px -15px 15px -15px;
+                aspect-ratio: 16 / 9;
+                background: #000;
+            }
+
+            .mobile-thumb a {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+
+            .mobile-thumb img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            /* ファイル名とバッジの衝突回避 (Floatロジック) */
+            .td-files {
+                display: block;
+                font-weight: bold;
+                font-size: 1.1em;
+                line-height: 1.6;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            /* バッジ */
+            .mobile-status {
+                font-size: 0.75em;
+                font-weight: bold;
+                padding: 4px 12px;
+                border-radius: 20px;
+                white-space: nowrap;
+                display: inline-flex;
+            }
+
+            /* YouTubeなし時はFloatで避ける */
+            tr.data-row:not(.yt-layout) .mobile-status {
+                float: right;
+                margin-left: 12px;
+                margin-bottom: 4px;
+            }
+
+            /* YouTubeあり時は画像の上にAbsolute */
+            tr.yt-layout .mobile-status {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                z-index: 10;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            }
+
+            /* メタ情報 */
+            .mobile-meta-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 15px;
+                border-top: none !important;
+                clear: both;
+            }
+
+            .td-last_update {
+                color: var(--text-color-subtle);
+                font-size: 0.85em;
+                white-space: nowrap !important;
+                padding: 0 !important;
+                flex: 0 1 auto;
+            }
+
+            .td-org {
+                padding: 0 !important;
+                display: flex;
+                flex: 0 0 auto;
+            }
+
+            /* 不要列非表示 */
+            .td-date,
+            .td-description,
+            .td-status,
+            .td-thumbnail {
+                display: none !important;
+            }
+
+            .ticker-wrapper {
+                position: sticky;
+                top: 0;
+                z-index: 10000;
+                margin: 0;
+            }
+
+
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content-wrapper">
+        <div class="top-controls">
+            <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
+            <div class="lang-switcher">
+                <button data-lang="ru" class="control-button active">RU</button>
+                <button data-lang="en" class="control-button">EN</button>
+                <button data-lang="ja" class="control-button">JP</button>
+            </div>
+        </div>
+        <div class="header">
+            <a href="https://line-0707.github.io/Kamoinformbyuro/voprosy.html">
+                <img src="https://line-0707.github.io/Kamoinformbyuro/source/sov.webp" alt="Site Icon">
+            </a>
+            <div>
+                <h1><a href="https://line-0707.github.io/Kamoinformbyuro/voprosy.html" id="site-title"></a></h1>
+                <h2 id="site-subtitle"></h2>
+            </div>
+        </div>
+        <div id="led-ticker-container" class="ticker-wrapper">
+            <div class="ticker" role="marquee">
+                <div id="ticker-inner" class="ticker__inner">
+                    <span>Loading...</span>
+                </div>
+            </div>
+        </div>
+        <div id="table-container">
+            <div class="loader">Loading data from Google Sheet...</div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1224757449';
+        const translations = {
+            ru: {
+                title: 'Часто задаваемые вопросы @Камоинформбюро',
+                subtitle: '',
+                headers: { date: 'дата', files: 'Название товара', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'оригиналы', thumbnail: 'превью' },
+                status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Недоступно' },
+                months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+                months_short: ['Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                last_update_label: 'Обновлено:', org_tooltip: 'Открыть оригинал'
+            },
+            en: {
+                title: 'Frequently Asked Questions @Kamoinformburo',
+                subtitle: '',
+                headers: { date: 'date', files: 'Item Names', description: 'description', status: 'status', last_update: 'last update', org: 'оriginals', thumbnail: 'preview' },
+                status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Unavailable' },
+                months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                last_update_label: 'Updated:', org_tooltip: 'Open original'
+            },
+            ja: {
+                title: 'Q&A集 @Камоинформбюро',
+                subtitle: 'よくある質問とそれに対する回答',
+                headers: { date: '日付', files: '項目名', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル', thumbnail: 'プレビュー' },
+                status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '利用不可' },
+                last_update_label: '更新日:', org_tooltip: 'オリジナルファイルを開く'
+            }
+        };
+
+        let fullData = [];
+        let columnIndices = {};
+        let visibleHeadersInfo = [];
+        let hasAnyYouTube = false;
+        const columnsToHide = new Set(['en', 'jp', 'link', 'desc_en', 'desc_ja']);
+
+        function parseCSV(csvText) { const lines = csvText.replace(/\r\n/g, '\n').split('\n'); return lines.map(line => { const r = []; let c = '', i = !1; for (let t = 0; t < line.length; t++) { const e = line[t]; if ('"' === e && i) { t + 1 < line.length && '"' === line[t + 1] ? (c += '"', t++) : i = !1 } else '"' === e && !i ? i = !0 : ',' === e && !i ? (r.push(c), c = '') : c += e } return r.push(c), r }) };
+        function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); };
+        function getYouTubeId(url) { if (!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
+
+        function formatDate(dateString, lang, useShort = false) {
+            if (!dateString || typeof dateString !== 'string') return dateString;
+            const matchYMD = dateString.match(/^(\d{4})(\d{2})(\d{2})(\d{2})?(\d{2})?(\d{2})?/);
+            if (matchYMD) {
+                const year = matchYMD[1], month = matchYMD[2], day = matchYMD[3], hour = matchYMD[4], min = matchYMD[5], sec = matchYMD[6];
+                const hasTime = hour && min && sec;
+                const monthIndex = parseInt(month) - 1;
+                const monthArray = useShort ? translations[lang].months_short : (translations[lang].months || translations.en.months);
+                if (lang === 'ru') return `${parseInt(day)} ${monthArray[monthIndex]} ${year}г.${hasTime ? ` ${hour}:${min}:${sec}` : ''}`;
+                if (lang === 'en') return `${monthArray[monthIndex]} ${parseInt(day)}, ${year}${hasTime ? ` ${hour}:${min}:${sec}` : ''}`;
+                if (lang === 'ja') return `${year}年${parseInt(month)}月${parseInt(day)}日${hasTime ? ` ${hour}時${min}分${sec}秒` : ''}`;
+                return `${year}/${month}/${day}${hasTime ? ` ${hour}:${min}:${sec}` : ''}`;
+            }
+            return dateString;
+        }
+
+        function getStatusConfig(statusCode, lang, isDarkMode) {
+            const colors = { g: { l: '#d1fae5', d: '#065f46', b: '#16a34a' }, ex: { l: '#fecaca', d: '#991b1b', b: '#dc2626' }, e: { l: '#fef9c3', d: '#92400e', b: '#f59e0b' }, b: { l: '#e5e7eb', d: '#374151', b: '#6b7280' } }[statusCode];
+            if (!colors) return null;
+            return { text: translations[lang].status_text[statusCode], bgColor: isDarkMode ? colors.d : colors.l, color: isDarkMode ? colors.l : colors.d, bulletColor: colors.b };
+        };
+
+        function fetchAndRender() {
+            fetch(sheetUrl).then(res => res.text()).then(csvText => {
+                fullData = parseCSV(csvText);
+                const firstRowRaw = fullData[0];
+                if (firstRowRaw.length > 0 && firstRowRaw.some(cell => cell.includes('cat['))) {
+                    const correctedHeaders = [], correctedFirstDataRow = [];
+                    firstRowRaw.forEach(cellContent => {
+                        const catIndex = cellContent.indexOf('cat[');
+                        if (catIndex !== -1) { correctedHeaders.push(cellContent.substring(0, catIndex).trim()); correctedFirstDataRow.push(cellContent.substring(catIndex).trim()); }
+                        else { const spaceIndex = cellContent.indexOf(' '); if (spaceIndex !== -1) { correctedHeaders.push(cellContent.substring(0, spaceIndex).trim()); correctedFirstDataRow.push(cellContent.substring(spaceIndex + 1).trim()); } else { correctedHeaders.push(cellContent.trim()); correctedFirstDataRow.push(''); } }
+                    });
+                    fullData.shift(); fullData.unshift(correctedFirstDataRow); fullData.unshift(correctedHeaders);
+                }
+                const headers = fullData[0];
+                headers.forEach((h, i) => { columnIndices[normalizeHeader(h)] = i; });
+                hasAnyYouTube = fullData.some((row, i) => i > 0 && getYouTubeId(row[columnIndices['link']]));
+                visibleHeadersInfo = [];
+                let thumbInserted = false;
+                headers.forEach((header, index) => {
+                    const norm = normalizeHeader(header);
+                    if (norm === 'status' && hasAnyYouTube && !thumbInserted) { visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true }); thumbInserted = true; }
+                    if (!columnsToHide.has(norm)) visibleHeadersInfo.push({ header, index, isVirtual: false });
+                    if (norm === 'description' && hasAnyYouTube && !thumbInserted) { visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true }); thumbInserted = true; }
+                });
+                renderPage(localStorage.getItem('lang') || 'ru');
+            });
+        }
+
+        function renderPage(lang) {
+            document.getElementById('site-title').textContent = translations[lang].title;
+            document.getElementById('site-subtitle').textContent = translations[lang].subtitle;
+            document.documentElement.lang = lang;
+            const isMobile = window.innerWidth <= 768, isDarkMode = document.body.classList.contains('dark-mode');
+            document.querySelectorAll('.lang-switcher button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+            const container = document.getElementById('table-container');
+            container.innerHTML = '';
+            if (hasAnyYouTube) container.classList.add('has-yt'); else container.classList.remove('has-yt');
+            const table = document.createElement('table'), thead = document.createElement('thead'), tbody = document.createElement('tbody');
+            const headerRow = document.createElement('tr');
+            visibleHeadersInfo.forEach(({ header }) => {
+                const th = document.createElement('th'), norm = normalizeHeader(header);
+                th.className = 'th-' + norm; th.textContent = translations[lang].headers[norm] || header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            for (let i = 1; i < fullData.length; i++) {
+                const row = fullData[i]; if (row.length <= 1 && !(row[0] || '').trim()) continue;
+                let fText = (row[columnIndices['files']] || '').trim();
+                if (lang === 'en' && row[columnIndices['en']]) fText = row[columnIndices['en']].trim();
+                else if (lang === 'ja' && row[columnIndices['jp']]) fText = row[columnIndices['jp']].trim();
+                const tr = document.createElement('tr');
+                if (fText.includes('cat[')) {
+                    tr.className = 'category-row'; const td = document.createElement('td'); td.className = 'category-cell';
+                    td.textContent = fText.match(/\[(.*?)\]/) ? fText.match(/\[(.*?)\]/)[1] : fText.replace(/cat\[|\]/g, '');
+                    tr.appendChild(td);
+                } else {
+                    tr.className = 'data-row'; const link = (row[columnIndices['link']] || '').trim(), ytId = getYouTubeId(link);
+                    const status = getStatusConfig((row[columnIndices['status']] || '').trim().toLowerCase(), lang, isDarkMode);
+                    if (isMobile) {
+                        if (ytId) {
+                            tr.classList.add('yt-layout'); const thumb = document.createElement('div'); thumb.className = 'mobile-thumb';
+                            const aT = document.createElement('a'); aT.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link;
+                            aT.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg">`; thumb.appendChild(aT); tr.appendChild(thumb);
+                        }
+                        const fTd = document.createElement('td'); fTd.className = 'td-files';
+                        if (status) {
+                            const sS = document.createElement('span'); sS.className = 'mobile-status'; sS.style.backgroundColor = status.bgColor; sS.style.color = status.color;
+                            sS.innerHTML = `<span style="color:${status.bulletColor}">●</span> ${status.text}`; fTd.appendChild(sS);
+                        }
+                        const aF = document.createElement('a'); aF.textContent = fText; aF.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link;
+                        fTd.appendChild(aF); tr.appendChild(fTd);
+                        const mR = document.createElement('div'); mR.className = 'mobile-meta-row';
+                        const upd = formatDate((row[columnIndices['last_update']] || '').trim(), lang, true);
+                        mR.innerHTML = `<div class="td-last_update">${upd ? translations[lang].last_update_label + ' ' + upd : ''}</div>`;
+                        const org = (row[columnIndices['org']] || '').trim();
+                        if (org) mR.innerHTML += `<div class="td-org"><a href="${org}" target="_blank"><span class="material-symbols-outlined">file_open</span></a></div>`;
+                        tr.appendChild(mR);
+                    } else {
+                        visibleHeadersInfo.forEach(({ header, index, isVirtual }) => {
+                            const td = document.createElement('td'); const norm = normalizeHeader(header); td.className = 'td-' + norm;
+                            if (isVirtual && norm === 'thumbnail') {
+                                if (ytId) { const aT = document.createElement('a'); aT.href = link; aT.target = "_blank"; aT.innerHTML = `<div class="thumb-wrapper"><img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" class="thumb-img"></div>`; td.appendChild(aT); }
+                                else { td.textContent = '—'; }
+                            } else if (norm === 'files') {
+                                const a = document.createElement('a'); a.textContent = fText; a.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link; td.appendChild(a);
+                            } else if (norm === 'description') {
+                                let d = (row[columnIndices['description']] || '').trim(); if (lang === 'en' && row[columnIndices['desc_en']]) d = row[columnIndices['desc_en']].trim(); else if (lang === 'ja' && row[columnIndices['desc_ja']]) d = row[columnIndices['desc_ja']].trim(); td.textContent = d;
+                            } else if (norm === 'status') {
+                                if (status) { td.style.backgroundColor = status.bgColor; td.style.color = status.color; td.innerHTML = `<span style="color:${status.bulletColor}">● </span><b>${status.text}</b>`; }
+                                else { td.textContent = (row[index] || '').trim(); }
+                            } else if (norm === 'org') {
+                                const url = (row[index] || '').trim(); td.innerHTML = url ? `<a href="${url}" target="_blank"><span class="material-symbols-outlined">file_open</span></a>` : '—';
+                            } else { td.textContent = formatDate((row[index] || '').trim(), lang, false); }
+                            tr.appendChild(td);
+                        });
+                    }
+                }
+                tbody.appendChild(tr);
+            }
+            table.appendChild(thead); table.appendChild(tbody); container.appendChild(table);
+            updateLEDTicker(lang);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.lang-switcher button').forEach(b => b.addEventListener('click', () => { localStorage.setItem('lang', b.dataset.lang); renderPage(b.dataset.lang); }));
+            fetchAndRender();
+        });
+        window.addEventListener('resize', () => renderPage(localStorage.getItem('lang') || 'ru'));
+
+        async function updateLEDTicker(langCode) {
+            const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1347522952";
+            const tickerInner = document.getElementById('ticker-inner');
+            if (!tickerInner) return;
+
+            // 完全にリセット
+            tickerInner.classList.remove('is-scrolling', 'is-blinking');
+            tickerInner.innerHTML = '';
+
+            try {
+                const response = await fetch(sheetUrl);
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+
+                let baseSpeed = 100;
+                const colorMapTable = { "default": "#bd5d3a" };
+
+                for (const row of rows) {
+                    for (const cell of row) {
+                        const val = (cell || "").trim();
+                        const sMatch = val.match(/speed\[(\d+)\]/);
+                        if (sMatch) baseSpeed = parseInt(sMatch[1]);
+                        if (val.includes('=') && !val.includes(' ')) {
+                            const [code, name] = val.split('=').map(s => s.trim());
+                            colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
+                        }
+                    }
+                }
+
+                const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
+                const colIdx = { ru: 0, en: 1, jp: 2 }[targetLang];
+
+                let items = [];
+                for (let i = 1; i < rows.length; i++) {
+                    let text = (rows[i][colIdx] || "").trim();
+                    if (!text) continue;
+                    const colorInput = (rows[i][3] || "").trim();
+                    let finalColor = colorMapTable[colorInput] || (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
+                    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+                    items.push(`<span style="color:${finalColor}">${text}</span>`);
+                }
+
+                if (items.length === 0) {
+                    tickerInner.innerHTML = `<div class="ticker__group"><span>СИСТЕМА ГОТОВА</span></div>`;
+                    tickerInner.classList.add('is-blinking');
+                } else {
+                    const content = items.join('');
+                    tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+
+                    // フォント読み込みを待つ
+                    await document.fonts.ready;
+
+                    // 描画が確定するのを待ってから計測
+                    requestAnimationFrame(() => {
+                        const group = tickerInner.querySelector('.ticker__group');
+                        if (group) {
+                            // これで「100vw ＋ 文字幅」の合計距離が正確に取れる
+                            const totalDistance = group.getBoundingClientRect().width;
+
+                            // 時間 ＝ 距離 ÷ 速度
+                            const durationSeconds = totalDistance / Math.max(baseSpeed, 1);
+
+                            tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
+                            tickerInner.classList.add('is-scrolling');
+                        }
+                    });
+                }
+            } catch (err) {
+                console.error("Ticker Error:", err);
+            }
+        }
+    </script>
+</body>
+
+</html>
