@@ -474,7 +474,7 @@
         status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Недоступно' },
         months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
         months_short: ['Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-        last_update_label: 'Обновлено:', org_tooltip: 'Открыть оригинал'
+        last_update_label: 'Обновлено:', org_tooltip: 'Открыть оригинал', no_news: 'Нет новых объявлений'
       },
       en: {
         title: 'Developer Page @Kamoinformburo',
@@ -483,14 +483,14 @@
         status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Unavailable' },
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        last_update_label: 'Updated:', org_tooltip: 'Open original'
+        last_update_label: 'Updated:', org_tooltip: 'Open original', no_news: 'No announcements at this time'
       },
       ja: {
         title: 'Developer Page @Камоинформбюро',
         subtitle: '公開されたドキュメントとリソースの概要',
         headers: { date: '日付', files: 'ファイル', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル', thumbnail: 'プレビュー' },
         status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '利用不可' },
-        last_update_label: '更新日:', org_tooltip: 'オリジナルファイルを開く'
+        last_update_label: '更新日:', org_tooltip: 'オリジナルファイルを開く', no_news: '現在、お知らせはありません。'
       }
     };
 
@@ -650,77 +650,84 @@
     });
     window.addEventListener('resize', () => renderPage(localStorage.getItem('lang') || 'ru'));
 
-    async function updateLEDTicker(langCode) {
-      const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1347522952";
-      const tickerInner = document.getElementById('ticker-inner');
-      if (!tickerInner) return;
+      async function updateLEDTicker(langCode) {
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1347522952";
+        const tickerInner = document.getElementById('ticker-inner');
+        if (!tickerInner) return;
 
-      // 完全にリセット
-      tickerInner.classList.remove('is-scrolling', 'is-blinking');
-      tickerInner.innerHTML = '';
+        // 完全にリセット
+        tickerInner.classList.remove('is-scrolling', 'is-blinking');
+        tickerInner.innerHTML = '';
 
-      try {
-        const response = await fetch(sheetUrl);
-        const csvText = await response.text();
-        const rows = parseCSV(csvText);
+        try {
+          const response = await fetch(sheetUrl);
+          const csvText = await response.text();
+          const rows = parseCSV(csvText);
 
-        let baseSpeed = 100;
-        const colorMapTable = { "default": "#bd5d3a" };
+          let baseSpeed = 100;
+          const colorMapTable = { "default": "#bd5d3a" };
 
-        for (const row of rows) {
-          for (const cell of row) {
-            const val = (cell || "").trim();
-            const sMatch = val.match(/speed\[(\d+)\]/);
-            if (sMatch) baseSpeed = parseInt(sMatch[1]);
-            if (val.includes('=') && !val.includes(' ')) {
-              const [code, name] = val.split('=').map(s => s.trim());
-              colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
+          for (const row of rows) {
+            for (const cell of row) {
+              const val = (cell || "").trim();
+              const sMatch = val.match(/speed\[(\d+)\]/);
+              if (sMatch) baseSpeed = parseInt(sMatch[1]);
+              if (val.includes('=') && !val.includes(' ')) {
+                const [code, name] = val.split('=').map(s => s.trim());
+                colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
+              }
             }
           }
+
+          const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
+          const colIdx = { ru: 0, en: 1, jp: 2 }[targetLang];
+          const pageId = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+
+          let items = [];
+          for (let i = 1; i < rows.length; i++) {
+            let showVal = (rows[i][5] || "").trim().toLowerCase();
+            if (!showVal) continue; // 未設定（空白）なら表示しない
+
+            const targetPages = showVal.split(/[,|\s]+/).map(s => s.trim());
+            if (!targetPages.includes('all') && !targetPages.includes(pageId)) continue;
+            // 'all' でもなく、現在のページ名とも一致しない場合はスキップ
+            let text = (rows[i][colIdx] || "").trim();
+            if (!text) continue;
+            const colorInput = (rows[i][3] || "").trim();
+            let finalColor = colorMapTable[colorInput] || (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
+            text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+            items.push(`<span style="color:${finalColor}">${text}</span>`);
+          }
+
+          if (items.length === 0) {
+            tickerInner.innerHTML = `<div class="ticker__group"><span>${translations[langCode].no_news}</span></div>`;
+            tickerInner.classList.add('is-blinking');
+          } else {
+            const content = items.join('');
+            tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+
+            // フォント読み込みを待つ
+            await document.fonts.ready;
+
+            // 描画が確定するのを待ってから計測
+            requestAnimationFrame(() => {
+              const group = tickerInner.querySelector('.ticker__group');
+              if (group) {
+                // これで「100vw ＋ 文字幅」の合計距離が正確に取れる
+                const totalDistance = group.getBoundingClientRect().width;
+
+                // 時間 ＝ 距離 ÷ 速度
+                const durationSeconds = totalDistance / Math.max(baseSpeed, 1);
+
+                tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
+                tickerInner.classList.add('is-scrolling');
+              }
+            });
+          }
+        } catch (err) {
+          console.error("Ticker Error:", err);
         }
-
-        const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
-        const colIdx = { ru: 0, en: 1, jp: 2 }[targetLang];
-
-        let items = [];
-        for (let i = 1; i < rows.length; i++) {
-          let text = (rows[i][colIdx] || "").trim();
-          if (!text) continue;
-          const colorInput = (rows[i][3] || "").trim();
-          let finalColor = colorMapTable[colorInput] || (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
-          text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
-          items.push(`<span style="color:${finalColor}">${text}</span>`);
-        }
-
-        if (items.length === 0) {
-          tickerInner.innerHTML = `<div class="ticker__group"><span>СИСТЕМА ГОТОВА</span></div>`;
-          tickerInner.classList.add('is-blinking');
-        } else {
-          const content = items.join('');
-          tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
-
-          // フォント読み込みを待つ
-          await document.fonts.ready;
-
-          // 描画が確定するのを待ってから計測
-          requestAnimationFrame(() => {
-            const group = tickerInner.querySelector('.ticker__group');
-            if (group) {
-              // これで「100vw ＋ 文字幅」の合計距離が正確に取れる
-              const totalDistance = group.getBoundingClientRect().width;
-
-              // 時間 ＝ 距離 ÷ 速度
-              const durationSeconds = totalDistance / Math.max(baseSpeed, 1);
-
-              tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
-              tickerInner.classList.add('is-scrolling');
-            }
-          });
-        }
-      } catch (err) {
-        console.error("Ticker Error:", err);
       }
-    }
   </script>
 </body>
 

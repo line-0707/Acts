@@ -657,8 +657,7 @@
 
       // 完全にリセット
       tickerInner.classList.remove('is-scrolling', 'is-blinking');
-      tickerInner.innerHTML = `<div class="ticker__group"><span>${translations[langCode].no_news}</span></div>`;
-      tickerInner.classList.add('is-blinking');
+      tickerInner.innerHTML = '';
 
       try {
         const response = await fetch(sheetUrl);
@@ -682,9 +681,16 @@
 
         const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
         const colIdx = { ru: 0, en: 1, jp: 2 }[targetLang];
+        const pageId = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
 
         let items = [];
         for (let i = 1; i < rows.length; i++) {
+          let showVal = (rows[i][5] || "").trim().toLowerCase();
+          if (!showVal) continue; // 未設定（空白）なら表示しない
+
+          const targetPages = showVal.split(/[,|\s]+/).map(s => s.trim());
+          if (!targetPages.includes('all') && !targetPages.includes(pageId)) continue;
+          // 'all' でもなく、現在のページ名とも一致しない場合はスキップ
           let text = (rows[i][colIdx] || "").trim();
           if (!text) continue;
           const colorInput = (rows[i][3] || "").trim();
@@ -694,7 +700,7 @@
         }
 
         if (items.length === 0) {
-          tickerInner.innerHTML = `<div class="ticker__group"><span>СИСТЕМА ГОТОВА</span></div>`;
+          tickerInner.innerHTML = `<div class="ticker__group"><span>${translations[langCode].no_news}</span></div>`;
           tickerInner.classList.add('is-blinking');
         } else {
           const content = items.join('');
