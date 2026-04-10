@@ -650,84 +650,91 @@
     });
     window.addEventListener('resize', () => renderPage(localStorage.getItem('lang') || 'ru'));
 
-    async function updateLEDTicker(langCode) {
-      const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1347522952";
-      const tickerInner = document.getElementById('ticker-inner');
-      if (!tickerInner) return;
+  async function updateLEDTicker(langCode) {
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1347522952";
+    const tickerInner = document.getElementById('ticker-inner');
+    if (!tickerInner) return;
 
-      // 完全にリセット
-      tickerInner.classList.remove('is-scrolling', 'is-blinking');
-      tickerInner.innerHTML = '';
+    // UIの状態をリセット
+    tickerInner.classList.remove('is-scrolling', 'is-blinking');
+    tickerInner.innerHTML = '<span>Loading...</span>';
 
-      try {
-        const response = await fetch(sheetUrl);
-        const csvText = await response.text();
-        const rows = parseCSV(csvText);
+    try {
+      const response = await fetch(sheetUrl);
+      const csvText = await response.text();
+      const rows = parseCSV(csvText);
 
-        let baseSpeed = 100;
-        const colorMapTable = { "default": "#bd5d3a" };
+      let baseSpeed = 100;
+      const colorMapTable = { "default": "#bd5d3a" };
 
-        for (const row of rows) {
-          for (const cell of row) {
-            const val = (cell || "").trim();
-            const sMatch = val.match(/speed\[(\d+)\]/);
-            if (sMatch) baseSpeed = parseInt(sMatch[1]);
-            if (val.includes('=') && !val.includes(' ')) {
-              const [code, name] = val.split('=').map(s => s.trim());
-              colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
-            }
+      // スピードとカラーマップの解析
+      for (const row of rows) {
+        for (const cell of row) {
+          const val = (cell || "").trim();
+          const sMatch = val.match(/speed\[(\d+)\]/);
+          if (sMatch) baseSpeed = parseInt(sMatch[1]);
+          if (val.includes('=') && !val.includes(' ')) {
+            const [code, name] = val.split('=').map(s => s.trim());
+            colorMapTable[name] = code.startsWith('#') ? code : '#' + code;
           }
         }
-
-        const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
-        const colIdx = { ru: 0, en: 1, jp: 2 }[targetLang];
-        const pageId = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
-
-        let items = [];
-        for (let i = 1; i < rows.length; i++) {
-          let showVal = (rows[i][4] || "").trim().toLowerCase();
-          if (!showVal) continue; // 未設定（空白）なら表示しない
-
-          const targetPages = showVal.split(/[,|\s]+/).map(s => s.trim());
-          if (!targetPages.includes('all') && !targetPages.includes(pageId)) continue;
-          // 'all' でもなく、現在のページ名とも一致しない場合はスキップ
-          let text = (rows[i][colIdx] || "").trim();
-          if (!text) continue;
-          const colorInput = (rows[i][3] || "").trim();
-          let finalColor = colorMapTable[colorInput] || (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
-          text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
-          items.push(`<span style="color:${finalColor}">${text}</span>`);
-        }
-
-        if (items.length === 0) {
-          tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
-          tickerInner.classList.add('is-blinking');
-        } else {
-          const content = items.join('');
-          tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
-
-          // フォント読み込みを待つ
-          await document.fonts.ready;
-
-          // 描画が確定するのを待ってから計測
-          requestAnimationFrame(() => {
-            const group = tickerInner.querySelector('.ticker__group');
-            if (group) {
-              // これで「100vw ＋ 文字幅」の合計距離が正確に取れる
-              const totalDistance = group.getBoundingClientRect().width;
-
-              // 時間 ＝ 距離 ÷ 速度
-              const durationSeconds = totalDistance / Math.max(baseSpeed, 1);
-
-              tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
-              tickerInner.classList.add('is-scrolling');
-            }
-          });
-        }
-      } catch (err) {
-        console.error("Ticker Error:", err);
       }
+
+      const targetLang = (langCode === 'ja' || langCode === 'jp') ? 'jp' : (langCode === 'en' ? 'en' : 'ru');
+      const colIdx = { ru: 0, en: 1, jp: 2 }[targetLang];
+      // 現在のページ名（拡張子なし）を取得
+      const pageId = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+
+      let items = [];
+      for (let i = 1; i < rows.length; i++) {
+        // 5列目 (インデックス4) の show 列を確認
+        let showVal = (rows[i][4] || "").trim().toLowerCase();
+        if (!showVal) continue; // 未設定なら表示しない
+
+        // カンマやスペースで分割して現在のページが含まれているか、または 'all' かを確認
+        const targetPages = showVal.split(/[,|\s]+/).map(s => s.trim());
+        if (!targetPages.includes('all') && !targetPages.includes(pageId)) continue;
+
+        let text = (rows[i][colIdx] || "").trim();
+        if (!text) continue;
+
+        const colorInput = (rows[i][3] || "").trim();
+        let finalColor = colorMapTable[colorInput] || (colorInput.match(/^[0-9a-fA-F]{6}$/) ? '#' + colorInput : "#bd5d3a");
+
+        // Markdown風装飾の適用
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>');
+        items.push(`<span style="color:${finalColor}">${text}</span>`);
+      }
+
+      if (items.length === 0) {
+        // お知らせがない場合：デフォルト色で点滅
+        tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
+        tickerInner.classList.add('is-blinking');
+      } else {
+        // お知らせがある場合：内容を連結してスクロール
+        const content = items.join('');
+        tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+
+        // フォントの準備を待ってからアニメーション計算
+        await document.fonts.ready;
+
+        requestAnimationFrame(() => {
+          const group = tickerInner.querySelector('.ticker__group');
+          if (group) {
+            const totalDistance = group.getBoundingClientRect().width;
+            const durationSeconds = totalDistance / Math.max(baseSpeed, 1);
+            tickerInner.style.setProperty('--ticker-duration', `${durationSeconds}s`);
+            tickerInner.classList.add('is-scrolling');
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Ticker Error:", err);
+      // エラー時（リンク切れ等）：デフォルト色でメッセージを点滅表示
+      tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
+      tickerInner.classList.add('is-blinking');
     }
+  }
   </script>
 </body>
 
