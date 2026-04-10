@@ -685,7 +685,7 @@
 
           let items = [];
           for (let i = 1; i < rows.length; i++) {
-            let showVal = (rows[i][5] || "").trim().toLowerCase();
+            let showVal = (rows[i][4] || "").trim().toLowerCase();
             if (!showVal) continue; // 未設定（空白）なら表示しない
 
             const targetPages = showVal.split(/[,|\s]+/).map(s => s.trim());
