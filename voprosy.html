@@ -433,66 +433,66 @@
 </head>
 
 <body>
-        <div class="content-wrapper">
-            <div class="top-controls">
-                <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
-                <div class="lang-switcher">
-                    <button data-lang="ru" class="control-button active">RU</button>
-                    <button data-lang="en" class="control-button">EN</button>
-                    <button data-lang="ja" class="control-button">JP</button>
-                </div>
-            </div>
-            <div class="header">
-                <a href="https://line-0707.github.io/Kamoinformbyuro/voprosy.html">
-                    <img src="https://line-0707.github.io/Kamoinformbyuro/source/sov.webp" alt="Site Icon">
-                </a>
-                <div>
-                    <h1><a href="https://line-0707.github.io/Kamoinformbyuro/voprosy.html" id="site-title"></a></h1>
-                    <h2 id="site-subtitle"></h2>
-                </div>
-            </div>
-            <div id="led-ticker-container" class="ticker-wrapper">
-                <div class="ticker" role="marquee">
-                    <div id="ticker-inner" class="ticker__inner">
-                        <span>Loading...</span>
-                    </div>
-                </div>
-            </div>
-            <div id="table-container">
-                <div class="loader">Loading data from Google Sheet...</div>
+    <div class="content-wrapper">
+        <div class="top-controls">
+            <button id="theme-toggle" class="control-button" title="Toggle theme"></button>
+            <div class="lang-switcher">
+                <button data-lang="ru" class="control-button active">RU</button>
+                <button data-lang="en" class="control-button">EN</button>
+                <button data-lang="ja" class="control-button">JP</button>
             </div>
         </div>
+        <div class="header">
+            <a href="https://line-0707.github.io/Kamoinformbyuro/voprosy.html">
+                <img src="https://line-0707.github.io/Kamoinformbyuro/source/sov.webp" alt="Site Icon">
+            </a>
+            <div>
+                <h1><a href="https://line-0707.github.io/Kamoinformbyuro/voprosy.html" id="site-title"></a></h1>
+                <h2 id="site-subtitle"></h2>
+            </div>
+        </div>
+        <div id="led-ticker-container" class="ticker-wrapper">
+            <div class="ticker" role="marquee">
+                <div id="ticker-inner" class="ticker__inner">
+                    <span>Loading...</span>
+                </div>
+            </div>
+        </div>
+        <div id="table-container">
+            <div class="loader">Loading data from Google Sheet...</div>
+        </div>
+    </div>
 
     <script src="common.js"></script>
     <script>
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/1Rvr4RwirK8-ygKXG3Qyq6Bf4OvGZ7YjsxiAb4ZI2Xeo/export?format=csv&gid=1224757449';
-            const translations = {
-                ru: {
-                    title: 'Часто задаваемые вопросы @Камоинформбюро',
-                    subtitle: '',
-                    headers: { date: 'дата', files: 'Название товара', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'оригиналы', thumbnail: 'превью' },
-                    status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Недоступно' },
-                    months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-                    months_short: ['Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                    last_update_label: 'Обновлено:', org_tooltip: 'Открыть оригинал', no_news: 'Нет новых объявлений'
-                },
-                en: {
-                    title: 'Frequently Asked Questions @Kamoinformburo',
-                    subtitle: '',
-                    headers: { date: 'date', files: 'Item Names', description: 'description', status: 'status', last_update: 'last update', org: 'оriginals', thumbnail: 'preview' },
-                    status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Unavailable' },
-                    months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-                    months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                    last_update_label: 'Updated:', org_tooltip: 'Open original', no_news: 'No announcements at this time'
-                },
-                ja: {
-                    title: 'Q&A集 @Камоинформбюро',
-                    subtitle: 'よくある質問とそれに対する回答',
-                    headers: { date: '日付', files: '項目名', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル', thumbnail: 'プレビュー' },
-                    status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '利用不可' },
-                    last_update_label: '更新日:', org_tooltip: 'オリジナルファイルを開く', no_news: '現在、お知らせはありません。'
-                }
-            };
+        const translations = {
+            ru: {
+                title: 'Часто задаваемые вопросы @Камоинформбюро',
+                subtitle: '',
+                headers: { date: 'дата', files: 'Название товара', description: 'описание', status: 'статус', last_update: 'последнее обновление', org: 'оригиналы', thumbnail: 'превью' },
+                status_text: { g: 'Доступен', ex: 'Истек срок', e: 'В разработке', b: 'Недоступно' },
+                months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+                months_short: ['Янв', 'Фев', 'Мар', 'Апр', 'Мая', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                last_update_label: 'Обновлено:', org_tooltip: 'Открыть оригинал', no_news: 'Нет новых объявлений'
+            },
+            en: {
+                title: 'Frequently Asked Questions @Kamoinformburo',
+                subtitle: '',
+                headers: { date: 'date', files: 'Item Names', description: 'description', status: 'status', last_update: 'last update', org: 'оriginals', thumbnail: 'preview' },
+                status_text: { g: 'Available', ex: 'Expired', e: 'Incomplete', b: 'Unavailable' },
+                months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                months_short: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                last_update_label: 'Updated:', org_tooltip: 'Open original', no_news: 'No announcements at this time'
+            },
+            ja: {
+                title: 'Q&A集 @Камоинформбюро',
+                subtitle: 'よくある質問とそれに対する回答',
+                headers: { date: '日付', files: '項目名', description: '説明', status: '状態', last_update: '最終更新', org: '元ファイル', thumbnail: 'プレビュー' },
+                status_text: { g: '利用可能', ex: '期限切れ', e: '未完成', b: '利用不可' },
+                last_update_label: '更新日:', org_tooltip: 'オリジナルファイルを開く', no_news: '現在、お知らせはありません。'
+            }
+        };
 
         let fullData = [];
         let columnIndices = {};
@@ -700,11 +700,11 @@
                 }
 
                 if (items.length === 0) {
-                    tickerInner.innerHTML = `<div class="ticker__group"><span>${translations[langCode].no_news}</span></div>`;
+                    tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
                     tickerInner.classList.add('is-blinking');
                 } else {
                     const content = items.join('');
-                    tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+                    tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
 
                     // フォント読み込みを待つ
                     await document.fonts.ready;

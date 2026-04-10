@@ -700,11 +700,11 @@
         }
 
         if (items.length === 0) {
-          tickerInner.innerHTML = `<div class="ticker__group"><span>${translations[langCode].no_news}</span></div>`;
+          tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
           tickerInner.classList.add('is-blinking');
         } else {
           const content = items.join('');
-          tickerInner.innerHTML = `<div class="ticker__group">${content}</div><div class="ticker__group">${content}</div>`;
+          tickerInner.innerHTML = `<div class="ticker__group"><span style="color:#bd5d3a">${translations[langCode].no_news}</span></div>`;
 
           // フォント読み込みを待つ
           await document.fonts.ready;
