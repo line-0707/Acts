@@ -1,3 +1,5 @@
+--- START OF FILE index.html ---
+
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -138,8 +140,20 @@
       background-color: var(--even-row-bg-color);
     }
 
-    tbody tr:hover:not(.category-row) {
+    /* リンクがある行のみホバー効果を適用 */
+    tbody tr:hover:not(.category-row):not(.no-link-row) {
       background-color: var(--hover-bg-color);
+    }
+
+    /* リンクがない行のスタイル設定 */
+    .no-link-row {
+      cursor: default !important;
+    }
+
+    .no-link-row a {
+      pointer-events: none;
+      text-decoration: none;
+      color: inherit;
     }
 
     /* PC版カテゴリー行：左寄せ */
@@ -310,6 +324,11 @@
         padding: 15px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         overflow: hidden;
+      }
+
+      /* モバイルリンクなし時の影無効化(任意) */
+      tr.data-row.no-link-row {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
       }
 
       /* モバイルサムネイル：カード上部密着 */
@@ -563,10 +582,17 @@
           td.textContent = fText.match(/\[(.*?)\]/) ? fText.match(/\[(.*?)\]/)[1] : fText.replace(/cat\[|\]/g, '');
           tr.appendChild(td);
         } else {
-          tr.className = 'data-row'; const link = (row[columnIndices['link']] || '').trim(), ytId = getYouTubeId(link);
-          const status = getStatusConfig((row[columnIndices['status']] || '').trim().toLowerCase(), lang, isDarkMode);
+          tr.className = 'data-row';
+          const link = (row[columnIndices['link']] || '').trim(), ytId = getYouTubeId(link);
+          const rawStatus = (row[columnIndices['status']] || '').trim().toLowerCase();
+          const status = getStatusConfig(rawStatus, lang, isDarkMode);
+
+          // リンク無効化条件: URLがない、またはステータスが 'b'
+          const isLinkDisabled = !link || rawStatus === 'b';
+          if (isLinkDisabled) tr.classList.add('no-link-row');
+
           if (isMobile) {
-            if (ytId) {
+            if (ytId && !isLinkDisabled) {
               tr.classList.add('yt-layout'); const thumb = document.createElement('div'); thumb.className = 'mobile-thumb';
               const aT = document.createElement('a'); aT.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link;
               aT.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg">`; thumb.appendChild(aT); tr.appendChild(thumb);
@@ -576,8 +602,13 @@
               const sS = document.createElement('span'); sS.className = 'mobile-status'; sS.style.backgroundColor = status.bgColor; sS.style.color = status.color;
               sS.innerHTML = `<span style="color:${status.bulletColor}">●</span> ${status.text}`; fTd.appendChild(sS);
             }
-            const aF = document.createElement('a'); aF.textContent = fText; aF.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link;
-            fTd.appendChild(aF); tr.appendChild(fTd);
+            if (isLinkDisabled) {
+              const spanF = document.createElement('span'); spanF.textContent = fText; fTd.appendChild(spanF);
+            } else {
+              const aF = document.createElement('a'); aF.textContent = fText; aF.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link;
+              fTd.appendChild(aF);
+            }
+            tr.appendChild(fTd);
             const mR = document.createElement('div'); mR.className = 'mobile-meta-row';
             const upd = formatDate((row[columnIndices['last_update']] || '').trim(), lang, true);
             mR.innerHTML = `<div class="td-last_update">${upd ? translations[lang].last_update_label + ' ' + upd : ''}</div>`;
@@ -588,10 +619,14 @@
             visibleHeadersInfo.forEach(({ header, index, isVirtual }) => {
               const td = document.createElement('td'); const norm = normalizeHeader(header); td.className = 'td-' + norm;
               if (isVirtual && norm === 'thumbnail') {
-                if (ytId) { const aT = document.createElement('a'); aT.href = link; aT.target = "_blank"; aT.innerHTML = `<div class="thumb-wrapper"><img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" class="thumb-img"></div>`; td.appendChild(aT); }
+                if (ytId && !isLinkDisabled) { const aT = document.createElement('a'); aT.href = link; aT.target = "_blank"; aT.innerHTML = `<div class="thumb-wrapper"><img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" class="thumb-img"></div>`; td.appendChild(aT); }
                 else { td.textContent = '—'; }
               } else if (norm === 'files') {
-                const a = document.createElement('a'); a.textContent = fText; a.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link; td.appendChild(a);
+                if (isLinkDisabled) {
+                  td.textContent = fText;
+                } else {
+                  const a = document.createElement('a'); a.textContent = fText; a.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link; td.appendChild(a);
+                }
               } else if (norm === 'description') {
                 let d = (row[columnIndices['description']] || '').trim(); if (lang === 'en' && row[columnIndices['desc_en']]) d = row[columnIndices['desc_en']].trim(); else if (lang === 'ja' && row[columnIndices['desc_ja']]) d = row[columnIndices['desc_ja']].trim(); td.textContent = d;
               } else if (norm === 'status') {
