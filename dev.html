@@ -546,14 +546,42 @@
         }
         const headers = fullData[0];
         headers.forEach((h, i) => { columnIndices[normalizeHeader(h)] = i; });
-        hasAnyYouTube = fullData.some((row, i) => i > 0 && getYouTubeId(row[columnIndices['link']]));
+
+        // --- YouTube判定の安全性を強化 ---
+        const linkIdx = columnIndices['link'];
+        hasAnyYouTube = fullData.some((row, i) => {
+          // ヘッダー行はスキップ
+          if (i === 0) return false;
+          // 列が足りない、または中身が空の行はスキップ
+          if (!row || row.length <= linkIdx) return false;
+
+          const linkVal = (row[linkIdx] || "").trim();
+          // リンクが存在し、かつYouTube IDが正しく取得できる場合のみtrue
+          return linkVal !== "" && getYouTubeId(linkVal) !== null;
+        });
+        // -------------------------------
+
         visibleHeadersInfo = [];
         let thumbInserted = false;
         headers.forEach((header, index) => {
           const norm = normalizeHeader(header);
-          if (norm === 'status' && hasAnyYouTube && !thumbInserted) { visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true }); thumbInserted = true; }
-          if (!columnsToHide.has(norm)) visibleHeadersInfo.push({ header, index, isVirtual: false });
-          if (norm === 'description' && hasAnyYouTube && !thumbInserted) { visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true }); thumbInserted = true; }
+
+          // ステータス列の前にサムネイルを入れる判定（YouTubeがある場合）
+          if (norm === 'status' && hasAnyYouTube && !thumbInserted) {
+            visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+            thumbInserted = true;
+          }
+
+          // 非表示リストに入っていない列のみ追加
+          if (!columnsToHide.has(norm)) {
+            visibleHeadersInfo.push({ header, index, isVirtual: false });
+          }
+
+          // 説明列の後にサムネイルを入れる判定（上記で入らなかった場合のみ）
+          if (norm === 'description' && hasAnyYouTube && !thumbInserted) {
+            visibleHeadersInfo.push({ header: 'thumbnail', index: -1, isVirtual: true });
+            thumbInserted = true;
+          }
         });
         renderPage(localStorage.getItem('lang') || 'ru');
       });
