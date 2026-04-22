@@ -503,11 +503,11 @@
     function parseCSV(csvText) { const lines = csvText.replace(/\r\n/g, '\n').split('\n'); return lines.map(line => { const r = []; let c = '', i = !1; for (let t = 0; t < line.length; t++) { const e = line[t]; if ('"' === e && i) { t + 1 < line.length && '"' === line[t + 1] ? (c += '"', t++) : i = !1 } else '"' === e && !i ? i = !0 : ',' === e && !i ? (r.push(c), c = '') : c += e } return r.push(c), r }) };
     function normalizeHeader(header) { return (header || '').trim().replace(/^"|"$/g, '').toLowerCase(); };
     function getYouTubeId(url) {
-      if (!url) return null;
-      // youtube.com または youtu.be を含むか厳格にチェック
-      const m = url.match(/^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/|shorts\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/);
-      return (m && m[1].length === 11) ? m[1] : null;
-    }
+        if (!url || typeof url !== 'string' || !url.includes('youtu')) return null;
+        // ドメイン（youtube.com / youtu.be）を厳格にチェックし、11桁のIDを抽出する正規表現
+        const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i);
+        return m ? m[1] : null;
+      }
 
     function formatDate(dateString, lang, useShort = false) {
       if (!dateString || typeof dateString !== 'string') return dateString;
@@ -597,17 +597,10 @@
           if (isLinkDisabled) tr.classList.add('no-link-row');
 
           if (isMobile) {
-            // ytId が確実に存在する場合のみ .yt-layout を追加してサムネイルを表示
             if (ytId && !isLinkDisabled) {
-              tr.classList.add('yt-layout');
-              const thumb = document.createElement('div');
-              thumb.className = 'mobile-thumb';
-              const aT = document.createElement('a');
-              // PDFならビューアー、そうでなければ直接リンク
-              aT.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link;
-              aT.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg">`;
-              thumb.appendChild(aT);
-              tr.appendChild(thumb);
+              tr.classList.add('yt-layout'); const thumb = document.createElement('div'); thumb.className = 'mobile-thumb';
+              const aT = document.createElement('a'); aT.href = link.toLowerCase().endsWith('.pdf') ? `pdfviewer/web/viewer.html?file=${encodeURIComponent(link)}` : link;
+              aT.innerHTML = `<img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg">`; thumb.appendChild(aT); tr.appendChild(thumb);
             }
             const fTd = document.createElement('td'); fTd.className = 'td-files';
             if (status) {
